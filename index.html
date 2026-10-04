@@ -11,6 +11,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#4F46E5">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -416,7 +417,7 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
           <h1>ศูนย์รวมระบบสารสนเทศและการเรียนรู้</h1>
           <p>รวบรวมสื่อการสอน แผนการสอน ใบงาน เอกสาร และระบบออนไลน์ทั้งหมดของครูซอสไว้ในที่เดียว เพื่อการทำงานที่รวดเร็วและทันสมัย</p>
           <div class="hero-actions">
-            <button class="btn primary" id="btnEnterHub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>เข้าสู่คลังจัดการระบบ</button>
+            <button class="btn primary" id="btnEnterHub" style="font-size:16px;padding:12px 28px;box-shadow:0 8px 24px rgba(79,70,229,0.35);font-weight:600"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>🚀 เข้าสู่หน้าระบบ</button>
             <button class="btn" id="btnSpotlightHero"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>ค้นหาด่วน (Ctrl+K)</button>
           </div>
         </div>
@@ -798,6 +799,14 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
      ========================================================================== -->
 <script>
 (function(){
+/* ---------- Core DOM & String Helpers ---------- */
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function normUrl(u){ u = (u||"").trim(); if(u && !/^https?:\/\//i.test(u)) u = "https://" + u; return u; }
+function host(u){ try{ return new URL(u).host; }catch(e){ return u; } }
+
 /* ---------- Firebase Project Config (ts010-2bf5d) ---------- */
 const DEFAULT_FB_CONFIG = {
   apiKey: "AIzaSyAIATPSYlkNRQWBVgE32_zMN5lJ8X_t-wQ",
@@ -930,27 +939,17 @@ function applyAnnouncementUI(){
   const bar = $("#announceBanner");
   const txt = $("#announceText");
   if(!bar) return;
-  if(announcement.enable && announcement.text.trim()){
+  if(announcement.enable && announcement.text && announcement.text.trim()){
     txt.textContent = announcement.text;
     bar.style.display = "flex";
   } else {
     bar.style.display = "none";
   }
-  $("#setAnnounceInput").value = announcement.text;
-  $("#setAnnounceEnable").checked = announcement.enable;
+  const inp = $("#setAnnounceInput");
+  const chk = $("#setAnnounceEnable");
+  if(inp) inp.value = announcement.text || "";
+  if(chk) chk.checked = !!announcement.enable;
 }
-
-$("#closeAnnounceBtn").onclick = () => {
-  $("#announceBanner").style.display = "none";
-};
-
-$("#btnSaveAnnounce").onclick = () => {
-  announcement.text = $("#setAnnounceInput").value.trim();
-  announcement.enable = $("#setAnnounceEnable").checked;
-  persist();
-  applyAnnouncementUI();
-  toast("บันทึกประกาศเรียบร้อย 📢");
-};
 
 /* ---------- Click Analytics (ฟีเจอร์ที่ 1: นับการคลิก) ---------- */
 function recordClick(id){
@@ -963,12 +962,7 @@ function recordClick(id){
   }
 }
 
-/* ---------- Helpers ---------- */
-const $ = s => document.querySelector(s);
-const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
-function normUrl(u){ u = (u||"").trim(); if(u && !/^https?:\/\//i.test(u)) u = "https://" + u; return u; }
-function host(u){ try{ return new URL(u).host; }catch(e){ return u; } }
+/* ---------- Rendering Helpers ---------- */
 function autoShot(u){ return "https://image.thum.io/get/width/1000/crop/700/" + u; }
 function imgOf(it){ if(it.imgMode === "auto") return autoShot(it.url); if(it.imgMode === "none") return ""; return it.img || ""; }
 function catOf(it){ return cats.find(c => c.id === it.cat) || null; }
@@ -1917,6 +1911,24 @@ $("#brandBtn").onclick = () => go("landing");
 $("#mobPortalBtn").onclick = () => go("landing");
 $("#btnEnterHub").onclick = () => go("all");
 $("#btnViewAllTop").onclick = () => go("all");
+
+/* Announcement Banner Controls */
+const closeAnnounceBtn = $("#closeAnnounceBtn");
+if(closeAnnounceBtn) closeAnnounceBtn.onclick = () => {
+  const b = $("#announceBanner");
+  if(b) b.style.display = "none";
+};
+
+const btnSaveAnnounce = $("#btnSaveAnnounce");
+if(btnSaveAnnounce) btnSaveAnnounce.onclick = () => {
+  const inp = $("#setAnnounceInput");
+  const chk = $("#setAnnounceEnable");
+  if(inp) announcement.text = inp.value.trim();
+  if(chk) announcement.enable = chk.checked;
+  persist();
+  applyAnnouncementUI();
+  toast("บันทึกประกาศเรียบร้อย 📢");
+};
 
 /* Sidebar Controls */
 $("#manageCatsBtn").onclick = () => requireOwner(openCatManager);
