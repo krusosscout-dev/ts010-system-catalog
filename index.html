@@ -298,20 +298,83 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
 .toast.show{opacity:1;transform:translate(-50%,0)}
 .scrim{display:none}
 
+/* ---------- Mobile Bottom Navigation Bar ---------- */
+.bottom-nav{display:none}
+.mobile-bar{display:none !important}
+
 @media (max-width:900px){
-  .app{grid-template-columns:1fr}
-  aside.side{position:fixed;left:0;top:0;bottom:0;width:min(280px,85vw);z-index:60;transform:translateX(-102%);transition:transform .22s ease;padding-top:calc(20px + env(safe-area-inset-top,0px))}
-  body.menu-open aside.side{transform:none;box-shadow:0 0 60px rgba(0,0,0,0.5)}
-  body.menu-open .scrim{display:block;position:fixed;inset:0;background:rgba(15,23,42,0.5);z-index:55}
-  .mobile-bar{display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:35;background:var(--paper);padding:10px 16px;padding-top:calc(10px + env(safe-area-inset-top,0px));border-bottom:1px solid var(--line)}
-  .mobile-bar .mb-title{font-weight:600;font-size:15px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .view-catalog{padding:16px 14px 60px}
+  .app{grid-template-columns:1fr !important}
+  aside.side{display:none !important}
+  .scrim{display:none !important}
+
+  /* Show Bottom Navigation on Mobile inside Catalog Dashboard */
+  .bottom-nav{
+    display:flex;
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    background:var(--surface-card);
+    backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
+    border-top:1px solid var(--line);
+    padding:6px 12px calc(8px + env(safe-area-inset-bottom,0px));
+    z-index:60;
+    justify-content:space-around;
+    align-items:center;
+    box-shadow:0 -4px 20px rgba(0,0,0,0.06);
+  }
+
+  .app.landing-active .bottom-nav{
+    display:none !important;
+  }
+
+  .view-catalog{
+    padding:16px 14px calc(84px + env(safe-area-inset-bottom,0px)) !important;
+  }
   .analytics-grid{grid-template-columns:1fr}
   .kpi-row{grid-template-columns:repeat(2,1fr)}
 }
 @media (max-width:640px){
   .f-grid{grid-template-columns:1fr}
   .kpi-row{grid-template-columns:1fr}
+}
+
+.b-nav-item{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+  color:var(--muted);
+  text-decoration:none;
+  font-size:11px;
+  font-weight:500;
+  padding:4px 8px;
+  border-radius:12px;
+  background:none;
+  border:none;
+  cursor:pointer;
+  transition:all .15s ease;
+  min-width:54px;
+}
+.b-nav-item .b-icon{font-size:19px;line-height:1;transition:transform .15s ease}
+.b-nav-item.active{color:var(--primary);font-weight:600}
+.b-nav-item.active .b-icon{transform:scale(1.18)}
+.b-nav-add{color:var(--primary)}
+.b-icon-add{
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  background:var(--primary);
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:22px;
+  font-weight:400;
+  box-shadow:0 4px 14px rgba(79,70,229,0.35);
+  margin-bottom:2px;
 }
 </style>
 </head>
@@ -381,13 +444,6 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
       <button class="announce-close" id="closeAnnounceBtn">✕</button>
     </div>
 
-    <!-- Mobile Header -->
-    <div class="mobile-bar">
-      <button class="btn icon-btn" id="menuBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
-      <div class="mb-title" id="mbTitle">ครูซอสสอนสังคม</div>
-      <button class="btn icon-btn" id="mobPortalBtn" title="หน้าแรกสุด"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg></button>
-      <button class="btn primary icon-btn" data-add><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg></button>
-    </div>
 
     <!-- ==============================================
          1. LANDING PORTAL VIEW (หน้าแรกสุด)
@@ -495,6 +551,30 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
         <div class="cards-grid" id="cardsGrid"></div>
       </div>
     </section>
+
+    <!-- Mobile Bottom Navigation (เมนูไอคอนด้านล่างสำหรับจอมือถือ) -->
+    <nav class="bottom-nav" id="bottomNav">
+      <a href="#landing" class="b-nav-item" id="bNavLanding">
+        <span class="b-icon">🚀</span>
+        <span class="b-label">หน้าแรก</span>
+      </a>
+      <a href="#all" class="b-nav-item active" id="bNavAll">
+        <span class="b-icon">📦</span>
+        <span class="b-label">ทั้งหมด</span>
+      </a>
+      <a href="#live" class="b-nav-item" id="bNavLive">
+        <span class="b-icon">🟢</span>
+        <span class="b-label">พร้อมใช้</span>
+      </a>
+      <a href="#dev" class="b-nav-item" id="bNavDev">
+        <span class="b-icon">🛠️</span>
+        <span class="b-label">ห้องทดลอง</span>
+      </a>
+      <button type="button" class="b-nav-item b-nav-add" data-add id="bNavAdd">
+        <span class="b-icon-add">+</span>
+        <span class="b-label">เพิ่มระบบ</span>
+      </button>
+    </nav>
   </main>
 </div>
 
@@ -763,6 +843,10 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const onClick = (sel, fn) => {
+  const el = typeof sel === "string" ? $(sel) : sel;
+  if(el) el.addEventListener("click", fn);
+};
 function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
 function normUrl(u){ u = (u||"").trim(); if(u && !/^https?:\/\//i.test(u)) u = "https://" + u; return u; }
 function host(u){ try{ return new URL(u).host; }catch(e){ return u; } }
@@ -1000,6 +1084,12 @@ function renderNav(){
   $("#navAll").classList.toggle("active", r.page === "catalog" && r.sub === "all");
   $("#navLive").classList.toggle("active", r.page === "catalog" && r.sub === "live");
   $("#navDev").classList.toggle("active", r.page === "catalog" && r.sub === "dev");
+
+  /* Sync Mobile Bottom Nav */
+  if($("#bNavLanding")) $("#bNavLanding").classList.toggle("active", r.page === "landing");
+  if($("#bNavAll")) $("#bNavAll").classList.toggle("active", r.page === "catalog" && r.sub === "all");
+  if($("#bNavLive")) $("#bNavLive").classList.toggle("active", r.page === "catalog" && r.sub === "live");
+  if($("#bNavDev")) $("#bNavDev").classList.toggle("active", r.page === "catalog" && r.sub === "dev");
 
   let h = "";
   cats.forEach(c => {
@@ -1302,8 +1392,8 @@ document.addEventListener("keydown", e => {
     openSpotlight();
   }
 });
-$("#btnSpotlightHero").onclick = openSpotlight;
-$("#btnSideSpotlight").onclick = openSpotlight;
+onClick("#btnSpotlightHero", openSpotlight);
+onClick("#btnSideSpotlight", openSpotlight);
 
 /* ---------- Detail Modal ---------- */
 let curDetailItem = null;
@@ -1596,7 +1686,7 @@ function updateLockUI(){
   if(b) b.style.color = isUnlocked ? "var(--live)" : "var(--side-text)";
 }
 
-$("#ownerLockBtn").onclick = () => {
+onClick("#ownerLockBtn", () => {
   const pin = getLS(PIN_KEY);
   if(!pin){
     const n = prompt("ตั้งรหัส PIN 4 หลักสำหรับล็อกการแก้ไข (ใช้งานคนเดียว):");
@@ -1615,7 +1705,7 @@ $("#ownerLockBtn").onclick = () => {
   } else {
     requireOwner(()=>{});
   }
-};
+});
 
 /* ---------- Instant QR Code Badge System ---------- */
 let currentQrItem = null;
@@ -1866,21 +1956,23 @@ function currentCatForAdd(){
   return (r.sub === "cat" && r.catId) ? r.catId : "";
 }
 
-/* Landing Navigation Buttons */
-$("#brandBtn").onclick = () => go("landing");
-$("#mobPortalBtn").onclick = () => go("landing");
-$("#btnEnterHub").onclick = () => go("all");
-$("#btnViewAllTop").onclick = () => go("all");
+/* Navigation & Landing Buttons */
+onClick("#brandBtn", () => go("landing"));
+onClick("#btnEnterHub", () => go("all"));
+
+/* Mobile Bottom Nav Buttons */
+onClick("#bNavLanding", (e) => { e.preventDefault(); go("landing"); });
+onClick("#bNavAll", (e) => { e.preventDefault(); go("all"); });
+onClick("#bNavLive", (e) => { e.preventDefault(); go("live"); });
+onClick("#bNavDev", (e) => { e.preventDefault(); go("dev"); });
 
 /* Announcement Banner Controls */
-const closeAnnounceBtn = $("#closeAnnounceBtn");
-if(closeAnnounceBtn) closeAnnounceBtn.onclick = () => {
+onClick("#closeAnnounceBtn", () => {
   const b = $("#announceBanner");
   if(b) b.style.display = "none";
-};
+});
 
-const btnSaveAnnounce = $("#btnSaveAnnounce");
-if(btnSaveAnnounce) btnSaveAnnounce.onclick = () => {
+onClick("#btnSaveAnnounce", () => {
   const inp = $("#setAnnounceInput");
   const chk = $("#setAnnounceEnable");
   if(inp) announcement.text = inp.value.trim();
@@ -1888,20 +1980,16 @@ if(btnSaveAnnounce) btnSaveAnnounce.onclick = () => {
   persist();
   applyAnnouncementUI();
   toast("บันทึกประกาศเรียบร้อย 📢");
-};
+});
 
 /* Sidebar Controls */
-$("#manageCatsBtn").onclick = () => requireOwner(openCatManager);
-$("#sideSettingsBtn").onclick = () => openOverlay($("#settingsOverlay"));
-$("#sideSyncPill").onclick = () => openOverlay($("#settingsOverlay"));
-$("#openFbConfigBtn").onclick = () => {
+onClick("#manageCatsBtn", () => requireOwner(openCatManager));
+onClick("#sideSettingsBtn", () => openOverlay($("#settingsOverlay")));
+onClick("#sideSyncPill", () => openOverlay($("#settingsOverlay")));
+onClick("#openFbConfigBtn", () => {
   closeOverlay($("#settingsOverlay"));
   toast("เชื่อมต่อกับ ts010-2bf5d อัตโนมัติแล้ว");
-};
-
-/* Mobile Menu */
-$("#menuBtn").onclick = () => document.body.classList.add("menu-open");
-$("#scrim").onclick = () => document.body.classList.remove("menu-open");
+});
 
 /* Export & Import */
 $("#exportBtn").onclick = () => {
@@ -1951,8 +2039,8 @@ const toggleTheme = () => {
   applyTheme(next);
   setLS("sauce-theme", next);
 };
-$("#themeBtn").onclick = toggleTheme;
-$("#landingThemeBtn").onclick = toggleTheme;
+onClick("#themeBtn", toggleTheme);
+onClick("#landingThemeBtn", toggleTheme);
 
 /* ---------- PWA Installation & Service Worker (ฟีเจอร์ที่ 3) ---------- */
 window.addEventListener("beforeinstallprompt", (e) => {
@@ -1962,16 +2050,17 @@ window.addEventListener("beforeinstallprompt", (e) => {
   if(pwaBtn) pwaBtn.style.display = "flex";
 });
 
-$("#btnPwaInstall").onclick = async () => {
+onClick("#btnPwaInstall", async () => {
   if(!deferredPwaPrompt) return;
   deferredPwaPrompt.prompt();
   const { outcome } = await deferredPwaPrompt.userChoice;
   if(outcome === "accepted"){
     toast("ติดตั้งแอปพลิเคชันเรียบร้อย 🎉");
-    $("#btnPwaInstall").style.display = "none";
+    const p = $("#btnPwaInstall");
+    if(p) p.style.display = "none";
   }
   deferredPwaPrompt = null;
-};
+});
 
 if("serviceWorker" in navigator){
   navigator.serviceWorker.register("./sw.js").then(reg => {
