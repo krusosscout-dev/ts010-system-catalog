@@ -3,497 +3,967 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>คลังระบบของฉัน</title>
+<title>คลังระบบออนไลน์ · ครูซอสสอนสังคม</title>
+
+<!-- Favicon & PWA Icons -->
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="logo-512.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#4F46E5">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@500;600;700&family=Anuphan:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+<!-- Firebase App & Firestore (Compat CDN) -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<!-- QRCode.js for Instant QR Code Badges -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="firebase-config.js" onerror="console.log('firebase-config.js fallback active');"></script>
+
 <style>
 :root{
-  --paper:#EDF0F4; --surface:#FFFFFF; --side:#E3E8EF; --ink:#18202E; --muted:#5B6678;
-  --line:#D3DAE4; --cobalt:#2C47D6; --cobalt-soft:#E3E8FC;
-  --live:#14946B; --live-soft:#DDF3EA; --dev:#B7791F; --dev-soft:#FBEFD9;
-  --off:#8A93A3; --off-soft:#E8EBF0; --danger:#C2362B; --star:#E8A317; --star-off:#CBD2DC;
-  --shadow:0 1px 0 rgba(24,32,46,.06), 0 8px 24px -12px rgba(24,32,46,.25);
-  --display:"Bai Jamjuree","Leelawadee UI","Thonburi",system-ui,sans-serif;
-  --body:"Anuphan","Leelawadee UI","Thonburi",system-ui,sans-serif;
+  --font-main:"Prompt",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --paper:#F8FAFC; --surface:#FFFFFF; --surface-card:rgba(255,255,255,0.92);
+  --side:#0F172A; --side-text:#94A3B8; --side-active:#FFFFFF; --side-hover:#1E293B;
+  --ink:#0F172A; --muted:#64748B; --line:#E2E8F0;
+  --primary:#4F46E5; --primary-hover:#4338CA; --primary-soft:#EEF2FF;
+  --accent:#06B6D4; --accent-glow:rgba(6,182,212,0.18);
+  --live:#10B981; --live-soft:#ECFDF5;
+  --dev:#F59E0B; --dev-soft:#FFFBEB;
+  --off:#94A3B8; --off-soft:#F1F5F9;
+  --danger:#EF4444; --danger-soft:#FEF2F2;
+  --shadow-sm:0 1px 2px rgba(15,23,42,0.04);
+  --shadow:0 4px 20px -2px rgba(15,23,42,0.06), 0 2px 6px -1px rgba(15,23,42,0.03);
+  --shadow-lg:0 20px 30px -8px rgba(79,70,229,0.12), 0 8px 16px -4px rgba(0,0,0,0.04);
+  --radius:16px;
   box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px);
   padding-bottom:env(safe-area-inset-bottom,0px);
 }
+
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
-    --paper:#11161F; --surface:#1A2130; --side:#151B27; --ink:#E6EAF1; --muted:#9AA4B5;
-    --line:#2B3446; --cobalt:#7D93FF; --cobalt-soft:#232D52;
-    --live:#3CCB98; --live-soft:#173A30; --dev:#E5A84A; --dev-soft:#3A2E17;
-    --off:#7C8597; --off-soft:#262D3B; --danger:#F07267; --star:#F2B93B; --star-off:#3A4458;
-    --shadow:0 1px 0 rgba(0,0,0,.3), 0 10px 28px -14px rgba(0,0,0,.7);
+    --paper:#090D16; --surface:#111827; --surface-card:rgba(17,24,39,0.85);
+    --side:#090D16; --side-text:#64748B; --side-active:#F8FAFC; --side-hover:#1F2937;
+    --ink:#F8FAFC; --muted:#94A3B8; --line:#1F2937;
+    --primary:#6366F1; --primary-hover:#4F46E5; --primary-soft:#1E1B4B;
+    --accent:#22D3EE; --accent-glow:rgba(34,211,238,0.15);
+    --live:#10B981; --live-soft:#064E3B;
+    --dev:#F59E0B; --dev-soft:#451A03;
+    --off:#64748B; --off-soft:#1E293B;
+    --danger:#F87171; --danger-soft:#450A0A;
+    --shadow:0 8px 24px -4px rgba(0,0,0,0.5);
+    --shadow-lg:0 20px 40px -10px rgba(0,0,0,0.8);
   }
 }
+
 :root[data-theme="dark"]{
-  --paper:#11161F; --surface:#1A2130; --side:#151B27; --ink:#E6EAF1; --muted:#9AA4B5;
-  --line:#2B3446; --cobalt:#7D93FF; --cobalt-soft:#232D52;
-  --live:#3CCB98; --live-soft:#173A30; --dev:#E5A84A; --dev-soft:#3A2E17;
-  --off:#7C8597; --off-soft:#262D3B; --danger:#F07267; --star:#F2B93B; --star-off:#3A4458;
-  --shadow:0 1px 0 rgba(0,0,0,.3), 0 10px 28px -14px rgba(0,0,0,.7);
+  --paper:#090D16; --surface:#111827; --surface-card:rgba(17,24,39,0.85);
+  --side:#090D16; --side-text:#64748B; --side-active:#F8FAFC; --side-hover:#1F2937;
+  --ink:#F8FAFC; --muted:#94A3B8; --line:#1F2937;
+  --primary:#6366F1; --primary-hover:#4F46E5; --primary-soft:#1E1B4B;
+  --accent:#22D3EE; --accent-glow:rgba(34,211,238,0.15);
+  --live:#10B981; --live-soft:#064E3B;
+  --dev:#F59E0B; --dev-soft:#451A03;
+  --off:#64748B; --off-soft:#1E293B;
+  --danger:#F87171; --danger-soft:#450A0A;
+  --shadow:0 8px 24px -4px rgba(0,0,0,0.5);
+  --shadow-lg:0 20px 40px -10px rgba(0,0,0,0.8);
 }
+
 *,*::before,*::after{box-sizing:inherit}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
-body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font-main);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
 img{max-width:100%;display:block}
 button,input,select,textarea{font:inherit;color:inherit}
-:focus-visible{outline:2px solid var(--cobalt);outline-offset:2px}
+:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
 
-/* ---------- App shell ---------- */
-.app{display:grid;grid-template-columns:268px 1fr;min-height:100vh}
-aside.side{background:var(--side);border-right:1px solid var(--line);position:sticky;top:0;height:100vh;overflow:auto;display:flex;flex-direction:column;padding:22px 14px 18px}
-.brand{font-family:var(--display);font-weight:700;font-size:21px;line-height:1.2;padding:0 10px 18px;display:flex;align-items:center;gap:10px}
-.brand-mark{width:32px;height:32px;border-radius:9px;background:var(--cobalt);display:grid;place-items:center;color:#fff;flex:none}
-.brand-mark svg{width:18px;height:18px}
-.nav{display:flex;flex-direction:column;gap:2px}
-.nav-group{font-size:13px;color:var(--muted);padding:18px 10px 6px;display:flex;justify-content:space-between;align-items:center}
-.nav-group button{border:none;background:none;color:var(--cobalt);font-size:13px;cursor:pointer;padding:0}
-.nav a{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;text-decoration:none;color:var(--ink);font-size:15px}
-.nav a:hover{background:var(--surface)}
-.nav a[aria-current="page"]{background:var(--surface);box-shadow:var(--shadow);font-weight:600}
-.nav a[aria-current="page"] .ico{background:var(--cobalt-soft)}
-.nav .ico{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font-size:16px;flex:none}
-.nav .ico svg{width:17px;height:17px}
-.nav .lbl{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.nav .n{font-size:13px;color:var(--muted)}
-.side-foot{margin-top:auto;padding-top:18px;display:flex;gap:6px;flex-wrap:wrap}
-.side-foot .btn{flex:1;justify-content:center;font-size:14px;padding:8px 10px}
+/* ---------- Typography & Utility ---------- */
+.badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;padding:3px 10px;border-radius:999px;white-space:nowrap}
+.badge-live{background:var(--live-soft);color:var(--live)}
+.badge-dev{background:var(--dev-soft);color:var(--dev)}
+.badge-off{background:var(--off-soft);color:var(--off)}
+.badge-primary{background:var(--primary-soft);color:var(--primary)}
 
-.mobile-bar{display:none}
-main.content{min-width:0;padding:28px 32px 70px}
-.content-inner{max-width:1180px;margin:0 auto}
+/* ---------- Announcement Banner (ฟีเจอร์ที่ 4) ---------- */
+.announce-banner{background:linear-gradient(90deg,var(--primary),#06B6D4);color:#fff;padding:8px 16px;font-size:13px;display:none;align-items:center;justify-content:center;gap:10px;box-shadow:var(--shadow-sm);position:relative;z-index:30}
+.announce-banner b{font-weight:600}
+.announce-close{position:absolute;right:16px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,255,255,0.8);font-size:16px;cursor:pointer;padding:2px 6px;border-radius:4px}
+.announce-close:hover{color:#fff;background:rgba(255,255,255,0.15)}
 
-/* ---------- Buttons ---------- */
-.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);padding:9px 14px;border-radius:10px;cursor:pointer;font-weight:500;font-size:15px;text-decoration:none;color:var(--ink);white-space:nowrap}
-.btn:hover{border-color:var(--cobalt)}
-.btn.primary{background:var(--cobalt);border-color:var(--cobalt);color:#fff}
-.btn.primary:hover{filter:brightness(1.08)}
+/* ---------- Layout Structure ---------- */
+.app{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+.app.landing-active{grid-template-columns:1fr}
+.app.landing-active aside.side{display:none}
+
+/* ---------- Sidebar ---------- */
+aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column;padding:22px 14px 18px;color:var(--side-text);z-index:40;border-right:1px solid rgba(255,255,255,0.06)}
+.side-brand{display:flex;align-items:center;gap:12px;padding:0 8px 18px;cursor:pointer}
+.side-logo-img{width:42px;height:42px;border-radius:50%;object-fit:cover;box-shadow:0 4px 12px rgba(79,70,229,0.3);flex:none}
+.side-title{font-weight:700;font-size:15px;color:#fff;line-height:1.2;letter-spacing:-.01em}
+.side-sub{font-size:11px;color:var(--side-text);font-weight:400}
+
+.nav-section-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:rgba(148,163,184,0.6);padding:16px 10px 6px;display:flex;justify-content:space-between;align-items:center}
+.nav-section-title button{border:none;background:none;color:var(--accent);font-size:12px;cursor:pointer;padding:0;font-weight:500}
+.nav-list{display:flex;flex-direction:column;gap:3px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;text-decoration:none;color:var(--side-text);font-size:14px;transition:all .15s ease}
+.nav-item:hover{background:var(--side-hover);color:var(--side-active)}
+.nav-item.active{background:var(--primary);color:#fff;font-weight:500;box-shadow:0 4px 14px rgba(79,70,229,0.35)}
+.nav-item .icon{width:24px;height:24px;border-radius:6px;display:grid;place-items:center;font-size:15px;flex:none}
+.nav-item .count{margin-left:auto;font-size:12px;background:rgba(255,255,255,0.08);padding:1px 8px;border-radius:999px}
+.nav-item.active .count{background:rgba(255,255,255,0.22);color:#fff}
+
+.side-bottom{margin-top:auto;padding-top:14px;border-top:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:8px}
+.sync-status-pill{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.04);font-size:12px;color:var(--side-text);cursor:pointer}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--live);box-shadow:0 0 8px var(--live)}
+
+/* ---------- Global Buttons ---------- */
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);padding:8px 15px;border-radius:10px;cursor:pointer;font-weight:500;font-size:14px;text-decoration:none;color:var(--ink);transition:all .15s ease;white-space:nowrap}
+.btn:hover{border-color:var(--primary);transform:translateY(-1px)}
+.btn.primary{background:var(--primary);border-color:var(--primary);color:#fff;box-shadow:0 4px 14px rgba(79,70,229,0.25)}
+.btn.primary:hover{background:var(--primary-hover)}
 .btn.live{background:var(--live);border-color:var(--live);color:#fff}
-.btn.ghost{background:transparent}
-.btn.danger{color:var(--danger)}
-.btn svg{width:17px;height:17px;flex:none}
-.icon-btn{width:40px;height:40px;padding:0;justify-content:center}
+.btn.ghost{background:transparent;border-color:transparent}
+.btn.ghost:hover{background:var(--surface);border-color:var(--line)}
+.btn.danger{color:var(--danger);border-color:var(--line)}
+.btn.danger:hover{background:var(--danger-soft);border-color:var(--danger)}
+.btn svg{width:16px;height:16px;flex:none}
+.icon-btn{width:38px;height:38px;padding:0;justify-content:center;border-radius:10px}
 
-/* ---------- Page header ---------- */
-.page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
-.page-head h1{font-family:var(--display);font-weight:700;font-size:clamp(28px,4.4vw,42px);line-height:1.12;margin:0;letter-spacing:-.01em;display:flex;align-items:center;gap:12px}
-.page-head h1 .big-ico{font-size:.85em}
-.page-head .sub{color:var(--muted);margin-top:6px;font-size:15px}
+/* ==========================================================================
+   1. LANDING PAGE VIEW (หน้าแรกสุด สไตล์ Apple + Minimalist)
+   ========================================================================== */
+.view-landing{display:none;position:relative;min-height:100vh;padding:24px 24px 80px;overflow:hidden}
+.view-landing.active{display:block}
 
-/* ---------- Home ---------- */
-.hero{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:28px 28px 24px;box-shadow:var(--shadow);margin-bottom:30px;position:relative;overflow:hidden}
-.hero::after{content:"";position:absolute;right:-60px;top:-60px;width:240px;height:240px;border-radius:50%;border:34px solid var(--cobalt-soft);pointer-events:none}
-.hero h1{font-family:var(--display);font-weight:700;font-size:clamp(28px,4.6vw,44px);line-height:1.12;margin:0 0 6px;position:relative;z-index:1;max-width:20ch}
-.hero p{margin:0 0 18px;color:var(--muted);position:relative;z-index:1}
-.hero-search{display:flex;gap:8px;max-width:560px;position:relative;z-index:1;flex-wrap:wrap}
-.hero-search input{flex:1 1 220px;padding:11px 14px;border:1px solid var(--line);border-radius:10px;background:var(--paper)}
-.stats{display:flex;gap:28px;flex-wrap:wrap;margin-top:22px;padding-top:18px;border-top:1px solid var(--line);position:relative;z-index:1}
-.stat b{font-family:var(--display);font-size:26px;display:block;line-height:1.1}
-.stat span{color:var(--muted);font-size:14px}
+.ambient-glow{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.orb-1{position:absolute;top:-10%;left:25%;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(79,70,229,0.12) 0%,transparent 70%);filter:blur(60px)}
+.orb-2{position:absolute;top:40%;right:-5%;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(6,182,212,0.10) 0%,transparent 70%);filter:blur(60px)}
 
-.sec{margin-bottom:34px}
-.sec-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:12px}
-.sec-head h2{font-family:var(--display);font-size:22px;margin:0}
-.sec-head a{color:var(--cobalt);text-decoration:none;font-size:15px}
-.cat-tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
-.tile{display:flex;align-items:center;gap:12px;padding:14px;background:var(--surface);border:1px solid var(--line);border-radius:14px;text-decoration:none;color:var(--ink)}
-.tile:hover{border-color:var(--cobalt)}
-.tile .t-ico{width:44px;height:44px;border-radius:12px;background:var(--cobalt-soft);display:grid;place-items:center;font-size:22px;flex:none}
-.tile b{display:block;font-weight:600;font-size:15px;line-height:1.3}
-.tile span{font-size:13px;color:var(--muted)}
-.tile.add{border-style:dashed;color:var(--muted);cursor:pointer;background:transparent;font:inherit;text-align:left}
-.tile.add .t-ico{background:transparent;border:1.5px dashed var(--line)}
+.landing-wrap{position:relative;z-index:1;max-width:1160px;margin:0 auto}
 
-.comment-feed{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
-.feed-row{display:flex;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line);cursor:pointer;background:none;border-left:none;border-right:none;border-top:none;width:100%;text-align:left;font:inherit;color:inherit}
-.feed-row:last-child{border-bottom:none}
-.feed-row:hover{background:var(--paper)}
-.avatar{width:36px;height:36px;border-radius:50%;background:var(--cobalt-soft);color:var(--cobalt);display:grid;place-items:center;font-weight:600;flex:none;font-family:var(--display)}
-.feed-row .fr-body{min-width:0;flex:1}
-.feed-row .fr-top{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:14px}
-.feed-row .fr-top b{font-weight:600}
-.feed-row .fr-sys{color:var(--muted)}
-.feed-row p{margin:2px 0 0;font-size:15px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.muted-box{padding:22px;color:var(--muted);text-align:center;background:var(--surface);border:1px dashed var(--line);border-radius:14px}
+/* Landing Top Navigation */
+.landing-top{display:flex;align-items:center;justify-content:space-between;padding:12px 22px;background:var(--surface-card);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--line);border-radius:18px;margin-bottom:34px;box-shadow:var(--shadow-sm)}
+.landing-brand{display:flex;align-items:center;gap:12px;font-weight:700;font-size:16px;letter-spacing:-.01em}
+.landing-meta{display:flex;align-items:center;gap:14px;font-size:13px;color:var(--muted)}
+.live-indicator{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:var(--live-soft);color:var(--live);font-size:12px;font-weight:500}
 
-/* ---------- Toolbar ---------- */
-.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding-bottom:16px;border-bottom:1px solid var(--line)}
-.search{flex:1 1 240px;position:relative}
-.search input{width:100%;padding:10px 14px 10px 40px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
-.search svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:17px;height:17px;color:var(--muted)}
-.toolbar select{padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+/* Hero Section with Floating Emblem */
+.landing-hero{text-align:center;padding:28px 16px 40px;max-width:840px;margin:0 auto}
+.hero-logo-box{width:116px;height:116px;margin:0 auto 18px;border-radius:50%;padding:4px;background:linear-gradient(135deg,#4F46E5,#06B6D4);box-shadow:0 14px 35px rgba(79,70,229,0.35);animation:floatLogo 3.5s ease-in-out infinite}
+.hero-logo-img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
+@keyframes floatLogo{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 
-/* ---------- Grid & cards ---------- */
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;padding-top:18px}
-.grid.compact{padding-top:0}
-.card{background:var(--surface);border-radius:14px;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;border:1px solid var(--line)}
-.shot{position:relative;aspect-ratio:16/10;background:var(--off-soft);overflow:hidden;cursor:pointer;border-bottom:1px solid var(--line)}
-.shot .browserbar{position:absolute;inset:0 0 auto 0;height:22px;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:5px;padding:0 9px;z-index:1}
-.shot .browserbar i{width:7px;height:7px;border-radius:50%;background:var(--line);display:block}
-.shot .browserbar span{margin-left:8px;font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.shot img{position:absolute;top:22px;left:0;width:100%;height:calc(100% - 22px);object-fit:cover;object-position:top}
-.shot .ph{position:absolute;top:22px;left:0;right:0;bottom:0;display:grid;place-items:center;font-family:var(--display);font-size:56px;font-weight:700;color:var(--cobalt);background:var(--cobalt-soft)}
-.shot .peek{position:absolute;inset:auto 10px 10px auto;z-index:2;background:rgba(24,32,46,.82);color:#fff;font-size:13px;padding:5px 10px;border-radius:8px;opacity:0;transition:opacity .15s}
-.shot:hover .peek,.shot:focus-visible .peek{opacity:1}
-.card-body{padding:14px 18px 4px;flex:1}
-.meta-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
-.status{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;padding:2px 9px;border-radius:999px}
-.status::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
-.status.live{color:var(--live);background:var(--live-soft)}
-.status.dev{color:var(--dev);background:var(--dev-soft)}
-.status.off{color:var(--off);background:var(--off-soft)}
-.cat{font-size:13px;color:var(--muted)}
-.card h3{font-family:var(--display);font-weight:600;font-size:19px;line-height:1.3;margin:0 0 4px;cursor:pointer}
-.card h3:hover{color:var(--cobalt)}
-.card p.desc{margin:0;color:var(--muted);font-size:15px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.rate-line{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:13px;color:var(--muted);cursor:pointer;background:none;border:none;padding:0}
-.tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
-.tag{font-size:12px;padding:1px 8px;border-radius:6px;background:var(--paper);color:var(--muted);border:1px solid var(--line)}
-.card-actions{display:flex;gap:6px;padding:12px 18px 16px;flex-wrap:wrap;align-items:center}
-.card-actions .btn{padding:7px 11px;font-size:14px}
-.card-actions .icon-btn{width:36px;height:36px}
-.card-actions .spacer{flex:1}
+.hero-pill{display:inline-flex;align-items:center;gap:8px;padding:5px 14px;border-radius:999px;background:var(--primary-soft);color:var(--primary);font-size:13px;font-weight:600;margin-bottom:16px;border:1px solid rgba(79,70,229,0.18)}
+.landing-hero h1{font-size:clamp(30px,5vw,50px);font-weight:700;line-height:1.18;letter-spacing:-.02em;margin:0 0 14px;background:linear-gradient(135deg,var(--ink) 40%,var(--primary) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.landing-hero p{font-size:clamp(15px,1.8vw,17px);color:var(--muted);margin:0 auto 26px;max-width:620px;font-weight:300;line-height:1.6}
+.hero-actions{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
+.hero-actions .btn{padding:12px 22px;font-size:15px;border-radius:12px;font-weight:600}
 
-/* stars */
-.stars{display:inline-flex;gap:1px;line-height:0}
-.stars svg{width:15px;height:15px}
-.stars .on{fill:var(--star)}
-.stars .off{fill:var(--star-off)}
-.stars.lg svg{width:22px;height:22px}
+/* KPI Bento Stats */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+.kpi-card{background:var(--surface-card);backdrop-filter:blur(12px);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:var(--shadow-sm);transition:transform .2s ease}
+.kpi-card:hover{transform:translateY(-2px);border-color:var(--primary)}
+.kpi-icon{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-size:20px;margin-bottom:12px}
+.kpi-val{font-size:32px;font-weight:700;line-height:1;margin-bottom:4px}
+.kpi-title{font-size:13px;color:var(--muted)}
 
-.empty{text-align:center;padding:60px 20px;grid-column:1/-1}
-.empty h2{font-family:var(--display);font-size:23px;margin:0 0 6px}
-.empty p{color:var(--muted);margin:0 0 20px}
+/* Charts Section */
+.analytics-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:28px 0}
+.chart-card{background:var(--surface-card);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:20px;padding:24px;box-shadow:var(--shadow)}
+.chart-card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.chart-card-head h3{font-size:16px;font-weight:600;margin:0;display:flex;align-items:center;gap:8px}
 
-/* ---------- Modals ---------- */
-.overlay{position:fixed;inset:0;background:rgba(10,14,22,.55);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
+.donut-box{display:flex;align-items:center;gap:24px;padding:10px 0}
+.donut-svg{width:130px;height:130px;transform:rotate(-90deg);flex:none}
+.donut-legend{display:flex;flex-direction:column;gap:8px;flex:1;min-width:0}
+.legend-row{display:flex;align-items:center;justify-content:space-between;font-size:13px}
+.legend-label{display:flex;align-items:center;gap:8px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex:none}
+.legend-val{font-weight:600;color:var(--ink)}
+
+.status-meter{margin-top:12px}
+.meter-label{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px}
+.meter-bar{height:10px;border-radius:999px;background:var(--line);overflow:hidden;display:flex}
+.meter-seg{height:100%;transition:width .3s ease}
+
+/* Quick Launch & Trending Grids */
+.section-head{display:flex;justify-content:space-between;align-items:center;margin:32px 0 16px}
+.section-head h2{font-size:20px;font-weight:600;margin:0}
+.dock-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.dock-item{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;align-items:center;gap:14px;text-decoration:none;color:var(--ink);box-shadow:var(--shadow-sm);transition:all .18s ease}
+.dock-item:hover{border-color:var(--primary);transform:translateY(-2px);box-shadow:var(--shadow)}
+.dock-icon{width:44px;height:44px;border-radius:12px;background:var(--primary-soft);display:grid;place-items:center;font-size:22px;flex:none}
+.dock-text{flex:1;min-width:0}
+.dock-text b{display:block;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dock-text span{display:block;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ==========================================================================
+   2. CATALOG DASHBOARD VIEW
+   ========================================================================== */
+.view-catalog{display:none;padding:24px 32px 70px}
+.view-catalog.active{display:block}
+.catalog-container{max-width:1200px;margin:0 auto}
+
+.catalog-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+.catalog-head h1{font-size:clamp(24px,3.5vw,32px);font-weight:700;margin:0;display:flex;align-items:center;gap:10px}
+.catalog-head .sub{font-size:13px;color:var(--muted);margin-top:4px}
+
+.tab-segmented{display:inline-flex;padding:4px;border-radius:12px;background:var(--line);gap:2px}
+.tab-segmented button{border:none;background:transparent;padding:6px 14px;border-radius:9px;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s ease}
+.tab-segmented button.active{background:var(--surface);color:var(--ink);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+
+.toolbar-bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:10px 14px;background:var(--surface);border:1px solid var(--line);border-radius:14px;margin-bottom:22px;box-shadow:var(--shadow-sm)}
+.search-box{flex:1 1 240px;position:relative}
+.search-box input{width:100%;padding:8px 12px 8px 36px;border:1px solid var(--line);border-radius:9px;background:var(--paper)}
+.search-box svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted)}
+.toolbar-bar select{padding:8px 12px;border:1px solid var(--line);border-radius:9px;background:var(--paper);font-size:13px}
+
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:20px}
+.sys-card{background:var(--surface);border-radius:16px;border:1px solid var(--line);box-shadow:var(--shadow-sm);overflow:hidden;display:flex;flex-direction:column;transition:all .18s ease}
+.sys-card:hover{border-color:var(--primary);transform:translateY(-2px);box-shadow:var(--shadow)}
+.card-shot{position:relative;aspect-ratio:16/9;background:var(--off-soft);overflow:hidden;cursor:pointer;border-bottom:1px solid var(--line)}
+.card-shot .bar{position:absolute;inset:0 0 auto 0;height:22px;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:5px;padding:0 9px;z-index:2}
+.card-shot .bar i{width:6px;height:6px;border-radius:50%;background:var(--line)}
+.card-shot .bar span{margin-left:6px;font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-shot img{position:absolute;top:22px;left:0;width:100%;height:calc(100% - 22px);object-fit:cover;object-position:top}
+.card-shot .ph{position:absolute;top:22px;left:0;right:0;bottom:0;display:grid;place-items:center;font-size:46px;font-weight:700;color:var(--primary);background:var(--primary-soft)}
+.card-shot .peek{position:absolute;inset:auto 10px 10px auto;z-index:3;background:rgba(15,23,42,0.85);color:#fff;font-size:11px;padding:3px 8px;border-radius:6px;opacity:0;transition:opacity .15s}
+.card-shot:hover .peek{opacity:1}
+.card-content{padding:14px 16px 8px;flex:1}
+.card-meta{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+.sys-card h3{font-size:17px;font-weight:600;line-height:1.3;margin:0 0 6px;cursor:pointer}
+.sys-card h3:hover{color:var(--primary)}
+.sys-card p.desc{margin:0;color:var(--muted);font-size:13px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tag-list{display:flex;flex-wrap:wrap;gap:4px;margin-top:10px}
+.tag-chip{font-size:11px;padding:2px 7px;border-radius:6px;background:var(--paper);color:var(--muted);border:1px solid var(--line)}
+.card-foot{display:flex;gap:6px;padding:10px 16px 12px;border-top:1px solid var(--line);background:var(--surface);align-items:center}
+.card-foot .btn{padding:5px 10px;font-size:13px}
+
+.empty-box{text-align:center;padding:60px 20px;grid-column:1/-1;background:var(--surface);border:1.5px dashed var(--line);border-radius:18px}
+.empty-box h2{font-size:20px;margin:0 0 6px}
+.empty-box p{color:var(--muted);font-size:14px;margin:0 0 16px}
+
+/* ==========================================================================
+   SPOTLIGHT SEARCH (Ctrl + K) (ฟีเจอร์ที่ 2)
+   ========================================================================== */
+.spotlight-box{background:var(--surface);border-radius:18px;width:min(620px,100%);box-shadow:0 30px 90px -15px rgba(0,0,0,0.6);border:1px solid var(--line);overflow:hidden;animation:spotIn .15s ease}
+@keyframes spotIn{from{opacity:0;transform:scale(0.97)}to{opacity:1;transform:scale(1)}}
+.spotlight-input-row{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--line)}
+.spotlight-input-row svg{width:20px;height:20px;color:var(--primary);flex:none}
+.spotlight-input-row input{flex:1;border:none;background:transparent;font-size:16px;outline:none;color:var(--ink);font-family:var(--font-main)}
+.spotlight-kbd{font-size:11px;font-weight:600;padding:3px 7px;border-radius:6px;background:var(--paper);color:var(--muted);border:1px solid var(--line)}
+.spotlight-results{max-height:360px;overflow-y:auto;padding:8px}
+.spotlight-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;cursor:pointer;transition:all .12s}
+.spotlight-item:hover,.spotlight-item.selected{background:var(--primary-soft);color:var(--primary)}
+.spotlight-item .s-icon{width:36px;height:36px;border-radius:8px;background:var(--paper);display:grid;place-items:center;font-size:18px;flex:none}
+.spotlight-item.selected .s-icon{background:var(--surface)}
+.spotlight-item .s-title{font-size:14px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.spotlight-item.selected .s-title{color:var(--primary)}
+.spotlight-item .s-sub{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ==========================================================================
+   MODALS & OVERLAYS
+   ========================================================================== */
+.overlay{position:fixed;inset:0;background:rgba(15,23,42,0.65);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:70;padding:16px}
 .overlay.open{display:flex}
-.modal{background:var(--surface);border-radius:16px;width:min(780px,100%);max-height:calc(100% - 20px);overflow:auto;box-shadow:0 30px 80px -20px rgba(0,0,0,.5);border:1px solid var(--line)}
-.modal.sm{width:min(520px,100%)}
-.modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 22px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--surface);z-index:2}
-.modal-head h2{font-family:var(--display);font-size:21px;margin:0;line-height:1.3}
-.modal-body{padding:20px 22px}
-.modal-foot{display:flex;justify-content:flex-end;gap:8px;padding:14px 22px;border-top:1px solid var(--line);position:sticky;bottom:0;background:var(--surface);flex-wrap:wrap}
+.modal{background:var(--surface);border-radius:18px;width:min(800px,100%);max-height:calc(100% - 24px);overflow-y:auto;box-shadow:0 30px 80px -20px rgba(0,0,0,0.6);border:1px solid var(--line)}
+.modal.sm{width:min(460px,100%)}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--surface);z-index:5}
+.modal-head h2{font-size:18px;font-weight:600;margin:0}
+.modal-body{padding:20px}
+.modal-foot{display:flex;justify-content:flex-end;gap:8px;padding:12px 20px;border-top:1px solid var(--line);position:sticky;bottom:0;background:var(--surface);z-index:5}
 
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 16px}
-.field{display:flex;flex-direction:column;gap:5px}
-.field.full{grid-column:1/-1}
-.field label{font-size:14px;font-weight:500}
-.field input,.field select,.field textarea,.inp{padding:9px 12px;border:1px solid var(--line);border-radius:9px;background:var(--paper);width:100%}
-.field textarea,textarea.inp{resize:vertical;min-height:90px}
+.f-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 16px}
+.f-field{display:flex;flex-direction:column;gap:5px}
+.f-field.full{grid-column:1/-1}
+.f-field label{font-size:13px;font-weight:500}
+.f-field input,.f-field select,.f-field textarea{padding:8px 12px;border:1px solid var(--line);border-radius:9px;background:var(--paper);font-size:14px}
+.f-field textarea{resize:vertical;min-height:80px}
 .req{color:var(--danger)}
-.img-tabs{display:flex;gap:6px;flex-wrap:wrap}
-.img-tabs button{border:1px solid var(--line);background:transparent;padding:5px 11px;border-radius:8px;cursor:pointer;font-size:14px}
-.img-tabs button[aria-pressed="true"]{background:var(--cobalt-soft);border-color:var(--cobalt);color:var(--cobalt)}
-.img-panel{margin-top:8px}
-.img-preview{margin-top:10px;border:1px dashed var(--line);border-radius:10px;aspect-ratio:16/9;max-width:340px;overflow:hidden;display:grid;place-items:center;color:var(--muted);font-size:14px;background:var(--paper)}
-.img-preview img{width:100%;height:100%;object-fit:cover;object-position:top}
-.drop{border:1.5px dashed var(--line);border-radius:10px;padding:18px;text-align:center;color:var(--muted);cursor:pointer;font-size:14px}
-.drop.over{border-color:var(--cobalt);background:var(--cobalt-soft)}
 
-/* category manager */
-.cat-row{display:grid;grid-template-columns:58px 1fr auto;gap:8px;align-items:center;margin-bottom:8px}
-.cat-row input.emo{text-align:center;font-size:20px;padding:6px}
-.cat-row .n{font-size:13px;color:var(--muted);min-width:56px;text-align:right}
-.emoji-pick{display:flex;flex-wrap:wrap;gap:4px;margin:4px 0 14px}
-.emoji-pick button{border:1px solid var(--line);background:var(--paper);border-radius:8px;width:34px;height:34px;font-size:17px;cursor:pointer}
+.d-shot{border-radius:12px;overflow:hidden;border:1px solid var(--line);margin-bottom:14px}
+.d-shot img{width:100%;max-height:340px;object-fit:cover;object-position:top}
+.d-link{display:flex;gap:6px;align-items:center;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:6px 6px 6px 12px;margin:12px 0}
+.d-link code{flex:1;font-size:13px;color:var(--primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.d-section{font-size:14px;font-weight:600;margin:16px 0 6px;color:var(--ink)}
+.d-box{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:14px;line-height:1.7;white-space:pre-wrap}
 
-/* detail */
-.detail-shot{border-radius:12px;overflow:hidden;border:1px solid var(--line);margin-bottom:18px;background:var(--paper)}
-.detail-shot img{width:100%;max-height:360px;object-fit:cover;object-position:top}
-.linkbox{display:flex;gap:6px;align-items:center;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:6px 6px 6px 12px;margin:14px 0}
-.linkbox code{flex:1;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--body);color:var(--cobalt)}
-.dl{display:grid;grid-template-columns:130px 1fr;gap:8px 14px;margin:16px 0;font-size:15px}
-.dl dt{color:var(--muted)}
-.dl dd{margin:0;word-break:break-word}
-.longtext{white-space:pre-wrap;font-size:15px;line-height:1.75;max-width:68ch}
-.section-h{font-family:var(--display);font-size:17px;font-weight:600;margin:22px 0 8px}
-.cred{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-size:15px}
-.cred div{display:flex;gap:8px;align-items:center;justify-content:space-between}
-.mini{border:none;background:none;color:var(--cobalt);cursor:pointer;font-size:13px;padding:2px 4px}
-.mini.del{color:var(--muted)}
-.mini.del:hover{color:var(--danger)}
-
-/* reviews */
-.review-wrap{border-top:1px solid var(--line);margin-top:22px;padding-top:4px}
-.rv-summary{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:14px}
-.rv-avg{font-family:var(--display);font-size:40px;font-weight:700;line-height:1}
-.rv-bars{flex:1;min-width:180px;display:flex;flex-direction:column;gap:3px}
-.rv-bar{display:grid;grid-template-columns:14px 1fr 26px;gap:8px;align-items:center;font-size:12px;color:var(--muted)}
-.rv-bar i{display:block;height:6px;border-radius:3px;background:var(--off-soft);overflow:hidden}
-.rv-bar i b{display:block;height:100%;background:var(--star)}
-.rv-form{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:16px}
-.star-pick{display:inline-flex;gap:2px;margin-bottom:10px}
-.star-pick button{border:none;background:none;padding:2px;cursor:pointer;line-height:0}
-.star-pick svg{width:28px;height:28px;fill:var(--star-off);transition:fill .1s}
-.star-pick button.on svg{fill:var(--star)}
-.rv-form .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-.rv-form .row input{flex:1 1 180px}
-.rv-form textarea{background:var(--surface);min-height:70px}
-.rv-form input{background:var(--surface)}
-.rv-hint{font-size:13px;color:var(--muted);margin-left:8px;vertical-align:middle}
-.rv-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
-.rv-item:last-child{border-bottom:none}
-.rv-item .rv-top{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:14px}
-.rv-item .rv-top b{font-weight:600}
-.rv-item .rv-date{color:var(--muted);font-size:13px}
-.rv-item p{margin:4px 0 0;font-size:15px;white-space:pre-wrap;word-break:break-word}
-
-/* preview */
-.preview-overlay .modal{width:min(1300px,100%);height:calc(100% - 20px);display:flex;flex-direction:column;overflow:hidden}
-.pv-head{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap}
-.pv-head .name{font-family:var(--display);font-weight:600;font-size:17px;margin-right:auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:40%}
-.seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden}
-.seg button{border:none;background:transparent;padding:6px 11px;cursor:pointer;font-size:14px}
-.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
-.pv-stage{flex:1;background:var(--paper);overflow:auto;display:flex;justify-content:center;padding:16px}
-.pv-frame{background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden;width:100%;height:100%;transition:width .25s ease;box-shadow:var(--shadow)}
-.pv-frame iframe{width:100%;height:100%;border:0;display:block}
-.pv-note{font-size:13px;color:var(--muted);padding:8px 16px;border-top:1px solid var(--line)}
-
-.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--ink);color:var(--paper);padding:10px 18px;border-radius:10px;opacity:0;pointer-events:none;transition:all .2s;z-index:100;font-size:15px}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--ink);color:var(--paper);padding:10px 20px;border-radius:10px;opacity:0;pointer-events:none;transition:all .2s;z-index:100;font-size:13px;box-shadow:0 10px 25px rgba(0,0,0,0.3)}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 .scrim{display:none}
 
-/* ---------- Responsive ---------- */
 @media (max-width:900px){
   .app{grid-template-columns:1fr}
-  aside.side{position:fixed;left:0;top:0;bottom:0;width:min(300px,85vw);height:auto;z-index:40;transform:translateX(-102%);transition:transform .22s ease;padding-top:calc(22px + env(safe-area-inset-top,0px))}
-  body.menu-open aside.side{transform:none;box-shadow:0 0 60px rgba(0,0,0,.35)}
-  body.menu-open .scrim{display:block;position:fixed;inset:0;background:rgba(10,14,22,.45);z-index:39}
-  .mobile-bar{display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:30;background:var(--paper);padding:10px 16px;padding-top:calc(10px + env(safe-area-inset-top,0px));border-bottom:1px solid var(--line)}
-  .mobile-bar .mb-title{font-family:var(--display);font-weight:600;font-size:17px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  main.content{padding:20px 16px 60px}
+  aside.side{position:fixed;left:0;top:0;bottom:0;width:min(280px,85vw);z-index:60;transform:translateX(-102%);transition:transform .22s ease;padding-top:calc(20px + env(safe-area-inset-top,0px))}
+  body.menu-open aside.side{transform:none;box-shadow:0 0 60px rgba(0,0,0,0.5)}
+  body.menu-open .scrim{display:block;position:fixed;inset:0;background:rgba(15,23,42,0.5);z-index:55}
+  .mobile-bar{display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:35;background:var(--paper);padding:10px 16px;padding-top:calc(10px + env(safe-area-inset-top,0px));border-bottom:1px solid var(--line)}
+  .mobile-bar .mb-title{font-weight:600;font-size:15px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .view-catalog{padding:16px 14px 60px}
+  .analytics-grid{grid-template-columns:1fr}
+  .kpi-row{grid-template-columns:repeat(2,1fr)}
 }
 @media (max-width:640px){
-  .form-grid{grid-template-columns:1fr}
-  .dl{grid-template-columns:1fr;gap:2px}
-  .dl dd{margin-bottom:8px}
-  .btn .lbl-hide{display:none}
-  .pv-head .name{max-width:100%;flex-basis:100%}
-  .hero{padding:22px 18px}
-  .stats{gap:18px}
+  .f-grid{grid-template-columns:1fr}
+  .kpi-row{grid-template-columns:1fr}
 }
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
 
-<div class="app">
-  <aside class="side" id="side" aria-label="เมนูหลัก">
-    <div class="brand">
-      <span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 8h18M8 21h8"/></svg></span>
-      คลังระบบของฉัน
-    </div>
-    <nav class="nav" id="nav"></nav>
-    <div class="side-foot">
-      <button class="btn" id="exportBtn" title="สำรองข้อมูลเป็นไฟล์ JSON">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v3h16v-3"/></svg>สำรอง
-      </button>
-      <button class="btn" id="importBtn" title="นำเข้าไฟล์ JSON">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V3m0 0L8 7m4-4 4 4M4 17v3h16v-3"/></svg>นำเข้า
-      </button>
-      <button class="btn icon-btn" id="themeBtn" title="สลับโหมดสว่าง/มืด" aria-label="สลับโหมดสว่าง/มืด">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
-      </button>
-      <input type="file" id="importFile" accept="application/json,.json" hidden>
-    </div>
-  </aside>
-  <div class="scrim" id="scrim"></div>
-
-  <div>
-    <div class="mobile-bar">
-      <button class="btn icon-btn" id="menuBtn" aria-label="เปิดเมนู"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
-      <div class="mb-title" id="mbTitle">หน้าแรก</div>
-      <button class="btn primary icon-btn" data-add aria-label="เพิ่มระบบ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg></button>
-    </div>
-    <main class="content"><div class="content-inner" id="view"></div></main>
-  </div>
-</div>
-
-<!-- Form modal -->
-<div class="overlay" id="formOverlay" role="dialog" aria-modal="true" aria-labelledby="formTitle">
-  <div class="modal">
-    <div class="modal-head">
-      <h2 id="formTitle">เพิ่มระบบ</h2>
-      <button class="btn ghost icon-btn" data-close aria-label="ปิด"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
-    </div>
-    <div class="modal-body">
-      <div class="form-grid">
-        <div class="field full">
-          <label for="f_name">ชื่อระบบ <span class="req">*</span></label>
-          <input id="f_name" placeholder="เช่น ระบบจองห้องประชุม">
-        </div>
-        <div class="field full">
-          <label for="f_url">ลิงก์ใช้งานจริง <span class="req">*</span></label>
-          <input id="f_url" type="url" placeholder="https://...">
-        </div>
-        <div class="field">
-          <label for="f_cat">ด้าน / หมวดหมู่</label>
-          <select id="f_cat"></select>
-        </div>
-        <div class="field">
-          <label for="f_status">สถานะ</label>
-          <select id="f_status">
-            <option value="live">ใช้งานอยู่</option>
-            <option value="dev">กำลังพัฒนา</option>
-            <option value="off">ปิดใช้งาน</option>
-          </select>
-        </div>
-        <div class="field full">
-          <label for="f_short">คำอธิบายสั้น</label>
-          <input id="f_short" placeholder="หนึ่งประโยคที่บอกว่าระบบนี้ทำอะไร">
-        </div>
-        <div class="field full">
-          <label for="f_detail">รายละเอียดระบบ</label>
-          <textarea id="f_detail" rows="5" placeholder="ฟีเจอร์หลัก ผู้ใช้งาน วิธีใช้ หรือหมายเหตุอื่น ๆ"></textarea>
-        </div>
-        <div class="field">
-          <label for="f_tech">เทคโนโลยีที่ใช้</label>
-          <input id="f_tech" placeholder="คั่นด้วยจุลภาค เช่น Apps Script, Sheets">
-        </div>
-        <div class="field">
-          <label for="f_date">วันที่สร้าง</label>
-          <input id="f_date" type="date">
-        </div>
-        <div class="field">
-          <label for="f_user">บัญชีทดลอง (ถ้ามี)</label>
-          <input id="f_user" placeholder="ชื่อผู้ใช้" autocomplete="off">
-        </div>
-        <div class="field">
-          <label for="f_pass">&nbsp;</label>
-          <input id="f_pass" placeholder="รหัสผ่าน" autocomplete="off">
-        </div>
-        <div class="field full">
-          <label>ภาพหน้าตาระบบ</label>
-          <div class="img-tabs" id="imgTabs">
-            <button type="button" data-mode="upload" aria-pressed="true">อัปโหลดภาพ</button>
-            <button type="button" data-mode="url" aria-pressed="false">ใช้ลิงก์ภาพ</button>
-            <button type="button" data-mode="auto" aria-pressed="false">จับภาพอัตโนมัติ</button>
-            <button type="button" data-mode="none" aria-pressed="false">ไม่ใช้ภาพ</button>
-          </div>
-          <div class="img-panel" id="panel_upload">
-            <div class="drop" id="drop" tabindex="0">ลากไฟล์ภาพมาวาง หรือคลิกเพื่อเลือก (วางภาพจากคลิปบอร์ดด้วย Ctrl+V ก็ได้)</div>
-            <input type="file" id="f_img" accept="image/*" hidden>
-          </div>
-          <div class="img-panel" id="panel_url" hidden>
-            <input id="f_imgurl" class="inp" type="url" placeholder="https://.../screenshot.png">
-          </div>
-          <div class="img-panel" id="panel_auto" hidden>
-            <small style="color:var(--muted)">ดึงภาพหน้าเว็บจากลิงก์ด้านบนผ่านบริการ thum.io ต้องเชื่อมต่ออินเทอร์เน็ต และระบบที่ต้องล็อกอินจะได้ภาพหน้าล็อกอิน</small>
-          </div>
-          <div class="img-preview" id="imgPreview">ยังไม่มีภาพ</div>
-        </div>
+<div class="app" id="appRoot">
+  <!-- SIDEBAR MENU -->
+  <aside class="side" id="side">
+    <div class="side-brand" id="brandBtn">
+      <img src="logo-512.png" alt="ครูซอสสอนสังคม" class="side-logo-img">
+      <div>
+        <div class="side-title">ครูซอสสอนสังคม</div>
+        <div class="side-sub">คลังระบบออนไลน์ · TS010</div>
       </div>
     </div>
-    <div class="modal-foot">
-      <button class="btn ghost" data-close>ยกเลิก</button>
-      <button class="btn primary" id="saveBtn">บันทึกระบบ</button>
+
+    <!-- Main Navigation Sections -->
+    <div class="nav-section-title"><span>เมนูหลัก</span></div>
+    <nav class="nav-list">
+      <a href="#landing" class="nav-item" id="navLanding"><span class="icon">🚀</span><span>หน้าแรกสุด (Portal)</span></a>
+      <a href="#all" class="nav-item" id="navAll"><span class="icon">📦</span><span>ระบบทั้งหมด</span><span class="count" id="countAll">0</span></a>
+      <a href="#live" class="nav-item" id="navLive"><span class="icon">🟢</span><span>พร้อมใช้งานจริง</span><span class="count" id="countLive">0</span></a>
+      <a href="#dev" class="nav-item" id="navDev"><span class="icon">🛠️</span><span>ห้องทดลอง / พัฒนา</span><span class="count" id="countDev">0</span></a>
+    </nav>
+
+    <!-- Category Navigation -->
+    <div class="nav-section-title">
+      <span>ด้านการปฏิบัติงาน</span>
+      <button id="manageCatsBtn">จัดการ</button>
     </div>
+    <nav class="nav-list" id="catNavList"></nav>
+
+    <div style="padding:16px 4px 0;display:flex;flex-direction:column;gap:6px">
+      <button class="btn primary" data-add style="width:100%;justify-content:center">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>เพิ่มระบบใหม่
+      </button>
+      <button class="btn ghost" id="btnSideSpotlight" style="width:100%;justify-content:center;color:var(--side-text);font-size:13px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>ค้นหาด่วน (Ctrl+K)
+      </button>
+      <button class="btn ghost" id="btnPwaInstall" style="display:none;width:100%;justify-content:center;color:var(--accent);font-size:13px">
+        📲 ติดตั้งแอปบนเครื่อง
+      </button>
+    </div>
+
+    <!-- Footer Controls -->
+    <div class="side-bottom">
+      <div class="sync-status-pill" id="sideSyncPill">
+        <span class="sync-dot" id="sideSyncDot"></span>
+        <span id="sideSyncText">Firebase Synced</span>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="btn ghost icon-btn" id="sideSettingsBtn" title="ตั้งค่าระบบ / ประกาศ" style="color:var(--side-text)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+        <button class="btn ghost icon-btn" id="ownerLockBtn" title="โหมดเจ้าของระบบ (PIN)" style="color:var(--side-text)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button>
+        <button class="btn ghost icon-btn" id="themeBtn" title="สลับโหมดมืด/สว่าง" style="color:var(--side-text)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
+      </div>
+    </div>
+  </aside>
+
+  <div class="scrim" id="scrim"></div>
+
+  <!-- MAIN BODY AREA -->
+  <main class="main-body">
+    <!-- Announcement Banner (แถบประกาศแจ้งเตือนสถานะด่วน) -->
+    <div class="announce-banner" id="announceBanner">
+      <span style="font-size:16px">📢</span>
+      <span id="announceText">ยินดีต้อนรับสู่ คลังระบบออนไลน์และนวัตกรรมดิจิทัลของครูซอสสอนสังคม</span>
+      <button class="announce-close" id="closeAnnounceBtn">✕</button>
+    </div>
+
+    <!-- Mobile Header -->
+    <div class="mobile-bar">
+      <button class="btn icon-btn" id="menuBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+      <div class="mb-title" id="mbTitle">ครูซอสสอนสังคม</div>
+      <button class="btn icon-btn" id="mobPortalBtn" title="หน้าแรกสุด"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg></button>
+      <button class="btn primary icon-btn" data-add><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg></button>
+    </div>
+
+    <!-- ==============================================
+         1. LANDING PORTAL VIEW (หน้าแรกสุด)
+         ============================================== -->
+    <section class="view-landing" id="viewLanding">
+      <div class="ambient-glow"><div class="orb-1"></div><div class="orb-2"></div></div>
+      <div class="landing-wrap">
+        <!-- Top Bar -->
+        <div class="landing-top">
+          <div class="landing-brand">
+            <img src="logo-512.png" alt="ครูซอส" style="width:36px;height:36px;border-radius:50%;object-fit:cover">
+            <span>คลังระบบออนไลน์ · ครูซอสสอนสังคม</span>
+          </div>
+          <div class="landing-meta">
+            <span class="live-indicator"><span class="sync-dot"></span><span id="liveTime">00:00:00 น.</span></span>
+            <span id="liveDate">-</span>
+            <button class="btn icon-btn" id="landingThemeBtn" title="สลับโหมด" style="border:none;background:transparent"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
+          </div>
+        </div>
+
+        <!-- Hero with Logo Emblem -->
+        <div class="landing-hero">
+          <div class="hero-logo-box">
+            <img src="logo-512.png" alt="คลังระบบออนไลน์ ครูซอสสอนสังคม" class="hero-logo-img">
+          </div>
+          <div class="hero-pill">✨ แพลตฟอร์มนวัตกรรมและคลังระบบดิจิทัล · ครูซอสสอนสังคม</div>
+          <h1>ศูนย์รวมระบบสารสนเทศและการเรียนรู้</h1>
+          <p>รวบรวมสื่อการสอน แผนการสอน ใบงาน เอกสาร และระบบออนไลน์ทั้งหมดของครูซอสไว้ในที่เดียว เพื่อการทำงานที่รวดเร็วและทันสมัย</p>
+          <div class="hero-actions">
+            <button class="btn primary" id="btnEnterHub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>เข้าสู่คลังจัดการระบบ</button>
+            <button class="btn" id="btnSpotlightHero"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>ค้นหาด่วน (Ctrl+K)</button>
+          </div>
+        </div>
+
+        <!-- 4 KPI Bento Stats -->
+        <div class="kpi-row">
+          <div class="kpi-card">
+            <div class="kpi-icon" style="background:var(--primary-soft);color:var(--primary)">📊</div>
+            <div class="kpi-val" id="kpiTotal">0</div>
+            <div class="kpi-title">ระบบทั้งหมดในคลัง</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon" style="background:var(--live-soft);color:var(--live)">🟢</div>
+            <div class="kpi-val" id="kpiLive">0</div>
+            <div class="kpi-title">พร้อมใช้งานจริง (Live)</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon" style="background:var(--dev-soft);color:var(--dev)">🛠️</div>
+            <div class="kpi-val" id="kpiDev">0</div>
+            <div class="kpi-title">ห้องทดลอง / กำลังพัฒนา</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon" style="background:var(--surface);border:1px solid var(--line)">🗂️</div>
+            <div class="kpi-val" id="kpiCats">0</div>
+            <div class="kpi-title">ด้านงานที่ดูแล</div>
+          </div>
+        </div>
+
+        <!-- Visual Analytics & Charts Section -->
+        <div class="analytics-grid">
+          <!-- Donut Chart -->
+          <div class="chart-card">
+            <div class="chart-card-head">
+              <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>สัดส่วนระบบแยกตามด้านงาน</h3>
+              <span style="font-size:12px;color:var(--muted)">Category Breakdown</span>
+            </div>
+            <div class="donut-box">
+              <svg class="donut-svg" viewBox="0 0 36 36" id="donutSvg"></svg>
+              <div class="donut-legend" id="donutLegend"></div>
+            </div>
+          </div>
+
+          <!-- Capacity Bar -->
+          <div class="chart-card">
+            <div class="chart-card-head">
+              <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>ดัชนีความพร้อมใช้งาน (Readiness)</h3>
+              <span class="badge badge-live" id="readinessRate">0% Active</span>
+            </div>
+            <div class="status-meter">
+              <div class="meter-label"><span>พร้อมใช้งานจริง (Production)</span><b id="meterLiveTxt">0 ระบบ</b></div>
+              <div class="meter-bar"><div class="meter-seg" id="barLive" style="background:var(--live);width:0%"></div></div>
+            </div>
+            <div class="status-meter" style="margin-top:16px">
+              <div class="meter-label"><span>ห้องทดลอง / พัฒนา (Sandbox)</span><b id="meterDevTxt">0 ระบบ</b></div>
+              <div class="meter-bar"><div class="meter-seg" id="barDev" style="background:var(--dev);width:0%"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trending / Most Popular Section (ฟีเจอร์ที่ 1: ระบบยอดนิยม) -->
+        <div class="section-head" id="trendingHead" style="display:none">
+          <h2>🔥 ระบบยอดนิยมที่มีคนเข้าใช้งานมากที่สุด</h2>
+          <span style="font-size:12px;color:var(--muted)">เรียงตามจำนวนสถิติการคลิกใช้งาน</span>
+        </div>
+        <div class="dock-grid" id="trendingGrid" style="display:none"></div>
+
+        <!-- Quick Launch Deck -->
+        <div class="section-head">
+          <h2>⚡ ระบบแนะนำและเข้าใช้บ่อย</h2>
+          <button class="btn ghost" id="btnViewAllTop">ดูทั้งหมดในคลัง →</button>
+        </div>
+        <div class="dock-grid" id="dockGrid"></div>
+      </div>
+    </section>
+
+    <!-- ==============================================
+         2. CATALOG & MANAGEMENT DASHBOARD VIEW
+         ============================================== -->
+    <section class="view-catalog" id="viewCatalog">
+      <div class="catalog-container">
+        <!-- Header -->
+        <div class="catalog-head">
+          <div>
+            <h1 id="catPageTitle">📦 ระบบทั้งหมด</h1>
+            <div class="sub" id="catPageSub">รายการระบบทั้งหมดในคลัง</div>
+          </div>
+          
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <div class="tab-segmented" id="segTab">
+              <button class="active" data-tab="all">ทั้งหมด</button>
+              <button data-tab="live">พร้อมใช้งานจริง 🟢</button>
+              <button data-tab="dev">ห้องทดลอง 🛠️</button>
+            </div>
+            <button class="btn primary" data-add id="btnAddTop">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>เพิ่มระบบ
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter & Search Toolbar -->
+        <div class="toolbar-bar">
+          <div class="search-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <input type="search" id="catSearch" placeholder="ค้นหาชื่อระบบ รายละเอียด หรือเทคโนโลยี... (Ctrl+K)">
+          </div>
+          <select id="catSortSelect">
+            <option value="new">เพิ่มล่าสุด</option>
+            <option value="clicks">ความนิยมสูงสุด 🔥</option>
+            <option value="old">เก่าสุด</option>
+            <option value="name">ชื่อ ก–ฮ / A–Z</option>
+          </select>
+        </div>
+
+        <!-- Cards Grid -->
+        <div class="cards-grid" id="cardsGrid"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ==========================================================================
+     SPOTLIGHT SEARCH MODAL (Ctrl + K) (ฟีเจอร์ที่ 2)
+     ========================================================================== -->
+<div class="overlay spotlight-overlay" id="spotlightOverlay" role="dialog" aria-modal="true" aria-label="ค้นหาระบบ">
+  <div class="spotlight-box">
+    <div class="spotlight-input-row">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input type="search" id="spotlightInput" placeholder="พิมพ์ชื่อระบบ หรือเทคโนโลยี... (กด ↑ ↓ เลือก, Enter เปิด)">
+      <kbd class="spotlight-kbd">ESC</kbd>
+    </div>
+    <div class="spotlight-results" id="spotlightResults"></div>
   </div>
 </div>
 
-<!-- Category manager -->
-<div class="overlay" id="catOverlay" role="dialog" aria-modal="true" aria-labelledby="catTitle">
-  <div class="modal sm">
-    <div class="modal-head">
-      <h2 id="catTitle">จัดการด้าน / หมวดหมู่</h2>
-      <button class="btn ghost icon-btn" data-close aria-label="ปิด"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
-    </div>
-    <div class="modal-body">
-      <div id="catRows"></div>
-      <button class="btn" id="catAddRow" style="margin-top:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>เพิ่มหมวดหมู่</button>
-      <p style="font-size:13px;color:var(--muted);margin:14px 0 4px">ไอคอนแนะนำ (คลิกช่องไอคอนของแถวก่อน แล้วเลือก)</p>
-      <div class="emoji-pick" id="emojiPick"></div>
-      <p style="font-size:13px;color:var(--muted);margin:0">ลบหมวดหมู่แล้ว ระบบในหมวดนั้นจะย้ายไปอยู่ “ไม่ระบุด้าน”</p>
-    </div>
-    <div class="modal-foot">
-      <button class="btn ghost" data-close>ยกเลิก</button>
-      <button class="btn primary" id="catSave">บันทึกหมวดหมู่</button>
-    </div>
-  </div>
-</div>
+<!-- ==========================================================================
+     MODALS
+     ========================================================================== -->
 
-<!-- Detail modal -->
+<!-- 1. Detail Modal -->
 <div class="overlay" id="detailOverlay" role="dialog" aria-modal="true" aria-labelledby="dTitle">
   <div class="modal">
     <div class="modal-head">
-      <h2 id="dTitle"></h2>
-      <button class="btn ghost icon-btn" data-close aria-label="ปิด"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      <h2 id="dTitle">รายละเอียดระบบ</h2>
+      <button class="btn ghost icon-btn" data-close><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
     <div class="modal-body" id="dBody"></div>
     <div class="modal-foot" id="dFoot"></div>
   </div>
 </div>
 
-<!-- Preview modal -->
-<div class="overlay preview-overlay" id="pvOverlay" role="dialog" aria-modal="true" aria-label="ดูตัวอย่างระบบ">
+<!-- 2. Form Modal (เพิ่ม/แก้ไข) -->
+<div class="overlay" id="formOverlay" role="dialog" aria-modal="true" aria-labelledby="fTitle">
   <div class="modal">
-    <div class="pv-head">
-      <div class="name" id="pvName"></div>
-      <div class="seg" id="pvSeg">
-        <button data-w="100%" aria-pressed="true">คอมพิวเตอร์</button>
-        <button data-w="820px" aria-pressed="false">แท็บเล็ต</button>
-        <button data-w="390px" aria-pressed="false">มือถือ</button>
-      </div>
-      <button class="btn" id="pvReload" title="โหลดใหม่" aria-label="โหลดใหม่"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg></button>
-      <button class="btn" id="pvCopy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span class="lbl-hide">คัดลอกลิงก์</span></button>
-      <a class="btn live" id="pvOpen" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>เปิดใช้งานจริง</a>
-      <button class="btn ghost icon-btn" data-close aria-label="ปิด"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    <div class="modal-head">
+      <h2 id="fTitle">เพิ่มระบบใหม่</h2>
+      <button class="btn ghost icon-btn" data-close><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
-    <div class="pv-stage"><div class="pv-frame" id="pvFrame"></div></div>
-    <div class="pv-note">ถ้าหน้าตัวอย่างว่างหรือขึ้นว่าปฏิเสธการเชื่อมต่อ แปลว่าเว็บนั้นไม่อนุญาตให้แสดงในหน้าอื่น ให้กด “เปิดใช้งานจริง” แทน</div>
+    <div class="modal-body">
+      <div class="f-grid">
+        <div class="f-field full">
+          <label for="f_name">ชื่อระบบ <span class="req">*</span></label>
+          <input id="f_name" placeholder="เช่น ระบบคลังสื่อการสอนครูซอส">
+        </div>
+        <div class="f-field full">
+          <label for="f_url">ลิงก์ใช้งานจริง (URL) <span class="req">*</span></label>
+          <input id="f_url" type="url" placeholder="https://...">
+        </div>
+        <div class="f-field">
+          <label for="f_cat">ด้าน / หมวดหมู่</label>
+          <select id="f_cat"></select>
+        </div>
+        <div class="f-field">
+          <label for="f_status">สถานะของระบบ</label>
+          <select id="f_status">
+            <option value="live">พร้อมใช้งานจริง (Live)</option>
+            <option value="dev">ห้องทดลอง / กำลังพัฒนา (Dev Lab)</option>
+            <option value="off">ปิดปรับปรุงชั่วคราว</option>
+          </select>
+        </div>
+        <div class="f-field full">
+          <label for="f_short">คำอธิบายสั้น (1 บรรทัด)</label>
+          <input id="f_short" placeholder="สรุปประโยชน์สั้นๆ ของระบบนี้">
+        </div>
+        <div class="f-field full">
+          <label for="f_detail">รายละเอียดการทำงาน</label>
+          <textarea id="f_detail" rows="3" placeholder="วัตถุประสงค์ ขั้นตอนการทำงาน และวิธีใช้"></textarea>
+        </div>
+        <div class="f-field full">
+          <label for="f_features">ฟีเจอร์เด่น (Key Features)</label>
+          <textarea id="f_features" rows="2" placeholder="- บันทึกข้อมูลและแจ้งเตือนผ่าน LINE&#10;- ส่งออกรายงานสรุป PDF"></textarea>
+        </div>
+        <div class="f-field">
+          <label for="f_target">กลุ่มผู้ใช้งาน</label>
+          <input id="f_target" placeholder="เช่น นักเรียน, ครูผู้สอน, ผู้สนใจทั่วไป">
+        </div>
+        <div class="f-field">
+          <label for="f_manual">ลิงก์คู่มือ / เอกสารแนบ (Drive / PDF)</label>
+          <input id="f_manual" type="url" placeholder="https://drive.google.com/...">
+        </div>
+        <div class="f-field">
+          <label for="f_tech">เทคโนโลยีที่ใช้ (Tech Stack)</label>
+          <input id="f_tech" placeholder="เช่น Apps Script, Google Sheets">
+        </div>
+        <div class="f-field">
+          <label for="f_version">เวอร์ชัน</label>
+          <input id="f_version" placeholder="เช่น v1.0, v2.3">
+        </div>
+        <div class="f-field">
+          <label for="f_user">บัญชีทดสอบ (Username)</label>
+          <input id="f_user" placeholder="ชื่อผู้ใช้สำหรับทดลอง" autocomplete="off">
+        </div>
+        <div class="f-field">
+          <label for="f_pass">รหัสผ่านทดสอบ (Password)</label>
+          <input id="f_pass" placeholder="รหัสผ่านสำหรับทดลอง" autocomplete="off">
+        </div>
+        <div class="f-field full">
+          <label for="f_notes">📝 โน้ตส่วนตัวของครูซอส (Dev Notes)</label>
+          <textarea id="f_notes" rows="2" placeholder="บันทึกโครงสร้าง Sheet, Trigger หรือสิ่งที่ต้องพัฒนาต่อ"></textarea>
+        </div>
+        <div class="f-field full">
+          <label>ภาพหน้าตาระบบ</label>
+          <div style="display:flex;gap:6px;margin-bottom:8px" id="imgTabs">
+            <button type="button" class="btn ghost" data-mode="upload">อัปโหลดภาพ</button>
+            <button type="button" class="btn ghost" data-mode="url">ใส่ลิงก์ภาพ</button>
+            <button type="button" class="btn ghost" data-mode="auto">จับภาพอัตโนมัติ</button>
+            <button type="button" class="btn ghost" data-mode="none">ไม่ใช้ภาพ</button>
+          </div>
+          <div id="panel_upload">
+            <div style="border:1.5px dashed var(--line);border-radius:10px;padding:16px;text-align:center;color:var(--muted);cursor:pointer;font-size:13px" id="dropArea">
+              คลิกเพื่อเลือกไฟล์ภาพ หรือลากมาวาง (Ctrl+V วางภาพได้ทันที)
+            </div>
+            <input type="file" id="f_imgFile" accept="image/*" hidden>
+          </div>
+          <div id="panel_url" hidden>
+            <input id="f_imgUrl" type="url" placeholder="https://.../screenshot.png">
+          </div>
+          <div id="panel_auto" hidden style="font-size:12px;color:var(--muted)">
+            ระบบจะดึงภาพ Screenshot จาก thum.io อัตโนมัติเมื่อกดบันทึก
+          </div>
+          <div id="imgPreviewBox" style="margin-top:10px;aspect-ratio:16/9;max-width:280px;border-radius:10px;border:1px dashed var(--line);overflow:hidden;display:grid;place-items:center;background:var(--paper);font-size:12px;color:var(--muted)">ยังไม่มีภาพ</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn ghost" data-close>ยกเลิก</button>
+      <button class="btn primary" id="saveSystemBtn">บันทึกระบบ</button>
+    </div>
+  </div>
+</div>
+
+<!-- 3. Category Manager Modal -->
+<div class="overlay" id="catOverlay" role="dialog" aria-modal="true" aria-labelledby="catTitle">
+  <div class="modal sm">
+    <div class="modal-head">
+      <h2 id="catTitle">จัดการด้านการปฏิบัติงาน</h2>
+      <button class="btn ghost icon-btn" data-close><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div id="catRowsList"></div>
+      <button class="btn" id="catAddBtn" style="margin-top:8px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>เพิ่มด้านใหม่</button>
+      <p style="font-size:12px;color:var(--muted);margin:14px 0 6px">ไอคอนแนะนำ:</p>
+      <div id="emojiPickBox" style="display:flex;flex-wrap:wrap;gap:4px"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn ghost" data-close>ยกเลิก</button>
+      <button class="btn primary" id="catSaveBtn">บันทึกหมวดหมู่</button>
+    </div>
+  </div>
+</div>
+
+<!-- 4. Settings, Announcement & Backup Modal -->
+<div class="overlay" id="settingsOverlay" role="dialog" aria-modal="true" aria-labelledby="setHead">
+  <div class="modal sm">
+    <div class="modal-head">
+      <h2 id="setHead">⚙️ ตั้งค่าระบบ & ประกาศข่าวสาร</h2>
+      <button class="btn ghost icon-btn" data-close><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <!-- Announcement Config (ฟีเจอร์ที่ 4) -->
+      <div style="margin-bottom:18px">
+        <h4 style="margin:0 0 6px;font-size:14px">📢 ข้อความประกาศหน้าแรก (Announcement Banner)</h4>
+        <input id="setAnnounceInput" placeholder="พิมพ์ข้อความประกาศ เช่น แจ้งปรับปรุงระบบ หรือเปิดตัวระบบใหม่..." style="width:100%;padding:8px 12px;border:1px solid var(--line);border-radius:8px;font-size:13px;margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <label style="font-size:13px;display:flex;align-items:center;gap:6px;cursor:pointer">
+            <input type="checkbox" id="setAnnounceEnable"> แสดงแถบประกาศบนหน้าแรก
+          </label>
+          <button class="btn primary" id="btnSaveAnnounce" style="padding:5px 12px;font-size:12px">บันทึกประกาศ</button>
+        </div>
+      </div>
+
+      <div style="border-top:1px solid var(--line);padding-top:14px;margin-bottom:18px">
+        <h4 style="margin:0 0 6px;font-size:14px">☁️ Firebase Cloud Sync</h4>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:10px">ซิงค์กับ Firestore (ts010-2bf5d) อัตโนมัติ</div>
+        <button class="btn" id="openFbConfigBtn" style="width:100%;justify-content:center">เชื่อมต่อ Cloud แล้ว 🟢</button>
+      </div>
+
+      <div style="border-top:1px solid var(--line);padding-top:14px">
+        <h4 style="margin:0 0 6px;font-size:14px">💾 สำรองและกู้คืนไฟล์ (JSON Backup)</h4>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:10px">ดาวน์โหลดฐานข้อมูลเก็บไว้ในคอมพิวเตอร์ หรือนำไฟล์กลับมาเปิด</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn" id="exportBtn" style="flex:1;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v3h16v-3"/></svg>สำรอง JSON</button>
+          <button class="btn" id="importBtn" style="flex:1;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V3m0 0L8 7m4-4 4 4M4 17v3h16v-3"/></svg>นำเข้า JSON</button>
+          <input type="file" id="importFileInput" accept=".json,application/json" hidden>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn ghost" data-close>ปิด</button>
+    </div>
+  </div>
+</div>
+
+<!-- 5. Owner PIN Modal -->
+<div class="overlay" id="pinOverlay" role="dialog" aria-modal="true" aria-labelledby="pinTitle">
+  <div class="modal sm">
+    <div class="modal-head">
+      <h2 id="pinTitle">🔒 รหัสผ่านเจ้าของระบบ (Owner Lock)</h2>
+      <button class="btn ghost icon-btn" data-close><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--muted);margin-top:0">ใส่รหัส PIN 4 หลัก เพื่อเปิดสิทธิ์การเพิ่ม แก้ไข หรือลบข้อมูลในระบบ</p>
+      <div style="max-width:220px;margin:16px auto">
+        <input type="password" id="pinInput" maxlength="6" placeholder="••••" style="font-size:24px;text-align:center;letter-spacing:8px;padding:8px">
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn ghost" data-close>ยกเลิก</button>
+      <button class="btn primary" id="pinConfirmBtn">ยืนยัน</button>
+    </div>
+  </div>
+</div>
+
+<!-- 6. QR Code Smart Badge Modal -->
+<div class="overlay" id="qrOverlay" role="dialog" aria-modal="true" aria-labelledby="qrTitle">
+  <div class="modal sm" style="max-width:440px">
+    <div class="modal-head">
+      <h2 id="qrTitle">📱 ป้ายชื่อระบบ & QR Code</h2>
+      <button class="btn ghost icon-btn" data-close><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+    <div class="modal-body" style="text-align:center">
+      <!-- Printable Card Preview -->
+      <div id="qrCardPreview" style="background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px 20px;box-shadow:var(--shadow);color:#0f172a;text-align:center;position:relative;overflow:hidden">
+        <div style="height:6px;background:linear-gradient(90deg,var(--primary),#06B6D4);position:absolute;top:0;left:0;right:0"></div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:6px">
+          <img src="logo-512.png" alt="ครูซอส" style="width:28px;height:28px;border-radius:50%;object-fit:cover">
+          <span style="font-size:11px;font-weight:600;letter-spacing:1px;color:#64748b;text-transform:uppercase">ครูซอสสอนสังคม · คลังระบบออนไลน์</span>
+        </div>
+        <div id="qrCardCat" style="display:inline-block;padding:2px 10px;border-radius:999px;background:#EEF2FF;color:#4F46E5;font-size:12px;font-weight:600;margin-bottom:10px">หมวดหมู่</div>
+        <h3 id="qrCardName" style="font-size:18px;font-weight:700;margin:0 0 6px;line-height:1.3;color:#0f172a">ชื่อระบบ</h3>
+        <p id="qrCardShort" style="font-size:12px;color:#64748b;margin:0 0 16px;line-height:1.5">คำอธิบายสั้นของระบบ</p>
+        
+        <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:14px;padding:16px;display:inline-block;margin:0 auto 14px">
+          <div id="qrCanvasBox" style="display:flex;justify-content:center"></div>
+        </div>
+
+        <div style="font-size:12px;font-weight:600;color:#0f172a;margin-bottom:4px">📱 สแกน QR Code เพื่อเปิดใช้งาน</div>
+        <div id="qrCardUrl" style="font-size:11px;color:#64748b;word-break:break-all">https://...</div>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-top:16px">
+        <button class="btn primary" id="btnDownloadQr" style="flex:1;justify-content:center">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>ดาวน์โหลดป้าย (PNG)
+        </button>
+        <button class="btn" id="btnCopyQr" style="flex:1;justify-content:center">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>คัดลอกรูปภาพ
+        </button>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn ghost" data-close>ปิด</button>
+    </div>
   </div>
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<!-- ==========================================================================
+     APPLICATION JAVASCRIPT
+     ========================================================================== -->
 <script>
 (function(){
-const KEY = "system-catalog-v1";
-const CAT_KEY = "system-catalog-cats";
-const NAME_KEY = "system-catalog-reviewer";
-const STATUS = { live:"ใช้งานอยู่", dev:"กำลังพัฒนา", off:"ปิดใช้งาน" };
+/* ---------- Firebase Project Config (ts010-2bf5d) ---------- */
+const DEFAULT_FB_CONFIG = {
+  apiKey: "AIzaSyAIATPSYlkNRQWBVgE32_zMN5lJ8X_t-wQ",
+  authDomain: "ts010-2bf5d.firebaseapp.com",
+  projectId: "ts010-2bf5d",
+  storageBucket: "ts010-2bf5d.firebasestorage.app",
+  messagingSenderId: "838806564711",
+  appId: "1:838806564711:web:4c18c70a8ad125f98b49c2"
+};
+
+const KEY = "sauce-systems-v3";
+const CAT_KEY = "sauce-cats-v3";
+const PIN_KEY = "sauce-owner-pin";
+const ANNOUNCE_KEY = "sauce-announcement";
+const STATUS_LABELS = { live:"พร้อมใช้งานจริง", dev:"ห้องทดลอง / พัฒนา", off:"ปิดปรับปรุง" };
 const NONE = "__none";
 const DEFAULT_CATS = [
-  ["งานบริหารทั่วไป","🏛️"],["งานบุคคล","👥"],["งานการเงิน/บัญชี","💰"],
-  ["งานพัสดุ/ครุภัณฑ์","📦"],["งานวิชาการ/การศึกษา","📚"],["งานบริการ","🤝"]
+  ["สื่อการสอน","📚"],["แผนการสอน","📋"],["ใบงาน/แบบฝึกหัด","🖼️"],
+  ["เอกสาร/คู่มือ","📑"],["ระบบอำนวยการ","⚙️"],["ระบบประเมินผล","📊"]
 ];
-const EMOJIS = ["🏛️","👥","💰","📦","📚","🤝","🏥","🧾","📊","📅","🗂️","🛠️","🚗","🏫","🍽️","🔐","📣","🌱","⚙️","💡"];
+const EMOJIS = ["📚","📋","🖼️","📑","⚙️","📊","💻","📱","📝","🏛️","👥","💰","📦","🤝","🏥","🧾","📅","🗂️","🛠️","🚗","🏫","🍽️","🔐","📣","🌱","💡"];
+const CHART_COLORS = ["#4F46E5","#06B6D4","#10B981","#F59E0B","#EC4899","#8B5CF6","#3B82F6"];
 
-const mem = {};
-function getLS(k){ try{ return localStorage.getItem(k); }catch(e){ return mem[k] ?? null; } }
-function setLS(k,v){
-  try{ localStorage.setItem(k,v); }
-  catch(e){ mem[k] = v; if(e && e.name === "QuotaExceededError") toast("พื้นที่เก็บเต็ม ลองใช้ภาพขนาดเล็กลงหรือใช้ลิงก์ภาพแทน"); }
+let items = [];
+let cats = [];
+let announcement = { text:"ยินดีต้อนรับสู่ คลังระบบออนไลน์และนวัตกรรมดิจิทัลของครูซอสสอนสังคม", enable:true };
+let isUnlocked = false;
+let fbDb = null;
+let currentTab = "all";
+let deferredPwaPrompt = null;
+
+/* ---------- Firebase Integration ---------- */
+function initFirebase(){
+  try{
+    if(window.firebase){
+      if(!firebase.apps.length){
+        firebase.initializeApp(DEFAULT_FB_CONFIG);
+      }
+      fbDb = firebase.firestore();
+      updateSyncStatus(true);
+      listenFirestore();
+    }
+  }catch(e){
+    console.warn("Firebase Init fallback to LocalStorage:", e);
+    updateSyncStatus(false);
+  }
 }
 
-let items = []; let cats = [];
+function updateSyncStatus(online){
+  const dot = document.querySelector("#sideSyncDot");
+  const txt = document.querySelector("#sideSyncText");
+  if(dot) dot.style.background = online ? "var(--live)" : "var(--off)";
+  if(txt) txt.textContent = online ? "Firebase Synced" : "Local Mode";
+}
+
+function listenFirestore(){
+  if(!fbDb) return;
+  fbDb.collection("systems").onSnapshot(snap => {
+    const list = [];
+    snap.forEach(d => list.push(d.data()));
+    if(list.length > 0){
+      items = list;
+      persist(false);
+      renderAll();
+    }
+  }, err => console.error(err));
+
+  fbDb.collection("meta").doc("categories").onSnapshot(doc => {
+    if(doc.exists && Array.isArray(doc.data().list)){
+      cats = doc.data().list;
+      persist(false);
+      renderNav();
+      renderAnalytics();
+    }
+  }, err => console.error(err));
+
+  fbDb.collection("meta").doc("announcement").onSnapshot(doc => {
+    if(doc.exists){
+      announcement = doc.data();
+      applyAnnouncementUI();
+    }
+  }, err => console.error(err));
+}
+
+async function syncToFirebase(){
+  if(!fbDb) return;
+  try{
+    const batch = fbDb.batch();
+    batch.set(fbDb.collection("meta").doc("categories"), { list: cats });
+    batch.set(fbDb.collection("meta").doc("announcement"), announcement);
+    items.forEach(it => {
+      batch.set(fbDb.collection("systems").doc(it.id), it);
+    });
+    await batch.commit();
+  }catch(e){
+    console.error("Sync error:", e);
+  }
+}
+
+/* ---------- Local Storage ---------- */
+function getLS(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+function setLS(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+
 function loadAll(){
   try{ items = JSON.parse(getLS(KEY) || "[]"); }catch(e){ items = []; }
   try{ cats = JSON.parse(getLS(CAT_KEY) || "null"); }catch(e){ cats = null; }
+  try{ const a = JSON.parse(getLS(ANNOUNCE_KEY) || "null"); if(a) announcement = a; }catch(e){}
+
   if(!Array.isArray(cats)){
     cats = [];
-    if(!items.length) DEFAULT_CATS.forEach(([name,icon]) => cats.push({ id:uid(), name, icon }));
+    DEFAULT_CATS.forEach(([name,icon]) => cats.push({ id:uid(), name, icon }));
   }
-  // migrate v1 items (cat stored as name) and fill defaults
   items.forEach(it => {
-    if(!Array.isArray(it.reviews)) it.reviews = [];
-    if(it.cat && !cats.some(c => c.id === it.cat)){
-      let c = cats.find(c => c.name === it.cat);
-      if(!c){ c = { id:uid(), name:String(it.cat), icon:"🗂️" }; cats.push(c); }
-      it.cat = c.id;
-    }
+    if(!it.status) it.status = "live";
+    if(typeof it.clicks !== "number") it.clicks = 0;
   });
-  persist();
+  persist(false);
+  applyAnnouncementUI();
 }
-function persist(){ setLS(KEY, JSON.stringify(items)); setLS(CAT_KEY, JSON.stringify(cats)); }
 
-/* ---------- helpers ---------- */
+function persist(syncCloud = true){
+  setLS(KEY, JSON.stringify(items));
+  setLS(CAT_KEY, JSON.stringify(cats));
+  setLS(ANNOUNCE_KEY, JSON.stringify(announcement));
+  if(syncCloud && fbDb) syncToFirebase();
+}
+
+/* ---------- Announcement Banner ---------- */
+function applyAnnouncementUI(){
+  const bar = $("#announceBanner");
+  const txt = $("#announceText");
+  if(!bar) return;
+  if(announcement.enable && announcement.text.trim()){
+    txt.textContent = announcement.text;
+    bar.style.display = "flex";
+  } else {
+    bar.style.display = "none";
+  }
+  $("#setAnnounceInput").value = announcement.text;
+  $("#setAnnounceEnable").checked = announcement.enable;
+}
+
+$("#closeAnnounceBtn").onclick = () => {
+  $("#announceBanner").style.display = "none";
+};
+
+$("#btnSaveAnnounce").onclick = () => {
+  announcement.text = $("#setAnnounceInput").value.trim();
+  announcement.enable = $("#setAnnounceEnable").checked;
+  persist();
+  applyAnnouncementUI();
+  toast("บันทึกประกาศเรียบร้อย 📢");
+};
+
+/* ---------- Click Analytics (ฟีเจอร์ที่ 1: นับการคลิก) ---------- */
+function recordClick(id){
+  const it = items.find(x => x.id === id);
+  if(!it) return;
+  it.clicks = (it.clicks || 0) + 1;
+  persist();
+  if(fbDb){
+    fbDb.collection("systems").doc(id).update({ clicks: it.clicks }).catch(()=>{});
+  }
+}
+
+/* ---------- Helpers ---------- */
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
@@ -501,471 +971,498 @@ function normUrl(u){ u = (u||"").trim(); if(u && !/^https?:\/\//i.test(u)) u = "
 function host(u){ try{ return new URL(u).host; }catch(e){ return u; } }
 function autoShot(u){ return "https://image.thum.io/get/width/1000/crop/700/" + u; }
 function imgOf(it){ if(it.imgMode === "auto") return autoShot(it.url); if(it.imgMode === "none") return ""; return it.img || ""; }
-function fmtDate(d){ if(!d) return ""; try{ return new Date(d).toLocaleDateString("th-TH",{year:"numeric",month:"long",day:"numeric"}); }catch(e){ return d; } }
-function ago(t){
-  const s = (Date.now() - t) / 1000;
-  if(s < 60) return "เมื่อสักครู่";
-  if(s < 3600) return Math.floor(s/60) + " นาทีที่แล้ว";
-  if(s < 86400) return Math.floor(s/3600) + " ชั่วโมงที่แล้ว";
-  if(s < 86400*7) return Math.floor(s/86400) + " วันที่แล้ว";
-  return fmtDate(t);
-}
 function catOf(it){ return cats.find(c => c.id === it.cat) || null; }
-function avg(it){ const r = it.reviews || []; return r.length ? r.reduce((a,b)=>a+b.stars,0) / r.length : 0; }
-const STAR = '<svg viewBox="0 0 24 24"><path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z"/></svg>';
-function starsHTML(v, lg){
-  let h = `<span class="stars${lg?" lg":""}" aria-label="${v.toFixed(1)} จาก 5 ดาว">`;
-  for(let i=1;i<=5;i++) h += STAR.replace("<svg", `<svg class="${v >= i - .25 ? "on" : "off"}"`);
-  return h + "</span>";
-}
-let toastT;
-function toast(msg){ const t = $("#toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(()=>t.classList.remove("show"), 2000); }
-async function copyText(text, msg){
-  try{ await navigator.clipboard.writeText(text); }
-  catch(e){ const ta = document.createElement("textarea"); ta.value = text; ta.style.position="fixed"; ta.style.opacity="0"; document.body.appendChild(ta); ta.select(); try{ document.execCommand("copy"); }catch(_){} ta.remove(); }
-  toast(msg || "คัดลอกลิงก์แล้ว");
-}
-function placeholder(name){ const ch = (name||"?").trim().charAt(0).toUpperCase() || "?"; return `<div class="ph">${esc(ch)}</div>`; }
+function placeholder(name){ return `<div class="ph">${esc((name||"?").charAt(0).toUpperCase())}</div>`; }
 window.__ph = placeholder;
 function shotHTML(it){
   const src = imgOf(it);
-  return `<div class="browserbar"><i></i><i></i><i></i><span>${esc(host(it.url))}</span></div>` +
-    (src ? `<img src="${esc(src)}" alt="หน้าตาระบบ ${esc(it.name)}" loading="lazy" onerror="this.outerHTML=window.__ph(${esc(JSON.stringify(it.name))})">` : placeholder(it.name));
+  return `<div class="bar"><i></i><i></i><i></i><span>${esc(host(it.url))}</span></div>` +
+    (src ? `<img src="${esc(src)}" alt="${esc(it.name)}" loading="lazy" onerror="this.outerHTML=window.__ph(${esc(JSON.stringify(it.name))})">` : placeholder(it.name));
 }
 
-const IC = {
-  home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>',
-  all:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>',
-  eye:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
-  open:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>',
-  copy:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>',
-  chat:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16v11H9l-5 4z"/></svg>',
-  edit:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h4L19 9l-4-4L4 16v4z"/></svg>',
-  del:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>',
-  plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>',
-  search:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>'
-};
+let toastT;
+function toast(msg){
+  const t = $("#toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(toastT); toastT = setTimeout(()=>t.classList.remove("show"), 2500);
+}
+async function copyText(text, msg){
+  try{ await navigator.clipboard.writeText(text); }
+  catch(e){
+    const ta = document.createElement("textarea"); ta.value = text;
+    ta.style.position="fixed"; ta.style.opacity="0"; document.body.appendChild(ta);
+    ta.select(); try{ document.execCommand("copy"); }catch(_){} ta.remove();
+  }
+  toast(msg || "คัดลอกเรียบร้อย");
+}
 
-/* ---------- routing ---------- */
-let listState = { q:"", status:"", sort:"new" };
+/* ---------- Routing ---------- */
 function currentRoute(){
-  const h = decodeURIComponent(location.hash.slice(1) || "home");
-  if(h === "home" || h === "all") return { page:h };
-  if(h.startsWith("cat/")) return { page:"cat", id:h.slice(4) };
-  return { page:"home" };
+  const h = decodeURIComponent(location.hash.slice(1) || "landing");
+  if(h === "landing") return { page:"landing" };
+  if(h === "all") return { page:"catalog", sub:"all" };
+  if(h === "live") return { page:"catalog", sub:"live" };
+  if(h === "dev") return { page:"catalog", sub:"dev" };
+  if(h.startsWith("cat/")) return { page:"catalog", sub:"cat", catId:h.slice(4) };
+  return { page:"landing" };
 }
-function go(hash){ if(location.hash !== "#" + hash) location.hash = hash; else render(); }
-window.addEventListener("hashchange", () => { document.body.classList.remove("menu-open"); render(); window.scrollTo(0,0); });
 
-function render(){
-  renderNav();
+function go(hash){
+  if(location.hash !== "#" + hash) location.hash = hash;
+  else renderAll();
+}
+
+window.addEventListener("hashchange", () => {
+  document.body.classList.remove("menu-open");
+  renderAll();
+  window.scrollTo(0,0);
+});
+
+function renderAll(){
   const r = currentRoute();
-  if(r.page === "home") renderHome();
-  else renderList(r.page === "cat" ? r.id : null);
+  const isLanding = r.page === "landing";
+
+  $("#appRoot").classList.toggle("landing-active", isLanding);
+  $("#viewLanding").classList.toggle("active", isLanding);
+  $("#viewCatalog").classList.toggle("active", !isLanding);
+
+  renderNav();
+  if(isLanding){
+    renderAnalytics();
+    renderQuickDock();
+    renderTrendingDock();
+  } else {
+    renderCatalogView(r);
+  }
 }
 
-/* ---------- nav ---------- */
+/* ---------- Sidebar Nav ---------- */
 function renderNav(){
   const r = currentRoute();
-  const cur = r.page === "cat" ? "cat/" + r.id : r.page;
-  const count = id => items.filter(i => id === NONE ? !catOf(i) : i.cat === id).length;
-  const noneCount = count(NONE);
-  let h = `
-    <a href="#home" ${cur==="home"?'aria-current="page"':""}><span class="ico">${IC.home}</span><span class="lbl">หน้าแรก</span></a>
-    <a href="#all" ${cur==="all"?'aria-current="page"':""}><span class="ico">${IC.all}</span><span class="lbl">ระบบทั้งหมด</span><span class="n">${items.length}</span></a>
-    <div class="nav-group"><span>ด้านของระบบ</span><button id="manageCats">จัดการ</button></div>`;
-  cats.forEach(c => {
-    h += `<a href="#cat/${encodeURIComponent(c.id)}" ${cur==="cat/"+c.id?'aria-current="page"':""}><span class="ico">${esc(c.icon||"🗂️")}</span><span class="lbl">${esc(c.name)}</span><span class="n">${count(c.id)}</span></a>`;
-  });
-  if(noneCount) h += `<a href="#cat/${NONE}" ${cur==="cat/"+NONE?'aria-current="page"':""}><span class="ico">❔</span><span class="lbl">ไม่ระบุด้าน</span><span class="n">${noneCount}</span></a>`;
-  h += `<div style="padding:14px 4px 0"><button class="btn primary" data-add style="width:100%;justify-content:center">${IC.plus}เพิ่มระบบ</button></div>`;
-  $("#nav").innerHTML = h;
-  $("#manageCats").onclick = openCatManager;
+  const liveCount = items.filter(i => i.status === "live").length;
+  const devCount = items.filter(i => i.status === "dev").length;
 
-  let title = "หน้าแรก";
-  if(r.page === "all") title = "ระบบทั้งหมด";
-  if(r.page === "cat") title = r.id === NONE ? "ไม่ระบุด้าน" : (cats.find(c=>c.id===r.id)?.name || "หมวดหมู่");
-  $("#mbTitle").textContent = title;
-  document.title = (r.page === "home" ? "" : title + " · ") + "คลังระบบของฉัน";
+  $("#countAll").textContent = items.length;
+  $("#countLive").textContent = liveCount;
+  $("#countDev").textContent = devCount;
+
+  $("#navLanding").classList.toggle("active", r.page === "landing");
+  $("#navAll").classList.toggle("active", r.page === "catalog" && r.sub === "all");
+  $("#navLive").classList.toggle("active", r.page === "catalog" && r.sub === "live");
+  $("#navDev").classList.toggle("active", r.page === "catalog" && r.sub === "dev");
+
+  let h = "";
+  cats.forEach(c => {
+    const count = items.filter(i => i.cat === c.id).length;
+    const isAct = r.page === "catalog" && r.sub === "cat" && r.catId === c.id;
+    h += `<a href="#cat/${encodeURIComponent(c.id)}" class="nav-item ${isAct?'active':''}">
+            <span class="icon">${esc(c.icon||"🗂️")}</span>
+            <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c.name)}</span>
+            <span class="count">${count}</span>
+          </a>`;
+  });
+  $("#catNavList").innerHTML = h;
 }
 
-/* ---------- home ---------- */
-function renderHome(){
+/* ---------- Analytics & Charts ---------- */
+function renderAnalytics(){
   const live = items.filter(i=>i.status==="live").length;
   const dev = items.filter(i=>i.status==="dev").length;
-  const allReviews = items.flatMap(it => (it.reviews||[]).map(r => ({...r, it})));
-  const rated = items.filter(i => (i.reviews||[]).length).sort((a,b) => avg(b)-avg(a) || b.reviews.length-a.reviews.length).slice(0,4);
-  const recent = [...items].sort((a,b)=>b.created-a.created).slice(0,4);
-  const feed = allReviews.sort((a,b)=>b.at-a.at).slice(0,6);
-  const hour = new Date().getHours();
-  const greet = hour < 12 ? "สวัสดีตอนเช้า" : hour < 17 ? "สวัสดีตอนบ่าย" : "สวัสดีตอนเย็น";
+  const total = items.length;
 
-  let h = `
-  <section class="hero">
-    <h1>${greet} ระบบทั้งหมดของคุณอยู่ที่นี่</h1>
-    <p>${new Date().toLocaleDateString("th-TH",{weekday:"long",year:"numeric",month:"long",day:"numeric"})}</p>
-    <form class="hero-search" id="heroSearch">
-      <input type="search" id="heroQ" placeholder="ค้นหาระบบจากชื่อ รายละเอียด หรือเทคโนโลยี" aria-label="ค้นหาระบบ">
-      <button class="btn primary" type="submit">${IC.search}ค้นหา</button>
-      <button class="btn" type="button" data-add>${IC.plus}เพิ่มระบบ</button>
-    </form>
-    <div class="stats">
-      <div class="stat"><b>${items.length}</b><span>ระบบทั้งหมด</span></div>
-      <div class="stat"><b>${live}</b><span>ใช้งานอยู่</span></div>
-      <div class="stat"><b>${dev}</b><span>กำลังพัฒนา</span></div>
-      <div class="stat"><b>${allReviews.length}</b><span>ความคิดเห็น</span></div>
-    </div>
-  </section>
+  $("#kpiTotal").textContent = total;
+  $("#kpiLive").textContent = live;
+  $("#kpiDev").textContent = dev;
+  $("#kpiCats").textContent = cats.length;
 
-  <section class="sec">
-    <div class="sec-head"><h2>เลือกดูตามด้าน</h2><a href="#all">ดูระบบทั้งหมด</a></div>
-    <div class="cat-tiles">
-      ${cats.map(c => { const n = items.filter(i=>i.cat===c.id).length; return `
-        <a class="tile" href="#cat/${encodeURIComponent(c.id)}"><span class="t-ico">${esc(c.icon||"🗂️")}</span><span><b>${esc(c.name)}</b><span>${n} ระบบ</span></span></a>`; }).join("")}
-      <button class="tile add" id="tileAddCat"><span class="t-ico">${IC.plus}</span><span><b>เพิ่ม/แก้ไขด้าน</b><span>จัดการหมวดหมู่</span></span></button>
-    </div>
-  </section>`;
+  const rate = total ? Math.round((live / total) * 100) : 0;
+  $("#readinessRate").textContent = `${rate}% พร้อมใช้`;
+  $("#meterLiveTxt").textContent = `${live} ระบบ (${rate}%)`;
+  $("#meterDevTxt").textContent = `${dev} ระบบ (${total ? 100-rate : 0}%)`;
+  $("#barLive").style.width = rate + "%";
+  $("#barDev").style.width = (total ? 100-rate : 0) + "%";
 
-  if(!items.length){
-    h += `<div class="empty" style="background:var(--surface);border:1px dashed var(--line);border-radius:16px">
-      <h2>ยังไม่มีระบบในคลัง</h2><p>เพิ่มระบบแรก หรือลองใส่ข้อมูลตัวอย่างเพื่อดูการทำงาน</p>
-      <button class="btn primary" data-add>${IC.plus}เพิ่มระบบ</button>
-      <button class="btn" id="sampleBtn" style="margin-left:6px">ใส่ข้อมูลตัวอย่าง</button></div>`;
-  } else {
-    h += `<section class="sec"><div class="sec-head"><h2>เพิ่มล่าสุด</h2></div><div class="grid compact">${recent.map(cardHTML).join("")}</div></section>`;
-    h += `<section class="sec"><div class="sec-head"><h2>คะแนนสูงสุด</h2></div>` +
-      (rated.length ? `<div class="grid compact">${rated.map(cardHTML).join("")}</div>` : `<div class="muted-box">ยังไม่มีระบบที่ได้รับคะแนน เปิดรายละเอียดระบบแล้วให้ดาวได้เลย</div>`) + `</section>`;
-    h += `<section class="sec"><div class="sec-head"><h2>ความคิดเห็นล่าสุด</h2></div>` +
-      (feed.length ? `<div class="comment-feed">${feed.map(r => `
-        <button class="feed-row" data-open="${r.it.id}">
-          <span class="avatar">${esc((r.name||"?").charAt(0))}</span>
-          <span class="fr-body">
-            <span class="fr-top"><b>${esc(r.name)}</b>${starsHTML(r.stars)}<span class="fr-sys">ใน ${esc(r.it.name)} · ${ago(r.at)}</span></span>
-            ${r.text ? `<p>${esc(r.text)}</p>` : ""}
-          </span>
-        </button>`).join("")}</div>` : `<div class="muted-box">ยังไม่มีความคิดเห็น</div>`) + `</section>`;
+  const svg = $("#donutSvg");
+  const legend = $("#donutLegend");
+  if(!total || !cats.length){
+    svg.innerHTML = `<circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--line)" stroke-width="3"/>`;
+    legend.innerHTML = `<span style="font-size:12px;color:var(--muted)">ยังไม่มีข้อมูลระบบ</span>`;
+    return;
   }
-  $("#view").innerHTML = h;
-  $("#heroSearch").onsubmit = e => { e.preventDefault(); listState.q = $("#heroQ").value.trim(); go("all"); };
-  $("#tileAddCat").onclick = openCatManager;
-  const sb = $("#sampleBtn"); if(sb) sb.onclick = addSample;
+
+  let acc = 0;
+  let circles = "";
+  let legH = "";
+  cats.forEach((c, idx) => {
+    const n = items.filter(i => i.cat === c.id).length;
+    if(n === 0) return;
+    const pct = (n / total) * 100;
+    const color = CHART_COLORS[idx % CHART_COLORS.length];
+    circles += `<circle cx="18" cy="18" r="15.91549430918954" fill="none" stroke="${color}" stroke-width="3.5"
+                stroke-dasharray="${pct} ${100-pct}" stroke-dashoffset="${-acc}"/>`;
+    legH += `<div class="legend-row">
+              <span class="legend-label"><span class="legend-dot" style="background:${color}"></span>${esc(c.name)}</span>
+              <span class="legend-val">${n} <small style="font-weight:400;color:var(--muted)">(${Math.round(pct)}%)</small></span>
+             </div>`;
+    acc += pct;
+  });
+  svg.innerHTML = circles || `<circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--line)" stroke-width="3"/>`;
+  legend.innerHTML = legH;
 }
 
-/* ---------- list page ---------- */
-function renderList(catId){
-  let title = "ระบบทั้งหมด", icon = "", sub = "";
-  if(catId){
-    if(catId === NONE){ title = "ไม่ระบุด้าน"; icon = "❔"; }
-    else{
-      const c = cats.find(c=>c.id===catId);
-      if(!c){ go("home"); return; }
-      title = c.name; icon = c.icon || "🗂️";
-    }
-  }
-  const base = catId ? items.filter(i => catId === NONE ? !catOf(i) : i.cat === catId) : items;
-  sub = `${base.length} ระบบ · ใช้งานอยู่ ${base.filter(i=>i.status==="live").length}`;
+/* Quick Launch Dock */
+function renderQuickDock(){
+  const grid = $("#dockGrid");
+  const liveItems = items.filter(i => i.status === "live");
+  const showList = liveItems.length ? liveItems.slice(0,6) : items.slice(0,6);
 
-  $("#view").innerHTML = `
-    <div class="page-head">
-      <div><h1>${icon?`<span class="big-ico">${esc(icon)}</span>`:""}${esc(title)}</h1><div class="sub">${sub}</div></div>
-      <button class="btn primary" data-add data-cat="${catId && catId!==NONE ? esc(catId) : ""}">${IC.plus}เพิ่มระบบ${catId && catId!==NONE ? "ในด้านนี้" : ""}</button>
-    </div>
-    <div class="toolbar">
-      <div class="search">${IC.search}<input type="search" id="q" placeholder="ค้นหาชื่อระบบ รายละเอียด หรือเทคโนโลยี" aria-label="ค้นหา" value="${esc(listState.q)}"></div>
-      <select id="statusFilter" aria-label="กรองตามสถานะ">
-        <option value="">ทุกสถานะ</option><option value="live">ใช้งานอยู่</option><option value="dev">กำลังพัฒนา</option><option value="off">ปิดใช้งาน</option>
-      </select>
-      <select id="sort" aria-label="เรียงลำดับ">
-        <option value="new">เพิ่มล่าสุด</option><option value="old">เก่าสุด</option><option value="name">ชื่อ ก–ฮ / A–Z</option><option value="rating">คะแนนสูงสุด</option>
-      </select>
-    </div>
-    <div class="grid" id="grid"></div>`;
-  $("#statusFilter").value = listState.status;
-  $("#sort").value = listState.sort;
-  const draw = () => {
-    listState = { q:$("#q").value.trim(), status:$("#statusFilter").value, sort:$("#sort").value };
-    const q = listState.q.toLowerCase();
-    let list = base.filter(it => {
-      if(listState.status && it.status !== listState.status) return false;
-      if(q){ const hay = [it.name,it.short,it.detail,catOf(it)?.name,it.url,(it.tech||[]).join(" ")].join(" ").toLowerCase(); if(!hay.includes(q)) return false; }
-      return true;
+  if(!showList.length){
+    grid.innerHTML = `<div class="empty-box" style="grid-column:1/-1;padding:30px">
+      <h2>ยังไม่มีระบบในคลัง</h2><p>เริ่มเพิ่มระบบงานและแอปพลิเคชันของคุณครูได้เลย</p>
+      <button class="btn primary" data-add>+ เพิ่มระบบแรก</button>
+    </div>`;
+    return;
+  }
+
+  grid.innerHTML = showList.map(it => {
+    const c = catOf(it);
+    return `
+    <a class="dock-item" href="${esc(it.url)}" target="_blank" rel="noopener" onclick="window.__click('${it.id}')">
+      <div class="dock-icon">${esc(c?.icon||"💻")}</div>
+      <div class="dock-text">
+        <b>${esc(it.name)}</b>
+        <span>${esc(it.short || c?.name || "ระบบงาน")}</span>
+      </div>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:var(--muted)"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>
+    </a>`;
+  }).join("");
+}
+
+/* Trending & Popular Section (ฟีเจอร์ที่ 1) */
+function renderTrendingDock(){
+  const head = $("#trendingHead");
+  const grid = $("#trendingGrid");
+  const sorted = [...items].filter(i => (i.clicks || 0) > 0).sort((a,b) => (b.clicks||0) - (a.clicks||0)).slice(0,4);
+
+  if(!sorted.length){
+    head.style.display = "none";
+    grid.style.display = "none";
+    return;
+  }
+
+  head.style.display = "flex";
+  grid.style.display = "grid";
+
+  grid.innerHTML = sorted.map((it, idx) => {
+    const c = catOf(it);
+    return `
+    <a class="dock-item" href="${esc(it.url)}" target="_blank" rel="noopener" onclick="window.__click('${it.id}')" style="border-color:rgba(79,70,229,0.3)">
+      <div class="dock-icon" style="background:var(--dev-soft);color:var(--dev)">${idx === 0 ? "🥇" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : "🔥"}</div>
+      <div class="dock-text">
+        <b>${esc(it.name)}</b>
+        <span>เข้าใช้ ${it.clicks} ครั้ง · ${esc(c?.name || "ระบบงาน")}</span>
+      </div>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:var(--primary)"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>
+    </a>`;
+  }).join("");
+}
+window.__click = recordClick;
+
+/* Real-time Clock */
+function updateClock(){
+  const d = new Date();
+  const t = $("#liveTime");
+  const dt = $("#liveDate");
+  if(t) t.textContent = d.toLocaleTimeString("th-TH", { hour12:false }) + " น.";
+  if(dt) dt.textContent = d.toLocaleDateString("th-TH", { weekday:"long", year:"numeric", month:"long", day:"numeric" });
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+/* ---------- Catalog Dashboard View ---------- */
+function renderCatalogView(route){
+  let title = "📦 ระบบทั้งหมด";
+  let sub = "ระบบงาน สื่อการสอน และนวัตกรรมดิจิทัลทั้งหมด";
+
+  if(route.sub === "live"){
+    title = "🟢 ระบบที่พร้อมใช้งานจริง";
+    sub = "เฉพาะระบบที่เปิดใช้งานแล้วและพร้อมให้บริการ";
+  } else if(route.sub === "dev"){
+    title = "🛠️ ห้องทดลอง / กำลังพัฒนา (Dev Lab)";
+    sub = "ระบบที่อยู่ระหว่างการสร้างและทดลอง";
+  } else if(route.sub === "cat"){
+    const c = cats.find(x => x.id === route.catId);
+    title = c ? `${esc(c.icon||"🗂️")} ${esc(c.name)}` : "ด้านงาน";
+    sub = `ระบบในสังกัดหมวดหมู่ ${esc(c?.name||"")}`;
+  }
+
+  $("#catPageTitle").innerHTML = title;
+  $("#catPageSub").textContent = sub;
+
+  if(route.sub === "live") currentTab = "live";
+  else if(route.sub === "dev") currentTab = "dev";
+  else currentTab = "all";
+
+  document.querySelectorAll("#segTab button").forEach(b => {
+    b.classList.toggle("active", b.dataset.tab === currentTab);
+  });
+
+  drawCards();
+}
+
+function drawCards(){
+  const r = currentRoute();
+  const q = $("#catSearch").value.trim().toLowerCase();
+  const sort = $("#catSortSelect").value;
+
+  let list = [...items];
+
+  if(r.sub === "cat" && r.catId){
+    list = list.filter(i => i.cat === r.catId);
+  }
+
+  if(currentTab === "live") list = list.filter(i => i.status === "live");
+  if(currentTab === "dev") list = list.filter(i => i.status === "dev");
+
+  if(q){
+    list = list.filter(it => {
+      const hay = [it.name, it.short, it.detail, it.features, it.tech?.join(" "), catOf(it)?.name, it.url].join(" ").toLowerCase();
+      return hay.includes(q);
     });
-    const s = listState.sort;
-    if(s === "new") list.sort((a,b)=>b.created-a.created);
-    if(s === "old") list.sort((a,b)=>a.created-b.created);
-    if(s === "name") list.sort((a,b)=>a.name.localeCompare(b.name,"th"));
-    if(s === "rating") list.sort((a,b)=>avg(b)-avg(a) || (b.reviews||[]).length-(a.reviews||[]).length);
-    const g = $("#grid");
-    if(!base.length){
-      g.innerHTML = `<div class="empty"><h2>ยังไม่มีระบบในด้านนี้</h2><p>เพิ่มระบบแรกของด้านนี้ได้เลย</p><button class="btn primary" data-add data-cat="${catId && catId!==NONE ? esc(catId) : ""}">${IC.plus}เพิ่มระบบ</button></div>`;
-    } else if(!list.length){
-      g.innerHTML = `<div class="empty"><h2>ไม่พบระบบที่ตรงกับการค้นหา</h2><p>ลองเปลี่ยนคำค้นหรือสถานะ</p></div>`;
-    } else g.innerHTML = list.map(cardHTML).join("");
-  };
-  ["q","statusFilter","sort"].forEach(id => $("#"+id).addEventListener("input", draw));
-  draw();
+  }
+
+  if(sort === "new") list.sort((a,b)=>b.created-a.created);
+  if(sort === "old") list.sort((a,b)=>a.created-b.created);
+  if(sort === "name") list.sort((a,b)=>a.name.localeCompare(b.name,"th"));
+  if(sort === "clicks") list.sort((a,b)=>(b.clicks||0)-(a.clicks||0));
+
+  const grid = $("#cardsGrid");
+  if(!list.length){
+    grid.innerHTML = `<div class="empty-box">
+      <h2>ไม่พบรายการระบบในส่วนนี้</h2>
+      <p>คุณครูสามารถเพิ่มระบบใหม่ได้จากปุ่ม <b>+ เพิ่มระบบ</b> ด้านบนขวา</p>
+    </div>`;
+  } else {
+    grid.innerHTML = list.map(cardHTML).join("");
+  }
 }
 
 function cardHTML(it){
-  const c = catOf(it); const n = (it.reviews||[]).length; const a = avg(it);
+  const c = catOf(it);
   return `
-  <article class="card" data-id="${it.id}">
-    <div class="shot" tabindex="0" role="button" aria-label="ดูตัวอย่าง ${esc(it.name)}" data-act="preview">${shotHTML(it)}<span class="peek">ดูตัวอย่าง</span></div>
-    <div class="card-body">
-      <div class="meta-row"><span class="status ${it.status}">${STATUS[it.status]||""}</span>${c?`<span class="cat">${esc(c.icon||"")} ${esc(c.name)}</span>`:""}</div>
+  <article class="sys-card" data-id="${it.id}">
+    <div class="card-shot" tabindex="0" role="button" data-act="preview">
+      ${shotHTML(it)}
+      <span class="peek">ดูตัวอย่าง</span>
+    </div>
+    <div class="card-content">
+      <div class="card-meta">
+        <span class="badge badge-${it.status}">${STATUS_LABELS[it.status]||""}</span>
+        ${c ? `<span class="badge badge-primary">${esc(c.icon||"")} ${esc(c.name)}</span>` : ""}
+        ${it.version ? `<span class="tag-chip" style="font-weight:600">${esc(it.version)}</span>` : ""}
+        ${it.clicks ? `<span class="tag-chip" style="color:var(--primary)">👁️ ${it.clicks} ครั้ง</span>` : ""}
+      </div>
       <h3 data-act="detail">${esc(it.name)}</h3>
       ${it.short ? `<p class="desc">${esc(it.short)}</p>` : ""}
-      <button class="rate-line" data-act="review">${starsHTML(a)}<span>${n ? `${a.toFixed(1)} · ${n} ความคิดเห็น` : "ยังไม่มีคะแนน"}</span></button>
-      ${(it.tech||[]).length ? `<div class="tags">${it.tech.map(t=>`<span class="tag">${esc(t)}</span>`).join("")}</div>` : ""}
+      ${(it.tech||[]).length ? `<div class="tag-list">${it.tech.map(t=>`<span class="tag-chip">${esc(t)}</span>`).join("")}</div>` : ""}
     </div>
-    <div class="card-actions">
-      <button class="btn" data-act="preview" title="ดูตัวอย่างภายในหน้านี้">${IC.eye}ตัวอย่าง</button>
-      <a class="btn live" href="${esc(it.url)}" target="_blank" rel="noopener" title="เปิดใช้งานจริงในแท็บใหม่">${IC.open}ใช้งานจริง</a>
-      <span class="spacer"></span>
-      <button class="btn icon-btn" data-act="copy" title="คัดลอกลิงก์" aria-label="คัดลอกลิงก์">${IC.copy}</button>
-      <button class="btn icon-btn" data-act="review" title="ให้ดาวและแสดงความคิดเห็น" aria-label="ให้ดาวและแสดงความคิดเห็น">${IC.chat}</button>
+    <div class="card-foot">
+      <button class="btn ghost" data-act="detail" style="font-weight:500">รายละเอียด</button>
+      <a class="btn live" href="${esc(it.url)}" target="_blank" rel="noopener" onclick="window.__click('${it.id}')">เปิดใช้งาน ↗</a>
+      <span style="flex:1"></span>
+      <button class="btn icon-btn ghost" data-act="qr" title="สร้าง QR Code ป้ายชื่อระบบ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></button>
+      <button class="btn icon-btn ghost" data-act="copy" title="คัดลอกลิงก์"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button>
     </div>
   </article>`;
 }
 
-/* ---------- global clicks ---------- */
-document.addEventListener("click", e => {
-  const add = e.target.closest("[data-add]");
-  if(add){ openForm(null, add.dataset.cat || currentCatForAdd()); return; }
-  const open = e.target.closest("[data-open]");
-  if(open){ const it = items.find(i=>i.id===open.dataset.open); if(it) openDetail(it, true); return; }
-  const el = e.target.closest("[data-act]"); if(!el) return;
-  const card = el.closest(".card"); if(!card) return;
-  const it = items.find(i => i.id === card.dataset.id); if(!it) return;
-  const act = el.dataset.act;
-  if(act === "preview") openPreview(it);
-  if(act === "detail") openDetail(it);
-  if(act === "review") openDetail(it, true);
-  if(act === "copy") copyText(it.url);
-});
-document.addEventListener("keydown", e => {
-  if((e.key === "Enter" || e.key === " ") && e.target.classList && e.target.classList.contains("shot")){ e.preventDefault(); e.target.click(); }
-});
-function currentCatForAdd(){ const r = currentRoute(); return r.page === "cat" && r.id !== NONE ? r.id : ""; }
+$("#catSearch").addEventListener("input", drawCards);
+$("#catSortSelect").addEventListener("change", drawCards);
 
-$("#menuBtn").onclick = () => document.body.classList.add("menu-open");
-$("#scrim").onclick = () => document.body.classList.remove("menu-open");
-
-/* ---------- overlays ---------- */
-let focusStack = [];
-function openOverlay(el){ focusStack.push(document.activeElement); el.classList.add("open"); document.body.style.overflow="hidden"; }
-function closeOverlay(el){
-  el.classList.remove("open");
-  if(!document.querySelector(".overlay.open")) document.body.style.overflow="";
-  if(el.id === "pvOverlay") $("#pvFrame").innerHTML = "";
-  const f = focusStack.pop(); if(f && f.focus && document.contains(f)) f.focus();
-}
-document.querySelectorAll(".overlay").forEach(o => o.addEventListener("click", e => { if(e.target === o || e.target.closest("[data-close]")) closeOverlay(o); }));
-document.addEventListener("keydown", e => {
-  if(e.key !== "Escape") return;
-  const open = [...document.querySelectorAll(".overlay.open")].pop();
-  if(open) closeOverlay(open); else document.body.classList.remove("menu-open");
+document.querySelectorAll("#segTab button").forEach(b => {
+  b.addEventListener("click", () => {
+    currentTab = b.dataset.tab;
+    document.querySelectorAll("#segTab button").forEach(x => x.classList.remove("active"));
+    b.classList.add("active");
+    drawCards();
+  });
 });
 
-/* ---------- preview ---------- */
-let currentPreview = null;
-function openPreview(it){
-  currentPreview = it;
-  $("#pvName").textContent = it.name;
-  $("#pvOpen").href = it.url;
-  setDevice("100%");
-  $("#pvFrame").innerHTML = `<iframe src="${esc(it.url)}" title="ตัวอย่าง ${esc(it.name)}" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads"></iframe>`;
-  openOverlay($("#pvOverlay"));
+/* ---------- Spotlight Search (Ctrl + K) (ฟีเจอร์ที่ 2) ---------- */
+function openSpotlight(){
+  const ov = $("#spotlightOverlay");
+  const inp = $("#spotlightInput");
+  inp.value = "";
+  renderSpotlightResults("");
+  openOverlay(ov);
+  setTimeout(() => inp.focus(), 80);
 }
-function setDevice(w){ $("#pvFrame").style.width = w; $("#pvSeg").querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", b.dataset.w === w)); }
-$("#pvSeg").addEventListener("click", e => { const b = e.target.closest("button"); if(b) setDevice(b.dataset.w); });
-$("#pvReload").onclick = () => { const f = $("#pvFrame iframe"); if(f) f.src = f.src; };
-$("#pvCopy").onclick = () => currentPreview && copyText(currentPreview.url);
 
-/* ---------- detail + reviews ---------- */
-let detailItem = null;
-function openDetail(it, focusReview){
-  detailItem = it;
-  $("#dTitle").textContent = it.name;
-  drawDetail();
-  if(!$("#detailOverlay").classList.contains("open")) openOverlay($("#detailOverlay"));
-  if(focusReview) setTimeout(() => { const w = $("#reviews"); if(w) w.scrollIntoView({block:"start"}); }, 40);
-}
-function drawDetail(){
-  const it = detailItem; const src = imgOf(it); const c = catOf(it);
-  const rv = [...(it.reviews||[])].sort((a,b)=>b.at-a.at);
-  const a = avg(it);
-  const dist = [5,4,3,2,1].map(s => ({ s, n: rv.filter(r=>r.stars===s).length }));
-  let savedName = getLS(NAME_KEY) || "";
+function renderSpotlightResults(q){
+  const res = $("#spotlightResults");
+  q = q.trim().toLowerCase();
+  let list = items;
+  if(q){
+    list = items.filter(it => {
+      const hay = [it.name, it.short, it.features, it.tech?.join(" "), catOf(it)?.name].join(" ").toLowerCase();
+      return hay.includes(q);
+    });
+  }
 
-  $("#dBody").innerHTML = `
-    ${src ? `<div class="detail-shot"><img src="${esc(src)}" alt="หน้าตาระบบ ${esc(it.name)}" onerror="this.parentNode.remove()"></div>` : ""}
-    <div class="meta-row"><span class="status ${it.status}">${STATUS[it.status]}</span>${c?`<span class="cat">${esc(c.icon||"")} ${esc(c.name)}</span>`:""}</div>
-    ${it.short ? `<p style="margin:6px 0 0;font-size:17px">${esc(it.short)}</p>` : ""}
-    <div class="linkbox"><code title="${esc(it.url)}">${esc(it.url)}</code><button class="btn" id="dCopy">${IC.copy}คัดลอก</button></div>
-    ${it.detail ? `<div class="section-h">รายละเอียด</div><div class="longtext">${esc(it.detail)}</div>` : ""}
-    ${(it.user||it.pass) ? `<div class="section-h">บัญชีทดลอง</div><div class="cred">
-        ${it.user?`<div><span>ชื่อผู้ใช้: <b>${esc(it.user)}</b></span><button class="mini" data-cp="${esc(it.user)}">คัดลอก</button></div>`:""}
-        ${it.pass?`<div><span>รหัสผ่าน: <b>${esc(it.pass)}</b></span><button class="mini" data-cp="${esc(it.pass)}">คัดลอก</button></div>`:""}
-      </div>` : ""}
-    <dl class="dl">
-      ${(it.tech||[]).length ? `<dt>เทคโนโลยี</dt><dd><div class="tags" style="margin:0">${it.tech.map(t=>`<span class="tag">${esc(t)}</span>`).join("")}</div></dd>` : ""}
-      ${it.date ? `<dt>วันที่สร้าง</dt><dd>${fmtDate(it.date)}</dd>` : ""}
-      <dt>บันทึกในคลังเมื่อ</dt><dd>${fmtDate(it.created)}</dd>
-    </dl>
+  if(!list.length){
+    res.innerHTML = `<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px">ไม่พบระบบที่ตรงกับคำค้นหา</div>`;
+    return;
+  }
 
-    <div class="review-wrap" id="reviews">
-      <div class="section-h">คะแนนและความคิดเห็น</div>
-      ${rv.length ? `<div class="rv-summary">
-          <div><div class="rv-avg">${a.toFixed(1)}</div>${starsHTML(a)}<div style="font-size:13px;color:var(--muted)">${rv.length} ความคิดเห็น</div></div>
-          <div class="rv-bars">${dist.map(d => `<div class="rv-bar"><span>${d.s}</span><i><b style="width:${rv.length ? d.n/rv.length*100 : 0}%"></b></i><span>${d.n}</span></div>`).join("")}</div>
-        </div>` : ""}
-      <div class="rv-form">
-        <div><span class="star-pick" id="starPick" role="radiogroup" aria-label="ให้คะแนน">
-          ${[1,2,3,4,5].map(i => `<button type="button" data-s="${i}" role="radio" aria-checked="false" aria-label="${i} ดาว">${STAR}</button>`).join("")}
-        </span><span class="rv-hint" id="starHint">แตะดาวเพื่อให้คะแนน</span></div>
-        <textarea class="inp" id="rvText" placeholder="เขียนความคิดเห็น ข้อเสนอแนะ หรือปัญหาที่พบ"></textarea>
-        <div class="row">
-          <input class="inp" id="rvName" placeholder="ชื่อผู้แสดงความคิดเห็น" value="${esc(savedName)}">
-          <button class="btn primary" id="rvSend">ส่งความคิดเห็น</button>
-        </div>
+  res.innerHTML = list.slice(0, 8).map((it, idx) => {
+    const c = catOf(it);
+    return `
+    <div class="spotlight-item ${idx===0?'selected':''}" data-id="${it.id}">
+      <div class="s-icon">${esc(c?.icon||"💻")}</div>
+      <div style="flex:1;min-width:0">
+        <div class="s-title">${esc(it.name)}</div>
+        <div class="s-sub">${esc(it.short || c?.name || it.url)}</div>
       </div>
-      ${rv.length ? rv.map(r => `
-        <div class="rv-item">
-          <span class="avatar">${esc((r.name||"?").charAt(0))}</span>
-          <div style="flex:1;min-width:0">
-            <div class="rv-top"><b>${esc(r.name)}</b>${starsHTML(r.stars)}<span class="rv-date">${ago(r.at)}</span>
-              <span style="flex:1"></span><button class="mini del" data-delrv="${r.id}">ลบ</button></div>
-            ${r.text ? `<p>${esc(r.text)}</p>` : ""}
-          </div>
-        </div>`).join("") : `<p style="color:var(--muted);margin:0">ยังไม่มีความคิดเห็น เป็นคนแรกที่ให้คะแนนระบบนี้</p>`}
+      <span class="badge badge-${it.status}">${STATUS_LABELS[it.status]}</span>
     </div>`;
+  }).join("");
 
-  $("#dFoot").innerHTML = `
-    <button class="btn danger" id="dDel">${IC.del}ลบระบบ</button>
-    <button class="btn" id="dEdit">${IC.edit}แก้ไข</button>
-    <span style="flex:1"></span>
-    <button class="btn" id="dPrev">${IC.eye}ดูตัวอย่าง</button>
-    <a class="btn live" href="${esc(it.url)}" target="_blank" rel="noopener">${IC.open}เปิดใช้งานจริง</a>`;
-
-  $("#dCopy").onclick = () => copyText(it.url);
-  $("#dBody").querySelectorAll("[data-cp]").forEach(b => b.onclick = () => copyText(b.dataset.cp, "คัดลอกแล้ว"));
-  $("#dPrev").onclick = () => openPreview(it);
-  $("#dEdit").onclick = () => { closeOverlay($("#detailOverlay")); openForm(it); };
-  $("#dDel").onclick = () => {
-    if(confirm(`ลบ “${it.name}” ออกจากคลัง? ความคิดเห็นทั้งหมดของระบบนี้จะถูกลบด้วย`)){
-      items = items.filter(i => i.id !== it.id); persist(); render(); closeOverlay($("#detailOverlay")); toast("ลบระบบแล้ว");
-    }
-  };
-
-  // star picker
-  let picked = 0;
-  const labels = ["","ต้องปรับปรุง","พอใช้","ดี","ดีมาก","ยอดเยี่ยม"];
-  const pick = $("#starPick");
-  const paint = v => pick.querySelectorAll("button").forEach(b => { const s = +b.dataset.s; b.classList.toggle("on", s <= v); b.setAttribute("aria-checked", s === picked); });
-  pick.addEventListener("mouseover", e => { const b = e.target.closest("button"); if(b) paint(+b.dataset.s); });
-  pick.addEventListener("mouseleave", () => paint(picked));
-  pick.addEventListener("click", e => { const b = e.target.closest("button"); if(!b) return; picked = +b.dataset.s; paint(picked); $("#starHint").textContent = `${picked} ดาว · ${labels[picked]}`; });
-
-  $("#rvSend").onclick = () => {
-    if(!picked){ toast("แตะดาวเพื่อให้คะแนนก่อนส่ง"); return; }
-    const name = $("#rvName").value.trim() || "ไม่ระบุชื่อ";
-    const text = $("#rvText").value.trim();
-    if($("#rvName").value.trim()) setLS(NAME_KEY, name);
-    it.reviews = it.reviews || [];
-    it.reviews.push({ id:uid(), name, stars:picked, text, at:Date.now() });
-    persist(); drawDetail(); render(); toast("ส่งความคิดเห็นแล้ว");
-  };
-  $("#dBody").querySelectorAll("[data-delrv]").forEach(b => b.onclick = () => {
-    if(!confirm("ลบความคิดเห็นนี้?")) return;
-    it.reviews = it.reviews.filter(r => r.id !== b.dataset.delrv);
-    persist(); drawDetail(); render(); toast("ลบความคิดเห็นแล้ว");
+  res.querySelectorAll(".spotlight-item").forEach(item => {
+    item.onclick = () => {
+      const it = items.find(x => x.id === item.dataset.id);
+      if(!it) return;
+      recordClick(it.id);
+      closeOverlay($("#spotlightOverlay"));
+      window.open(it.url, "_blank");
+    };
   });
 }
 
-/* ---------- category manager ---------- */
-let catDraft = []; let emojiTarget = null;
-function openCatManager(){
-  document.body.classList.remove("menu-open");
-  catDraft = cats.map(c => ({...c}));
-  drawCatRows();
-  $("#emojiPick").innerHTML = EMOJIS.map(e => `<button type="button" data-e="${e}">${e}</button>`).join("");
-  openOverlay($("#catOverlay"));
-}
-function drawCatRows(){
-  $("#catRows").innerHTML = catDraft.length ? catDraft.map((c,i) => `
-    <div class="cat-row">
-      <input class="inp emo" data-i="${i}" data-f="icon" value="${esc(c.icon||"")}" maxlength="4" aria-label="ไอคอน">
-      <input class="inp" data-i="${i}" data-f="name" value="${esc(c.name)}" placeholder="ชื่อด้าน เช่น งานบุคคล" aria-label="ชื่อหมวดหมู่">
-      <button class="btn icon-btn danger" data-rm="${i}" aria-label="ลบหมวดหมู่ ${esc(c.name)}">${IC.del}</button>
-    </div>`).join("") : `<p style="color:var(--muted)">ยังไม่มีหมวดหมู่</p>`;
-}
-$("#catRows").addEventListener("input", e => { const t = e.target; if(t.dataset.i != null) catDraft[+t.dataset.i][t.dataset.f] = t.value; });
-$("#catRows").addEventListener("focusin", e => { if(e.target.classList.contains("emo")) emojiTarget = +e.target.dataset.i; });
-$("#catRows").addEventListener("click", e => {
-  const b = e.target.closest("[data-rm]"); if(!b) return;
-  const c = catDraft[+b.dataset.rm]; const n = items.filter(i=>i.cat===c.id).length;
-  if(n && !confirm(`“${c.name}” มี ${n} ระบบ ลบหมวดหมู่นี้แล้วระบบจะย้ายไป “ไม่ระบุด้าน” ต่อไหม?`)) return;
-  catDraft.splice(+b.dataset.rm, 1); drawCatRows();
+$("#spotlightInput").addEventListener("input", e => {
+  renderSpotlightResults(e.target.value);
 });
-$("#emojiPick").addEventListener("click", e => {
-  const b = e.target.closest("[data-e]"); if(!b) return;
-  const i = emojiTarget != null && catDraft[emojiTarget] ? emojiTarget : catDraft.length - 1;
-  if(i < 0) return;
-  catDraft[i].icon = b.dataset.e; drawCatRows();
-});
-$("#catAddRow").onclick = () => {
-  catDraft.push({ id:uid(), name:"", icon:"🗂️" }); drawCatRows();
-  emojiTarget = catDraft.length - 1;
-  const inputs = $("#catRows").querySelectorAll('input[data-f="name"]'); inputs[inputs.length-1].focus();
-};
-$("#catSave").onclick = () => {
-  const clean = catDraft.map(c => ({ ...c, name:c.name.trim(), icon:(c.icon||"").trim() || "🗂️" })).filter(c => c.name);
-  cats = clean;
-  items.forEach(it => { if(it.cat && !cats.some(c=>c.id===it.cat)) it.cat = ""; });
-  persist(); closeOverlay($("#catOverlay"));
-  const r = currentRoute();
-  if(r.page === "cat" && r.id !== NONE && !cats.some(c=>c.id===r.id)) go("home"); else render();
-  fillCatSelect($("#f_cat").value);
-  toast("บันทึกหมวดหมู่แล้ว");
-};
 
-/* ---------- form ---------- */
-let editingId = null, imgMode = "upload", imgData = "";
+// Shortcut Ctrl+K / Cmd+K
+document.addEventListener("keydown", e => {
+  if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k"){
+    e.preventDefault();
+    openSpotlight();
+  }
+});
+$("#btnSpotlightHero").onclick = openSpotlight;
+$("#btnSideSpotlight").onclick = openSpotlight;
+
+/* ---------- Detail Modal ---------- */
+let curDetailItem = null;
+function openDetail(it){
+  curDetailItem = it;
+  $("#dTitle").textContent = it.name;
+  const c = catOf(it);
+  const src = imgOf(it);
+
+  let h = `
+    ${src ? `<div class="d-shot"><img src="${esc(src)}" alt="${esc(it.name)}" onerror="this.parentNode.remove()"></div>` : ""}
+    <div class="card-meta">
+      <span class="badge badge-${it.status}">${STATUS_LABELS[it.status]}</span>
+      ${c ? `<span class="badge badge-primary">${esc(c.icon||"")} ${esc(c.name)}</span>` : ""}
+      ${it.version ? `<span class="tag-chip" style="font-weight:600">เวอร์ชัน ${esc(it.version)}</span>` : ""}
+      ${it.clicks ? `<span class="tag-chip" style="color:var(--primary)">👁️ เข้าใช้ ${it.clicks} ครั้ง</span>` : ""}
+    </div>
+    ${it.short ? `<p style="font-size:15px;font-weight:500;margin:10px 0">${esc(it.short)}</p>` : ""}
+
+    <div class="d-link">
+      <code title="${esc(it.url)}">${esc(it.url)}</code>
+      <button class="btn ghost" id="dCopyBtn">คัดลอก</button>
+    </div>`;
+
+  if(it.detail){
+    h += `<div class="d-section">📄 รายละเอียดการทำงาน</div>
+          <div class="d-box">${esc(it.detail)}</div>`;
+  }
+  if(it.features){
+    h += `<div class="d-section">⚡ ฟีเจอร์หลัก (Key Features)</div>
+          <div class="d-box">${esc(it.features)}</div>`;
+  }
+  if(it.manual){
+    h += `<div class="d-section">📖 คู่มือการใช้งาน / เอกสารแนบ</div>
+          <div class="d-link"><code>${esc(it.manual)}</code><a class="btn primary" href="${esc(it.manual)}" target="_blank" rel="noopener">เปิดคู่มือ</a></div>`;
+  }
+  if(it.user || it.pass){
+    h += `<div class="d-section">🔑 บัญชีทดลองใช้งาน</div>
+          <div class="d-box" style="display:flex;gap:16px;flex-wrap:wrap">
+            ${it.user ? `<div>User: <b>${esc(it.user)}</b></div>` : ""}
+            ${it.pass ? `<div>Pass: <b>${esc(it.pass)}</b></div>` : ""}
+          </div>`;
+  }
+  if(it.notes){
+    h += `<div class="d-section">📝 โน้ตส่วนตัวของครูซอส (Dev Notes)</div>
+          <div class="d-box" style="background:var(--dev-soft);border-color:var(--dev)">${esc(it.notes)}</div>`;
+  }
+
+  $("#dBody").innerHTML = h;
+
+  $("#dFoot").innerHTML = `
+    <button class="btn danger" id="dDelBtn">ลบระบบ</button>
+    <button class="btn" id="dEditBtn">แก้ไข</button>
+    <button class="btn" id="dQrBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>ป้าย QR Code</button>
+    <span style="flex:1"></span>
+    <a class="btn live" href="${esc(it.url)}" target="_blank" rel="noopener" onclick="window.__click('${it.id}')">เปิดใช้งานจริง ↗</a>`;
+
+  $("#dCopyBtn").onclick = () => copyText(it.url);
+  $("#dQrBtn").onclick = () => openQrModal(it);
+  $("#dEditBtn").onclick = () => requireOwner(() => { closeOverlay($("#detailOverlay")); openForm(it); });
+  $("#dDelBtn").onclick = () => requireOwner(() => {
+    if(confirm(`ยืนยันการลบ “${it.name}” ออกจากคลัง?`)){
+      items = items.filter(x => x.id !== it.id);
+      if(fbDb) fbDb.collection("systems").doc(it.id).delete();
+      persist();
+      renderAll();
+      closeOverlay($("#detailOverlay"));
+      toast("ลบระบบเรียบร้อย");
+    }
+  });
+
+  openOverlay($("#detailOverlay"));
+}
+
+/* ---------- Form Handling ---------- */
+let editingId = null;
+let imgMode = "upload";
+let imgData = "";
+
 function fillCatSelect(sel){
   $("#f_cat").innerHTML = `<option value="">— ไม่ระบุ —</option>` +
-    cats.map(c => `<option value="${esc(c.id)}">${esc(c.icon||"")} ${esc(c.name)}</option>`).join("") +
-    `<option value="__new">+ เพิ่มด้านใหม่…</option>`;
+    cats.map(c => `<option value="${esc(c.id)}">${esc(c.icon||"")} ${esc(c.name)}</option>`).join("");
   $("#f_cat").value = cats.some(c=>c.id===sel) ? sel : "";
 }
-let prevCat = "";
-$("#f_cat").addEventListener("focus", () => { prevCat = $("#f_cat").value; });
-$("#f_cat").addEventListener("change", () => {
-  if($("#f_cat").value !== "__new"){ prevCat = $("#f_cat").value; return; }
-  const name = (prompt("ชื่อด้านใหม่ เช่น งานอาคารสถานที่") || "").trim();
-  if(!name){ $("#f_cat").value = prevCat; return; }
-  let c = cats.find(c => c.name === name);
-  if(!c){ c = { id:uid(), name, icon:"🗂️" }; cats.push(c); persist(); renderNav(); }
-  fillCatSelect(c.id); prevCat = c.id;
-});
 
 function setImgMode(m){
   imgMode = m;
-  $("#imgTabs").querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", b.dataset.mode === m));
+  document.querySelectorAll("#imgTabs button").forEach(b => {
+    b.classList.toggle("primary", b.dataset.mode === m);
+    b.classList.toggle("ghost", b.dataset.mode !== m);
+  });
   ["upload","url","auto"].forEach(k => $("#panel_"+k).hidden = k !== m);
   updateImgPreview();
 }
+
 function updateImgPreview(){
-  const box = $("#imgPreview"); let src = "";
+  const box = $("#imgPreviewBox");
+  let src = "";
   if(imgMode === "upload") src = imgData.startsWith("data:") ? imgData : "";
-  if(imgMode === "url") src = $("#f_imgurl").value.trim();
-  if(imgMode === "auto"){ const u = normUrl($("#f_url").value); src = u ? autoShot(u) : ""; }
+  if(imgMode === "url") src = $("#f_imgUrl").value.trim();
+  if(imgMode === "auto"){
+    const u = normUrl($("#f_url").value);
+    src = u ? autoShot(u) : "";
+  }
   box.style.display = imgMode === "none" ? "none" : "grid";
-  box.innerHTML = src ? `<img src="${esc(src)}" alt="" onerror="this.parentNode.textContent='โหลดภาพไม่ได้'">` : (imgMode === "auto" ? "ใส่ลิงก์ใช้งานจริงก่อน" : "ยังไม่มีภาพ");
+  box.innerHTML = src ? `<img src="${esc(src)}" alt="พรีวิว" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.textContent='โหลดภาพไม่ได้'">` : "ยังไม่มีภาพ";
 }
-$("#imgTabs").addEventListener("click", e => { const b = e.target.closest("button"); if(b) setImgMode(b.dataset.mode); });
-$("#f_imgurl").addEventListener("input", updateImgPreview);
-$("#f_url").addEventListener("change", () => { if(imgMode === "auto") updateImgPreview(); });
+
+document.querySelectorAll("#imgTabs button").forEach(b => {
+  b.addEventListener("click", () => setImgMode(b.dataset.mode));
+});
+$("#f_imgUrl").addEventListener("input", updateImgPreview);
+$("#f_url").addEventListener("change", () => { if(imgMode==="auto") updateImgPreview(); });
 
 function readImage(file){
   if(!file || !file.type.startsWith("image/")) return;
@@ -973,23 +1470,23 @@ function readImage(file){
   reader.onload = () => {
     const img = new Image();
     img.onload = () => {
-      const scale = Math.min(1, 1280 / img.width);
+      const scale = Math.min(1, 1200 / img.width);
       const c = document.createElement("canvas");
       c.width = Math.round(img.width * scale); c.height = Math.round(img.height * scale);
       c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
-      imgData = c.toDataURL("image/jpeg", 0.78); updateImgPreview();
+      imgData = c.toDataURL("image/jpeg", 0.75);
+      updateImgPreview();
     };
     img.src = reader.result;
   };
   reader.readAsDataURL(file);
 }
-const drop = $("#drop");
-drop.onclick = () => $("#f_img").click();
-drop.onkeydown = e => { if(e.key==="Enter"||e.key===" "){ e.preventDefault(); $("#f_img").click(); } };
-$("#f_img").onchange = e => readImage(e.target.files[0]);
-["dragenter","dragover"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add("over"); }));
-["dragleave","drop"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove("over"); }));
-drop.addEventListener("drop", e => readImage(e.dataTransfer.files[0]));
+
+const drop = $("#dropArea");
+drop.onclick = () => $("#f_imgFile").click();
+$("#f_imgFile").onchange = e => readImage(e.target.files[0]);
+drop.addEventListener("dragover", e => e.preventDefault());
+drop.addEventListener("drop", e => { e.preventDefault(); readImage(e.dataTransfer.files[0]); });
 document.addEventListener("paste", e => {
   if(!$("#formOverlay").classList.contains("open")) return;
   const f = [...(e.clipboardData?.files||[])].find(x => x.type.startsWith("image/"));
@@ -997,135 +1494,522 @@ document.addEventListener("paste", e => {
 });
 
 function openForm(it, presetCat){
-  document.body.classList.remove("menu-open");
   editingId = it ? it.id : null;
-  $("#formTitle").textContent = it ? "แก้ไขระบบ" : "เพิ่มระบบ";
-  $("#saveBtn").textContent = it ? "บันทึกการแก้ไข" : "บันทึกระบบ";
+  $("#fTitle").textContent = it ? "แก้ไขระบบ" : "เพิ่มระบบใหม่";
+  $("#saveSystemBtn").textContent = it ? "บันทึกการแก้ไข" : "บันทึกระบบ";
+
   $("#f_name").value = it?.name || "";
   $("#f_url").value = it?.url || "";
   fillCatSelect(it ? it.cat : (presetCat || ""));
   $("#f_status").value = it?.status || "live";
   $("#f_short").value = it?.short || "";
   $("#f_detail").value = it?.detail || "";
+  $("#f_features").value = it?.features || "";
+  $("#f_target").value = it?.target || "";
+  $("#f_manual").value = it?.manual || "";
   $("#f_tech").value = (it?.tech || []).join(", ");
-  $("#f_date").value = it?.date || "";
+  $("#f_version").value = it?.version || "";
   $("#f_user").value = it?.user || "";
   $("#f_pass").value = it?.pass || "";
-  $("#f_img").value = "";
+  $("#f_notes").value = it?.notes || "";
+  $("#f_imgFile").value = "";
+
   imgData = (it && it.imgMode === "upload") ? (it.img || "") : "";
-  $("#f_imgurl").value = (it && it.imgMode === "url") ? (it.img || "") : "";
+  $("#f_imgUrl").value = (it && it.imgMode === "url") ? (it.img || "") : "";
   setImgMode(it?.imgMode || "upload");
+
   openOverlay($("#formOverlay"));
-  setTimeout(() => $("#f_name").focus(), 30);
+  setTimeout(() => $("#f_name").focus(), 40);
 }
 
-$("#saveBtn").onclick = () => {
+$("#saveSystemBtn").onclick = () => {
   const name = $("#f_name").value.trim();
   const url = normUrl($("#f_url").value);
-  if(!name){ toast("ใส่ชื่อระบบก่อนบันทึก"); $("#f_name").focus(); return; }
-  if(!url){ toast("ใส่ลิงก์ใช้งานจริงก่อนบันทึก"); $("#f_url").focus(); return; }
-  try{ new URL(url); }catch(e){ toast("ลิงก์ไม่ถูกต้อง ตรวจสอบอีกครั้ง"); $("#f_url").focus(); return; }
+  if(!name){ toast("กรุณาระบุชื่อระบบ"); $("#f_name").focus(); return; }
+  if(!url){ toast("กรุณาระบุลิงก์ URL"); $("#f_url").focus(); return; }
+  try{ new URL(url); }catch(e){ toast("ลิงก์ URL ไม่ถูกต้อง"); return; }
+
   let img = "";
   if(imgMode === "upload") img = imgData;
-  if(imgMode === "url") img = $("#f_imgurl").value.trim();
-  const catVal = $("#f_cat").value === "__new" ? "" : $("#f_cat").value;
+  if(imgMode === "url") img = $("#f_imgUrl").value.trim();
+
   const data = {
-    name, url, cat:catVal, status:$("#f_status").value,
-    short:$("#f_short").value.trim(), detail:$("#f_detail").value.trim(),
-    tech:$("#f_tech").value.split(",").map(s=>s.trim()).filter(Boolean),
-    date:$("#f_date").value, user:$("#f_user").value.trim(), pass:$("#f_pass").value.trim(),
+    name, url,
+    cat: $("#f_cat").value,
+    status: $("#f_status").value,
+    short: $("#f_short").value.trim(),
+    detail: $("#f_detail").value.trim(),
+    features: $("#f_features").value.trim(),
+    target: $("#f_target").value.trim(),
+    manual: normUrl($("#f_manual").value),
+    tech: $("#f_tech").value.split(",").map(s=>s.trim()).filter(Boolean),
+    version: $("#f_version").value.trim(),
+    user: $("#f_user").value.trim(),
+    pass: $("#f_pass").value.trim(),
+    notes: $("#f_notes").value.trim(),
     imgMode, img
   };
-  if(editingId){ items = items.map(i => i.id === editingId ? { ...i, ...data } : i); toast("บันทึกการแก้ไขแล้ว"); }
-  else { items.push({ id:uid(), created:Date.now(), reviews:[], ...data }); toast("บันทึกระบบแล้ว"); }
-  persist(); render(); closeOverlay($("#formOverlay"));
+
+  if(editingId){
+    items = items.map(i => i.id === editingId ? { ...i, ...data, updated:Date.now() } : i);
+    toast("บันทึกการแก้ไขแล้ว");
+  } else {
+    items.unshift({ id:uid(), created:Date.now(), clicks:0, ...data });
+    toast("เพิ่มระบบใหม่แล้ว");
+  }
+
+  persist();
+  renderAll();
+  closeOverlay($("#formOverlay"));
 };
 
-/* ---------- import / export ---------- */
+/* ---------- Category Manager ---------- */
+let catDraft = [];
+let emojiTarget = null;
+
+function openCatManager(){
+  catDraft = cats.map(c => ({...c}));
+  drawCatRows();
+  $("#emojiPickBox").innerHTML = EMOJIS.map(e => `<button type="button" class="btn icon-btn ghost" data-e="${e}" style="font-size:18px">${e}</button>`).join("");
+  openOverlay($("#catOverlay"));
+}
+
+function drawCatRows(){
+  $("#catRowsList").innerHTML = catDraft.length ? catDraft.map((c,i) => `
+    <div style="display:grid;grid-template-columns:48px 1fr auto;gap:8px;align-items:center;margin-bottom:8px">
+      <input class="emo" data-i="${i}" data-f="icon" value="${esc(c.icon||"")}" maxlength="4" style="text-align:center;font-size:18px;padding:6px;border:1px solid var(--line);border-radius:8px">
+      <input data-i="${i}" data-f="name" value="${esc(c.name)}" placeholder="ชื่อด้าน" style="padding:7px 10px;border:1px solid var(--line);border-radius:8px">
+      <button class="btn icon-btn danger" data-rm="${i}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+    </div>`).join("") : `<p style="color:var(--muted)">ยังไม่มีหมวดหมู่</p>`;
+}
+
+$("#catRowsList").addEventListener("input", e => {
+  const t = e.target;
+  if(t.dataset.i != null) catDraft[+t.dataset.i][t.dataset.f] = t.value;
+});
+$("#catRowsList").addEventListener("focusin", e => {
+  if(e.target.classList.contains("emo")) emojiTarget = +e.target.dataset.i;
+});
+$("#catRowsList").addEventListener("click", e => {
+  const b = e.target.closest("[data-rm]");
+  if(!b) return;
+  catDraft.splice(+b.dataset.rm, 1);
+  drawCatRows();
+});
+$("#emojiPickBox").addEventListener("click", e => {
+  const b = e.target.closest("[data-e]");
+  if(!b) return;
+  const idx = emojiTarget != null && catDraft[emojiTarget] ? emojiTarget : catDraft.length - 1;
+  if(idx >= 0){ catDraft[idx].icon = b.dataset.e; drawCatRows(); }
+});
+$("#catAddBtn").onclick = () => {
+  catDraft.push({ id:uid(), name:"", icon:"🗂️" });
+  drawCatRows();
+  emojiTarget = catDraft.length - 1;
+};
+$("#catSaveBtn").onclick = () => {
+  cats = catDraft.map(c => ({ ...c, name:c.name.trim(), icon:(c.icon||"").trim() || "🗂️" })).filter(c => c.name);
+  items.forEach(it => { if(it.cat && !cats.some(c=>c.id===it.cat)) it.cat = ""; });
+  persist();
+  closeOverlay($("#catOverlay"));
+  renderAll();
+  toast("บันทึกหมวดหมู่เรียบร้อย");
+};
+
+/* ---------- PIN Owner Lock ---------- */
+function requireOwner(callback){
+  const pin = getLS(PIN_KEY);
+  if(!pin || isUnlocked){ callback(); return; }
+  openOverlay($("#pinOverlay"));
+  $("#pinInput").value = "";
+  $("#pinInput").focus();
+  $("#pinConfirmBtn").onclick = () => {
+    if($("#pinInput").value.trim() === pin){
+      isUnlocked = true;
+      closeOverlay($("#pinOverlay"));
+      updateLockUI();
+      toast("ปลดล็อกโหมดเจ้าของระบบ 🔓");
+      callback();
+    } else {
+      toast("รหัส PIN ไม่ถูกต้อง");
+      $("#pinInput").select();
+    }
+  };
+}
+
+function updateLockUI(){
+  const b = $("#ownerLockBtn");
+  if(b) b.style.color = isUnlocked ? "var(--live)" : "var(--side-text)";
+}
+
+$("#ownerLockBtn").onclick = () => {
+  const pin = getLS(PIN_KEY);
+  if(!pin){
+    const n = prompt("ตั้งรหัส PIN 4 หลักสำหรับล็อกการแก้ไข (ใช้งานคนเดียว):");
+    if(n && n.trim().length >= 4){
+      setLS(PIN_KEY, n.trim());
+      isUnlocked = true;
+      updateLockUI();
+      toast("ตั้งรหัส PIN เรียบร้อย");
+    }
+    return;
+  }
+  if(isUnlocked){
+    isUnlocked = false;
+    updateLockUI();
+    toast("ล็อกโหมดเจ้าของระบบ 🔒");
+  } else {
+    requireOwner(()=>{});
+  }
+};
+
+/* ---------- Instant QR Code Badge System ---------- */
+let currentQrItem = null;
+
+function openQrModal(it){
+  currentQrItem = it;
+  const c = catOf(it);
+
+  $("#qrCardName").textContent = it.name;
+  $("#qrCardShort").textContent = it.short || "ศูนย์รวมระบบออนไลน์ · ครูซอสสอนสังคม";
+  $("#qrCardCat").textContent = c ? `${c.icon||""} ${c.name}` : "ระบบงานทั่วไป";
+  $("#qrCardUrl").textContent = it.url;
+
+  const box = $("#qrCanvasBox");
+  box.innerHTML = "";
+
+  try{
+    new QRCode(box, {
+      text: it.url,
+      width: 170,
+      height: 170,
+      colorDark: "#0F172A",
+      colorLight: "#F8FAFC",
+      correctLevel: QRCode.CorrectLevel.H
+    });
+  }catch(err){
+    console.error(err);
+    box.innerHTML = `<span style="color:var(--danger)">สร้าง QR Code ไม่สำเร็จ</span>`;
+  }
+
+  openOverlay($("#qrOverlay"));
+}
+
+function createQrCardCanvas(it, callback){
+  const c = catOf(it);
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+  const W = 800;
+  const H = 1080;
+  canvas.width = W;
+  canvas.height = H;
+
+  // Background
+  ctx.fillStyle = "#FFFFFF";
+  ctx.fillRect(0, 0, W, H);
+
+  // Gradient Top Bar
+  const grad = ctx.createLinearGradient(0, 0, W, 0);
+  grad.addColorStop(0, "#4F46E5");
+  grad.addColorStop(1, "#06B6D4");
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, 16);
+
+  // Border
+  ctx.strokeStyle = "#E2E8F0";
+  ctx.lineWidth = 4;
+  ctx.strokeRect(2, 2, W-4, H-4);
+
+  // Header Logo & Branding
+  const logoImg = new Image();
+  logoImg.src = "logo-512.png";
+  logoImg.onload = () => {
+    ctx.drawImage(logoImg, (W/2) - 170, 48, 44, 44);
+    drawContent();
+  };
+  logoImg.onerror = () => drawContent();
+
+  function drawContent(){
+    ctx.fillStyle = "#64748B";
+    ctx.font = "600 20px Prompt, sans-serif";
+    ctx.textAlign = "left";
+    ctx.fillText("ครูซอสสอนสังคม · คลังระบบออนไลน์", (W/2) - 116, 78);
+
+    // Category Pill
+    const catText = c ? `${c.icon||""} ${c.name}` : "ระบบงานทั่วไป";
+    ctx.font = "500 17px Prompt, sans-serif";
+    ctx.textAlign = "center";
+    const catWidth = ctx.measureText(catText).width + 36;
+    ctx.fillStyle = "#EEF2FF";
+    roundRect(ctx, (W - catWidth)/2, 105, catWidth, 34, 17);
+    ctx.fill();
+    ctx.fillStyle = "#4F46E5";
+    ctx.fillText(catText, W/2, 128);
+
+    // System Title
+    ctx.fillStyle = "#0F172A";
+    ctx.font = "bold 32px Prompt, sans-serif";
+    wrapText(ctx, it.name, W/2, 190, 680, 42);
+
+    // Tagline
+    if(it.short){
+      ctx.fillStyle = "#64748B";
+      ctx.font = "400 19px Prompt, sans-serif";
+      wrapText(ctx, it.short, W/2, 255, 680, 28);
+    }
+
+    // QR Code Frame
+    const qrBoxSize = 430;
+    const qrBoxX = (W - qrBoxSize) / 2;
+    const qrBoxY = 320;
+    ctx.fillStyle = "#F8FAFC";
+    roundRect(ctx, qrBoxX, qrBoxY, qrBoxSize, qrBoxSize, 20);
+    ctx.fill();
+    ctx.strokeStyle = "#E2E8F0";
+    ctx.lineWidth = 2;
+    roundRect(ctx, qrBoxX, qrBoxY, qrBoxSize, qrBoxSize, 20);
+    ctx.stroke();
+
+    // QR Code Image
+    const qrImg = $("#qrCanvasBox img") || $("#qrCanvasBox canvas");
+    if(qrImg){
+      const doDraw = (img) => {
+        ctx.drawImage(img, qrBoxX + 40, qrBoxY + 40, 350, 350);
+        finishDrawing();
+      };
+      if(qrImg.tagName === "IMG" && !qrImg.complete){
+        qrImg.onload = () => doDraw(qrImg);
+      } else {
+        doDraw(qrImg);
+      }
+    } else {
+      finishDrawing();
+    }
+  }
+
+  function finishDrawing(){
+    ctx.fillStyle = "#0F172A";
+    ctx.font = "600 23px Prompt, sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("📱 สแกน QR Code เพื่อเปิดใช้งานระบบ", W/2, 805);
+
+    ctx.fillStyle = "#4F46E5";
+    ctx.font = "400 17px Prompt, sans-serif";
+    wrapText(ctx, it.url, W/2, 845, 680, 24);
+
+    ctx.fillStyle = "#94A3B8";
+    ctx.font = "400 15px Prompt, sans-serif";
+    ctx.fillText("พัฒนาและบริหารจัดการโดย ครูซอส (ครูซอสสอนสังคม)", W/2, 1010);
+
+    callback(canvas);
+  }
+}
+
+function roundRect(ctx, x, y, width, height, radius) {
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.lineTo(x + width - radius, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+  ctx.lineTo(x + width, y + height - radius);
+  ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+  ctx.lineTo(x + radius, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+  ctx.lineTo(x, y + radius);
+  ctx.quadraticCurveTo(x, y, x + radius, y);
+  ctx.closePath();
+}
+
+function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+  const words = (text || "").split(" ");
+  let line = "";
+  for(let n = 0; n < words.length; n++) {
+    const testLine = line + words[n] + " ";
+    const metrics = ctx.measureText(testLine);
+    if (metrics.width > maxWidth && n > 0) {
+      ctx.fillText(line, x, y);
+      line = words[n] + " ";
+      y += lineHeight;
+    } else {
+      line = testLine;
+    }
+  }
+  ctx.fillText(line, x, y);
+}
+
+$("#btnDownloadQr").onclick = () => {
+  if(!currentQrItem) return;
+  toast("กำลังเตรียมไฟล์รูปภาพความละเอียดสูง...");
+  createQrCardCanvas(currentQrItem, canvas => {
+    const a = document.createElement("a");
+    a.download = `QR-${currentQrItem.name}.png`;
+    a.href = canvas.toDataURL("image/png");
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    toast("ดาวน์โหลดป้ายชื่อ QR Code สำเร็จ 🎉");
+  });
+};
+
+$("#btnCopyQr").onclick = () => {
+  if(!currentQrItem) return;
+  toast("กำลังคัดลอกรูปภาพ...");
+  createQrCardCanvas(currentQrItem, canvas => {
+    canvas.toBlob(blob => {
+      try{
+        navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]).then(() => {
+          toast("คัดลอกรูปภาพแล้ว! กด Ctrl+V วางใน LINE หรือสไลด์ได้เลย 📋");
+        }).catch(() => {
+          toast("เบราว์เซอร์ไม่รองรับ ให้ใช้ปุ่มดาวน์โหลดรูปแทนครับ");
+        });
+      }catch(e){
+        toast("ให้ใช้ปุ่มดาวน์โหลดรูปแทนครับ");
+      }
+    }, "image/png");
+  });
+};
+
+/* ---------- Overlays Control ---------- */
+function openOverlay(el){ el.classList.add("open"); document.body.style.overflow="hidden"; }
+function closeOverlay(el){
+  el.classList.remove("open");
+  if(!document.querySelector(".overlay.open")) document.body.style.overflow="";
+}
+document.querySelectorAll(".overlay").forEach(o => {
+  o.addEventListener("click", e => {
+    if(e.target === o || e.target.closest("[data-close]")) closeOverlay(o);
+  });
+});
+document.addEventListener("keydown", e => {
+  if(e.key === "Escape"){
+    const open = [...document.querySelectorAll(".overlay.open")].pop();
+    if(open) closeOverlay(open);
+    else document.body.classList.remove("menu-open");
+  }
+});
+
+/* Global Click Handlers */
+document.addEventListener("click", e => {
+  const add = e.target.closest("[data-add]");
+  if(add){
+    requireOwner(() => openForm(null, currentCatForAdd()));
+    return;
+  }
+  const el = e.target.closest("[data-act]");
+  if(!el) return;
+  const card = el.closest(".sys-card");
+  if(!card) return;
+  const it = items.find(i => i.id === card.dataset.id);
+  if(!it) return;
+
+  const act = el.dataset.act;
+  if(act === "detail") openDetail(it);
+  if(act === "copy") copyText(it.url);
+  if(act === "qr") openQrModal(it);
+});
+
+function currentCatForAdd(){
+  const r = currentRoute();
+  return (r.sub === "cat" && r.catId) ? r.catId : "";
+}
+
+/* Landing Navigation Buttons */
+$("#brandBtn").onclick = () => go("landing");
+$("#mobPortalBtn").onclick = () => go("landing");
+$("#btnEnterHub").onclick = () => go("all");
+$("#btnViewAllTop").onclick = () => go("all");
+
+/* Sidebar Controls */
+$("#manageCatsBtn").onclick = () => requireOwner(openCatManager);
+$("#sideSettingsBtn").onclick = () => openOverlay($("#settingsOverlay"));
+$("#sideSyncPill").onclick = () => openOverlay($("#settingsOverlay"));
+$("#openFbConfigBtn").onclick = () => {
+  closeOverlay($("#settingsOverlay"));
+  toast("เชื่อมต่อกับ ts010-2bf5d อัตโนมัติแล้ว");
+};
+
+/* Mobile Menu */
+$("#menuBtn").onclick = () => document.body.classList.add("menu-open");
+$("#scrim").onclick = () => document.body.classList.remove("menu-open");
+
+/* Export & Import */
 $("#exportBtn").onclick = () => {
-  const blob = new Blob([JSON.stringify({ app:"system-catalog", version:2, exported:new Date().toISOString(), categories:cats, items }, null, 2)], { type:"application/json" });
+  const blob = new Blob([JSON.stringify({ app:"kru-sauce-hub", version:4, categories:cats, items, announcement }, null, 2)], { type:"application/json" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = "คลังระบบ-" + new Date().toISOString().slice(0,10) + ".json";
+  a.download = "kru-sauce-hub-backup-" + new Date().toISOString().slice(0,10) + ".json";
   document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-  toast("ดาวน์โหลดไฟล์สำรองแล้ว");
+  toast("ดาวน์โหลดไฟล์สำรองเรียบร้อย");
 };
-$("#importBtn").onclick = () => $("#importFile").click();
-$("#importFile").onchange = e => {
+$("#importBtn").onclick = () => requireOwner(() => $("#importFileInput").click());
+$("#importFileInput").onchange = e => {
   const f = e.target.files[0]; if(!f) return;
   const r = new FileReader();
   r.onload = () => {
     try{
       const parsed = JSON.parse(r.result);
-      const list = Array.isArray(parsed) ? parsed : parsed.items;
+      const list = parsed.items || parsed;
       if(!Array.isArray(list)) throw 0;
-      const catMap = {};
-      (parsed.categories || []).forEach(c => {
-        if(!c || !c.name) return;
-        let ex = cats.find(x => x.name === c.name);
-        if(!ex){ ex = { id: cats.some(x=>x.id===c.id) ? uid() : (c.id || uid()), name:c.name, icon:c.icon || "🗂️" }; cats.push(ex); }
-        catMap[c.id] = ex.id;
-      });
-      const ids = new Set(items.map(i=>i.id)); let added = 0;
+      let added = 0;
       list.forEach(it => {
         if(!it || !it.name || !it.url) return;
-        if(!it.id || ids.has(it.id)) it.id = uid();
+        it.id = uid();
         it.created = it.created || Date.now();
-        it.reviews = Array.isArray(it.reviews) ? it.reviews : [];
-        if(it.cat && catMap[it.cat]) it.cat = catMap[it.cat];
-        else if(it.cat && !cats.some(c=>c.id===it.cat)){
-          let c = cats.find(c => c.name === it.cat);
-          if(!c){ c = { id:uid(), name:String(it.cat), icon:"🗂️" }; cats.push(c); }
-          it.cat = c.id;
-        }
-        items.push(it); added++;
+        it.clicks = it.clicks || 0;
+        items.push(it);
+        added++;
       });
-      persist(); render(); toast(`นำเข้า ${added} ระบบแล้ว`);
-    }catch(err){ toast("ไฟล์นี้ไม่ใช่ไฟล์สำรองของคลังระบบ"); }
+      persist();
+      renderAll();
+      toast(`นำเข้า ${added} ระบบเรียบร้อย`);
+    }catch(err){ toast("ไฟล์ไม่ถูกต้อง"); }
     e.target.value = "";
   };
   r.readAsText(f);
 };
 
-/* ---------- theme ---------- */
-function applyTheme(t){ if(t) document.documentElement.setAttribute("data-theme", t); else document.documentElement.removeAttribute("data-theme"); }
-applyTheme(getLS(KEY+"-theme"));
-$("#themeBtn").onclick = () => {
+/* Theme Toggle */
+function applyTheme(t){
+  if(t) document.documentElement.setAttribute("data-theme", t);
+  else document.documentElement.removeAttribute("data-theme");
+}
+applyTheme(getLS("sauce-theme"));
+const toggleTheme = () => {
   const cur = document.documentElement.getAttribute("data-theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-  const next = cur === "dark" ? "light" : "dark"; applyTheme(next); setLS(KEY+"-theme", next);
+  const next = cur === "dark" ? "light" : "dark";
+  applyTheme(next);
+  setLS("sauce-theme", next);
+};
+$("#themeBtn").onclick = toggleTheme;
+$("#landingThemeBtn").onclick = toggleTheme;
+
+/* ---------- PWA Installation & Service Worker (ฟีเจอร์ที่ 3) ---------- */
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredPwaPrompt = e;
+  const pwaBtn = $("#btnPwaInstall");
+  if(pwaBtn) pwaBtn.style.display = "flex";
+});
+
+$("#btnPwaInstall").onclick = async () => {
+  if(!deferredPwaPrompt) return;
+  deferredPwaPrompt.prompt();
+  const { outcome } = await deferredPwaPrompt.userChoice;
+  if(outcome === "accepted"){
+    toast("ติดตั้งแอปพลิเคชันเรียบร้อย 🎉");
+    $("#btnPwaInstall").style.display = "none";
+  }
+  deferredPwaPrompt = null;
 };
 
-/* ---------- sample ---------- */
-function catIdByName(name, icon){
-  let c = cats.find(c => c.name === name);
-  if(!c){ c = { id:uid(), name, icon:icon||"🗂️" }; cats.push(c); }
-  return c.id;
-}
-function addSample(){
-  const now = Date.now();
-  items.push(
-    { id:uid(), created:now-3000, name:"ระบบลงเวลาปฏิบัติงาน", url:"https://example.com", cat:catIdByName("งานบุคคล","👥"), status:"live",
-      short:"บันทึกเวลาเข้า–ออกงานของพนักงานพร้อมสรุปรายเดือน",
-      detail:"ฟีเจอร์หลัก\n- ลงเวลาเข้า–ออกผ่านมือถือ\n- สรุปชั่วโมงทำงานรายเดือน\n- ส่งออกรายงานเป็น Excel\n\nผู้ใช้งาน: พนักงานทุกฝ่าย และฝ่ายบุคคล",
-      tech:["Google Apps Script","Google Sheets"], date:"2026-05-12", user:"demo", pass:"1234", imgMode:"none", img:"",
-      reviews:[
-        { id:uid(), name:"สมชาย", stars:5, text:"ใช้งานง่ายมาก ลงเวลาจากมือถือได้เลย", at:now-86400000*2 },
-        { id:uid(), name:"วรรณา", stars:4, text:"อยากให้มีแจ้งเตือนเมื่อลืมลงเวลาออก", at:now-3600000*5 }
-      ] },
-    { id:uid(), created:now-2000, name:"ระบบแจ้งซ่อมครุภัณฑ์", url:"https://example.org", cat:catIdByName("งานพัสดุ/ครุภัณฑ์","📦"), status:"dev",
-      short:"แจ้งซ่อม ติดตามสถานะ และดูประวัติการซ่อมของครุภัณฑ์แต่ละชิ้น",
-      detail:"อยู่ระหว่างพัฒนาหน้ารายงานสำหรับผู้บริหาร", tech:["HTML","JavaScript"], date:"2026-08-30", imgMode:"none", img:"",
-      reviews:[{ id:uid(), name:"ประภาส", stars:4, text:"ติดตามสถานะได้ชัดเจนดี", at:now-3600000 }] },
-    { id:uid(), created:now-1000, name:"ระบบเบิกจ่ายงบประมาณ", url:"https://example.net", cat:catIdByName("งานการเงิน/บัญชี","💰"), status:"live",
-      short:"ขออนุมัติเบิกจ่าย ตรวจสอบยอดคงเหลือของแต่ละโครงการ",
-      detail:"มีขั้นตอนอนุมัติ 2 ระดับ และสรุปยอดรายไตรมาส", tech:["AppSheet"], date:"2026-03-01", imgMode:"none", img:"", reviews:[] }
-  );
-  persist(); render(); toast("ใส่ข้อมูลตัวอย่างแล้ว ลองเลือกเมนูด้านซ้ายดูได้เลย");
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.register("./sw.js").catch(() => {});
 }
 
+/* Initial Launch */
 loadAll();
-render();
+initFirebase();
+renderAll();
+
 })();
 </script>
 </body>
