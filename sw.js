@@ -1,19 +1,7 @@
-// Minimal Service Worker for Kru Sauce PWA installation
-const CACHE_NAME = "sauce-hub-v1";
-const ASSETS = [
-  "./",
-  "./index.html",
-  "./logo-512.png",
-  "./favicon.png",
-  "./manifest.json"
-];
+// Service Worker for Kru Sauce PWA (TS010) - v2
+const CACHE_NAME = "sauce-hub-v2";
 
 self.addEventListener("install", (e) => {
-  e.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS).catch(() => {});
-    })
-  );
   self.skipWaiting();
 });
 
@@ -21,16 +9,29 @@ self.addEventListener("activate", (e) => {
   e.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
-        keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
+        keys.map((key) => {
+          if (key !== CACHE_NAME) {
+            return caches.delete(key);
+          }
+        })
       );
-    })
+    }).then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
 self.addEventListener("fetch", (e) => {
   if (e.request.method !== "GET" || e.request.url.startsWith("chrome-extension")) return;
+  // Network first strategy with fallback to cache
   e.respondWith(
-    fetch(e.request).catch(() => caches.match(e.request))
+    fetch(e.request)
+      .then((res) => {
+        // Only cache valid GET responses
+        if (res && res.status === 200 && res.type === "basic") {
+          const resClone = res.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(e.request, resClone));
+        }
+        return res;
+      })
+      .catch(() => caches.match(e.request))
   );
 });
