@@ -1065,7 +1065,7 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
 </head>
 <body>
 
-<div class="app" id="appRoot">
+<div class="app landing-active" id="appRoot">
   <!-- SIDEBAR MENU -->
   <aside class="side" id="side">
     <div class="side-brand" id="brandBtn">
@@ -1130,7 +1130,7 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
     <!-- ==============================================
          1. LANDING PORTAL VIEW (ภาพที่ 3: โลโก้เด่น 3 มิติ + ฟีเจอร์น่าสนใจ + เข้าสู่ระบบด้วยแป้นตัวเลข)
          ============================================== -->
-    <section class="view-landing" id="viewLanding">
+    <section class="view-landing active" id="viewLanding">
       <div class="ambient-glow">
         <div class="ambient-grid"></div>
         <div class="orb-1"></div>
@@ -3444,7 +3444,7 @@ onClick("#bNavLock", () => {
     openKeypadModal("login");
   }
 });
-onClick("#bNavTheme", toggleTheme);
+onClick("#bNavTheme", () => toggleTheme());
 
 /* Announcement Banner Controls */
 onClick("#closeAnnounceBtn", () => {
@@ -3513,12 +3513,12 @@ function applyTheme(t){
   else document.documentElement.removeAttribute("data-theme");
 }
 applyTheme(getLS("sauce-theme"));
-const toggleTheme = () => {
+function toggleTheme(){
   const cur = document.documentElement.getAttribute("data-theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
   const next = cur === "dark" ? "light" : "dark";
   applyTheme(next);
   setLS("sauce-theme", next);
-};
+}
 onClick("#themeBtn", toggleTheme);
 onClick("#landingThemeBtn", toggleTheme);
 
