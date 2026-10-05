@@ -143,9 +143,9 @@ button,input,select,textarea{font:inherit;color:inherit}
 
 /* ---------- Layout Structure ---------- */
 .app{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
-.app.landing-active{grid-template-columns:1fr !important;height:100vh !important;max-height:100vh !important;overflow:hidden !important}
+.app.landing-active{grid-template-columns:1fr !important;min-height:100vh !important;height:auto !important;max-height:none !important;overflow-y:auto !important}
 .app.landing-active aside.side{display:none !important}
-.app.landing-active .main-body{height:100vh !important;max-height:100vh !important;overflow:hidden !important}
+.app.landing-active .main-body{min-height:100vh !important;height:auto !important;max-height:none !important;overflow-y:auto !important}
 
 /* ---------- Sidebar ---------- */
 aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column;padding:22px 14px 18px;color:var(--side-text);z-index:40;border-right:1px solid rgba(255,255,255,0.06)}
@@ -182,26 +182,27 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
 .icon-btn{width:38px;height:38px;padding:0;justify-content:center;border-radius:10px}
 
 /* ==========================================================================
-   1. LANDING PAGE VIEW (หน้าแรกสุด สไตล์ Apple + Minimalist - เลื่อนไม่ได้ จบใน 1 หน้า)
+   1. LANDING PAGE VIEW (ภาพที่ 3: โลโก้เด่นมีมิติ + หน้าแรกมีชีวิตชีวา + ฟีเจอร์น่าสนใจ)
    ========================================================================== */
-.view-landing{display:none;position:relative;height:100vh;max-height:100vh;padding:16px 24px;overflow:hidden !important;box-sizing:border-box}
+.view-landing{display:none;position:relative;min-height:100vh;padding:16px 24px 60px;box-sizing:border-box}
 .view-landing.active{display:flex;flex-direction:column}
 
 .ambient-glow{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
-.orb-1{position:absolute;top:-10%;left:25%;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(79,70,229,0.12) 0%,transparent 70%);filter:blur(60px)}
-.orb-2{position:absolute;top:40%;right:-5%;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(6,182,212,0.10) 0%,transparent 70%);filter:blur(60px)}
+.orb-1{position:absolute;top:-10%;left:20%;width:550px;height:550px;border-radius:50%;background:radial-gradient(circle,rgba(79,70,229,0.18) 0%,transparent 70%);filter:blur(65px);animation:orbFloat 8s ease-in-out infinite alternate}
+.orb-2{position:absolute;top:35%;right:-5%;width:480px;height:480px;border-radius:50%;background:radial-gradient(circle,rgba(6,182,212,0.15) 0%,transparent 70%);filter:blur(65px);animation:orbFloat 10s ease-in-out infinite alternate-reverse}
+.ambient-grid{position:absolute;inset:0;background-image:radial-gradient(rgba(79,70,229,0.08) 1px,transparent 1px);background-size:28px 28px;opacity:0.75;pointer-events:none}
+@keyframes orbFloat{0%{transform:translate(0,0) scale(1)}100%{transform:translate(20px,30px) scale(1.08)}}
 
 .landing-wrap{
   position:relative;
   z-index:1;
-  max-width:860px;
+  max-width:1080px;
   width:100%;
-  height:100%;
   margin:0 auto;
   display:flex;
   flex-direction:column;
-  justify-content:space-between;
   align-items:center;
+  gap:26px;
 }
 
 /* Landing Top Navigation */
@@ -210,30 +211,111 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
   display:flex;
   align-items:center;
   justify-content:space-between;
-  padding:10px 20px;
+  padding:12px 24px;
   background:var(--surface-card);
   backdrop-filter:blur(16px);
   -webkit-backdrop-filter:blur(16px);
   border:1px solid var(--line);
-  border-radius:16px;
+  border-radius:18px;
   box-shadow:var(--shadow-sm);
 }
 .landing-brand{display:flex;align-items:center;gap:12px;font-weight:700;font-size:15px;letter-spacing:-.01em}
 .landing-meta{display:flex;align-items:center;gap:14px;font-size:13px;color:var(--muted)}
 .live-indicator{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;background:var(--live-soft);color:var(--live);font-size:12px;font-weight:500}
 
-/* Hero Section with Floating Emblem */
-.landing-hero{text-align:center;padding:10px 16px;max-width:760px;margin:auto 0}
-.hero-logo-box{width:96px;height:96px;margin:0 auto 14px;border-radius:50%;padding:3px;background:linear-gradient(135deg,#4F46E5,#06B6D4);box-shadow:0 12px 28px rgba(79,70,229,0.30);animation:floatLogo 3.5s ease-in-out infinite}
-.hero-logo-img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
-@keyframes floatLogo{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+/* Hero Section with Enhanced 3D Dimensional Logo (ขยายขนาด 134px + ออร่า 3 มิติ) */
+.landing-hero{text-align:center;padding:20px 16px 6px;max-width:820px;margin:0 auto;position:relative}
+.hero-logo-box{
+  width:134px;
+  height:134px;
+  margin:0 auto 20px;
+  border-radius:50%;
+  padding:4px;
+  background:linear-gradient(135deg,#4F46E5 0%,#06B6D4 55%,#10B981 100%);
+  box-shadow:0 18px 45px -8px rgba(79,70,229,0.42), 0 0 0 6px rgba(79,70,229,0.12);
+  animation:floatLogo 4s ease-in-out infinite;
+  position:relative;
+}
+.hero-logo-box::after{
+  content:"";
+  position:absolute;
+  inset:-14px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(79,70,229,0.28) 0%,rgba(6,182,212,0.12) 50%,transparent 70%);
+  z-index:-1;
+  animation:pulseAura 3s ease-in-out infinite alternate;
+}
+.hero-logo-img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block;background:#fff}
+@keyframes floatLogo{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes pulseAura{0%{transform:scale(0.92);opacity:0.55}100%{transform:scale(1.15);opacity:1}}
 
-.hero-pill{display:inline-flex;align-items:center;gap:8px;padding:4px 14px;border-radius:999px;background:var(--primary-soft);color:var(--primary);font-size:12px;font-weight:600;margin-bottom:12px;border:1px solid rgba(79,70,229,0.18)}
-.landing-hero-title{font-size:clamp(24px, 3.4vw, 38px);font-weight:700;line-height:1.25;letter-spacing:-.02em;margin:0 0 12px;background:linear-gradient(135deg,var(--ink) 40%,var(--primary) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;word-break:keep-all}
+.hero-pill{display:inline-flex;align-items:center;gap:8px;padding:5px 16px;border-radius:999px;background:var(--primary-soft);color:var(--primary);font-size:12.5px;font-weight:600;margin-bottom:14px;border:1px solid rgba(79,70,229,0.22);box-shadow:0 2px 10px rgba(79,70,229,0.08)}
+.landing-hero-title{font-size:clamp(26px, 3.8vw, 42px);font-weight:700;line-height:1.24;letter-spacing:-.02em;margin:0 0 14px;background:linear-gradient(135deg,var(--ink) 35%,var(--primary) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;word-break:keep-all}
 .hero-chunk{display:inline-block;white-space:nowrap}
-.landing-hero-sub{font-size:clamp(13px, 1.3vw, 15px);color:var(--muted);margin:0 auto 20px;max-width:620px;font-weight:300;line-height:1.6;word-break:keep-all}
-.hero-actions{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
-.hero-actions .btn{padding:10px 22px;font-size:15px;border-radius:12px;font-weight:600}
+.landing-hero-sub{font-size:clamp(14px, 1.4vw, 16px);color:var(--muted);margin:0 auto 24px;max-width:640px;font-weight:350;line-height:1.65;word-break:keep-all}
+
+.hero-actions{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.hero-actions .btn{padding:11px 24px;font-size:15px;border-radius:14px;font-weight:600}
+.btn-hero-admin{background:var(--surface);border:1.5px solid rgba(79,70,229,0.3);color:var(--primary)}
+.btn-hero-admin:hover{background:var(--primary-soft);border-color:var(--primary);color:var(--primary-hover)}
+
+/* Landing Live Stats Bar */
+.landing-metrics-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-around;
+  flex-wrap:wrap;
+  gap:16px 20px;
+  width:100%;
+  max-width:880px;
+  padding:16px 24px;
+  background:var(--surface-card);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  border:1px solid var(--line);
+  border-radius:18px;
+  box-shadow:var(--shadow-sm);
+}
+.landing-metric-item{display:flex;align-items:center;gap:12px}
+.landing-metric-icon{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-size:20px;background:var(--primary-soft);color:var(--primary);flex:none}
+.landing-metric-val{font-size:20px;font-weight:700;line-height:1.1;color:var(--ink)}
+.landing-metric-label{font-size:12px;color:var(--muted)}
+.landing-metric-sep{width:1px;height:32px;background:var(--line)}
+@media(max-width:700px){.landing-metric-sep{display:none}}
+
+/* Landing Features Bento Grid (ฟีเจอร์น่าสนใจในหน้าแรก) */
+.landing-features-wrap{width:100%;max-width:1040px;margin-top:6px}
+.landing-features-head{text-align:center;margin-bottom:18px}
+.landing-features-head h2{font-size:21px;font-weight:700;margin:8px 0 4px;letter-spacing:-.01em}
+.landing-features-head p{font-size:13.5px;color:var(--muted);margin:0}
+
+.landing-bento-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+@media(max-width:960px){.landing-bento-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:540px){.landing-bento-grid{grid-template-columns:1fr}}
+
+.bento-card{
+  background:var(--surface-card);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:20px 18px;
+  box-shadow:var(--shadow-sm);
+  transition:all .22s ease;
+  cursor:pointer;
+  display:flex;
+  flex-direction:column;
+  text-align:left;
+  position:relative;
+  overflow:hidden;
+}
+.bento-card:hover{transform:translateY(-3px);border-color:var(--primary);box-shadow:var(--shadow)}
+.bento-card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--card-accent,var(--primary));opacity:0;transition:opacity .2s}
+.bento-card:hover::before{opacity:1}
+.bento-icon{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:22px;margin-bottom:14px;background:var(--primary-soft);color:var(--primary)}
+.bento-title{font-size:15px;font-weight:600;margin:0 0 6px;color:var(--ink);line-height:1.3}
+.bento-desc{font-size:12.5px;color:var(--muted);line-height:1.6;margin:0;flex:1}
+.bento-footer{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--primary);margin-top:14px}
 
 /* ==========================================================================
    2. CATALOG DASHBOARD & ANALYTICS VIEW
@@ -307,9 +389,144 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
 .dock-text b{display:block;font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dock-text span{display:block;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-.catalog-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px}
-.catalog-head h1{font-size:clamp(24px,3.5vw,32px);font-weight:700;margin:0;display:flex;align-items:center;gap:10px}
-.catalog-head .sub{font-size:13px;color:var(--muted);margin-top:4px}
+/* Executive Catalog Header Section (ภาพที่ 2: สวยงาม มีระดับ เข้ากับแถบเมนูด้านซ้าย) */
+.catalog-hero-header{
+  background:linear-gradient(135deg, rgba(15,23,42,0.03) 0%, rgba(79,70,229,0.07) 100%), var(--surface-card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:18px 22px;
+  margin-bottom:22px;
+  box-shadow:var(--shadow-sm);
+  position:relative;
+  overflow:hidden;
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+}
+[data-theme="dark"] .catalog-hero-header{
+  background:linear-gradient(135deg, rgba(30,41,59,0.5) 0%, rgba(79,70,229,0.18) 100%), var(--surface-card);
+  border-color:rgba(255,255,255,0.08);
+}
+.catalog-hero-header::before{
+  content:"";
+  position:absolute;
+  top:0;left:0;right:0;
+  height:3.5px;
+  background:linear-gradient(90deg, #4F46E5, #06B6D4, #10B981);
+}
+
+.cat-header-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  padding-bottom:12px;
+  margin-bottom:14px;
+  border-bottom:1px solid rgba(148,163,184,0.15);
+  flex-wrap:wrap;
+}
+.cat-header-brand{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:12.5px;
+  color:var(--muted);
+}
+.brand-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:3px 10px;
+  border-radius:999px;
+  background:var(--primary-soft);
+  color:var(--primary);
+  font-weight:600;
+  font-size:11.5px;
+}
+.chip-glow{width:6px;height:6px;border-radius:50%;background:var(--primary);box-shadow:0 0 6px var(--primary)}
+.cat-divider{color:var(--line)}
+.cat-school-tag{font-weight:400;color:var(--muted)}
+
+.cat-role-container{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.role-badge-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:4px 12px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:600;
+}
+.role-viewer{
+  background:var(--off-soft);
+  color:var(--muted);
+  border:1px solid var(--line);
+}
+.role-admin{
+  background:var(--live-soft);
+  color:var(--live);
+  border:1px solid rgba(16,185,129,0.25);
+}
+.role-pulse-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:currentColor;
+  animation:rolePulse 2s infinite;
+}
+@keyframes rolePulse{0%,100%{opacity:1}50%{opacity:0.3}}
+
+.cat-header-main{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  flex-wrap:wrap;
+}
+.cat-header-titles{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  min-width:0;
+}
+.cat-icon-badge{
+  width:48px;
+  height:48px;
+  border-radius:14px;
+  background:var(--surface);
+  border:1px solid var(--line);
+  display:grid;
+  place-items:center;
+  font-size:24px;
+  box-shadow:var(--shadow-sm);
+  flex:none;
+}
+.cat-page-title{
+  font-size:clamp(20px, 3vw, 26px);
+  font-weight:700;
+  margin:0;
+  line-height:1.25;
+  letter-spacing:-.01em;
+}
+.cat-page-sub{
+  font-size:12.5px;
+  color:var(--muted);
+  margin:3px 0 0;
+  line-height:1.4;
+}
+
+.cat-header-actions{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.cat-action-group{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
 
 .tab-segmented{display:inline-flex;padding:4px;border-radius:12px;background:var(--line);gap:2px}
 .tab-segmented button{border:none;background:transparent;padding:6px 14px;border-radius:9px;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s ease}
@@ -473,6 +690,221 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
   box-shadow:0 4px 14px rgba(79,70,229,0.35);
   margin-bottom:2px;
 }
+
+/* ==========================================================================
+   NUMERIC KEYPAD PIN MODAL (ภาพที่ 1 & 3: แป้นตัวเลขกดได้ทันที สวย ทันสมัย)
+   ========================================================================== */
+.keypad-modal-card{
+  background:var(--surface-card);
+  backdrop-filter:blur(24px);
+  -webkit-backdrop-filter:blur(24px);
+  border:1px solid var(--line);
+  border-radius:26px;
+  width:min(390px, 94vw);
+  padding:26px 22px 20px;
+  box-shadow:0 30px 90px -15px rgba(0,0,0,0.55);
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+  animation:keypadPop .22s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes keypadPop{from{opacity:0;transform:scale(0.92)}to{opacity:1;transform:scale(1)}}
+
+.keypad-lock-emblem{
+  width:58px;
+  height:58px;
+  border-radius:50%;
+  margin:0 auto 12px;
+  background:linear-gradient(135deg, rgba(79,70,229,0.14), rgba(6,182,212,0.14));
+  border:1.5px solid rgba(79,70,229,0.25);
+  display:grid;
+  place-items:center;
+  font-size:26px;
+  box-shadow:0 8px 24px -4px rgba(79,70,229,0.22);
+  transition:all .2s ease;
+}
+.keypad-title{font-size:19px;font-weight:700;margin:0 0 6px;letter-spacing:-.01em;color:var(--ink)}
+.keypad-subtitle{font-size:12.5px;color:var(--muted);margin:0 auto 16px;max-width:300px;line-height:1.5}
+
+/* 4 PIN Dots Indicator */
+.pin-dots-row{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:18px;
+  margin:0 auto 14px;
+  padding:6px 0;
+}
+.pin-dot{
+  width:16px;
+  height:16px;
+  border-radius:50%;
+  border:2px solid var(--line);
+  background:var(--paper);
+  transition:all .2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.pin-dot.filled{
+  border-color:var(--primary);
+  background:var(--primary);
+  box-shadow:0 0 14px var(--primary);
+  transform:scale(1.18);
+}
+.pin-dots-row.error .pin-dot{
+  border-color:var(--danger);
+  background:var(--danger);
+  box-shadow:0 0 14px var(--danger);
+}
+.pin-dots-row.success .pin-dot{
+  border-color:var(--live);
+  background:var(--live);
+  box-shadow:0 0 14px var(--live);
+}
+.pin-dots-row.error{
+  animation:pinShake 0.4s ease;
+}
+@keyframes pinShake{
+  0%,100%{transform:translateX(0)}
+  20%,60%{transform:translateX(-10px)}
+  40%,80%{transform:translateX(10px)}
+}
+
+.pin-feedback-msg{
+  min-height:20px;
+  font-size:12.5px;
+  font-weight:500;
+  margin-bottom:12px;
+  transition:all .15s ease;
+}
+.pin-feedback-msg.error{color:var(--danger)}
+.pin-feedback-msg.success{color:var(--live)}
+.pin-feedback-msg.muted{color:var(--muted)}
+
+/* Keypad Grid 3x4 */
+.keypad-grid{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:12px;
+  max-width:280px;
+  margin:0 auto 16px;
+}
+.num-key{
+  width:72px;
+  height:72px;
+  margin:0 auto;
+  border-radius:50%;
+  border:1px solid var(--line);
+  background:var(--surface);
+  color:var(--ink);
+  font-size:24px;
+  font-weight:600;
+  font-family:inherit;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  box-shadow:var(--shadow-sm);
+  transition:all .14s ease;
+  user-select:none;
+  -webkit-user-select:none;
+  touch-action:manipulation;
+}
+.num-key:hover{
+  border-color:var(--primary);
+  background:var(--primary-soft);
+  color:var(--primary);
+  transform:scale(1.05);
+}
+.num-key:active{
+  transform:scale(0.92);
+  background:var(--primary);
+  color:#fff;
+}
+.num-key.func-key{
+  font-size:13px;
+  font-weight:500;
+  background:var(--paper);
+  color:var(--muted);
+}
+.num-key.func-key:hover{
+  color:var(--ink);
+  background:var(--line);
+}
+.keypad-foot-actions{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  padding-top:10px;
+  border-top:1px solid var(--line);
+}
+
+/* Custom Confirmation Modal (ภาพที่ 1: แทนที่ confirm() น่าเกลียด) */
+.confirm-modal-card{
+  background:var(--surface);
+  border-radius:22px;
+  width:min(440px, 94vw);
+  padding:26px 22px 20px;
+  box-shadow:0 30px 90px -15px rgba(0,0,0,0.55);
+  border:1px solid var(--line);
+  text-align:center;
+  animation:keypadPop .2s ease;
+}
+.confirm-icon-box{
+  width:58px;
+  height:58px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  font-size:26px;
+  margin:0 auto 14px;
+}
+.confirm-icon-box.danger{
+  background:var(--danger-soft);
+  color:var(--danger);
+  border:1.5px solid rgba(239,68,68,0.25);
+}
+.confirm-icon-box.info{
+  background:var(--primary-soft);
+  color:var(--primary);
+  border:1.5px solid rgba(79,70,229,0.25);
+}
+.confirm-title{font-size:19px;font-weight:700;margin:0 0 8px;color:var(--ink)}
+.confirm-desc{font-size:13.5px;color:var(--muted);margin:0 0 20px;line-height:1.6}
+
+/* Browser Mockup & Preview Dialog */
+.browser-mockup{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:14px;
+  overflow:hidden;
+  box-shadow:var(--shadow-sm);
+  margin-bottom:16px;
+}
+.browser-bar{
+  background:var(--paper);
+  border-bottom:1px solid var(--line);
+  padding:8px 14px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.browser-dots{display:flex;gap:6px}
+.browser-dot{width:10px;height:10px;border-radius:50%}
+.browser-url-bar{
+  flex:1;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:7px;
+  padding:4px 10px;
+  font-size:12px;
+  color:var(--muted);
+  display:flex;
+  align-items:center;
+  gap:6px;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
 </style>
 </head>
 <body>
@@ -540,25 +972,29 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
   <main class="main-body">
 
     <!-- ==============================================
-         1. LANDING PORTAL VIEW (หน้าแรกสุด สไตล์ Modern Minimalist - เลื่อนไม่ได้ จบใน 1 หน้า)
+         1. LANDING PORTAL VIEW (ภาพที่ 3: โลโก้เด่น 3 มิติ + ฟีเจอร์น่าสนใจ + เข้าสู่ระบบด้วยแป้นตัวเลข)
          ============================================== -->
     <section class="view-landing" id="viewLanding">
-      <div class="ambient-glow"><div class="orb-1"></div><div class="orb-2"></div></div>
+      <div class="ambient-glow">
+        <div class="ambient-grid"></div>
+        <div class="orb-1"></div>
+        <div class="orb-2"></div>
+      </div>
       <div class="landing-wrap">
         <!-- Top Bar -->
         <div class="landing-top">
           <div class="landing-brand">
-            <img src="logo-512.png" alt="ครูซอส" style="width:34px;height:34px;border-radius:50%;object-fit:cover">
+            <img src="logo-512.png" alt="ครูซอส" style="width:36px;height:36px;border-radius:50%;object-fit:cover;box-shadow:0 2px 8px rgba(79,70,229,0.3)">
             <span>คลังระบบออนไลน์ · ครูซอสสอนสังคม</span>
           </div>
           <div class="landing-meta">
             <span class="live-indicator"><span class="sync-dot"></span><span id="liveTime">00:00:00 น.</span></span>
             <span id="liveDate" style="display:inline-block">-</span>
-            <button class="btn icon-btn" id="landingThemeBtn" title="สลับโหมด" style="border:none;background:transparent;width:32px;height:32px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
+            <button class="btn icon-btn" id="landingThemeBtn" title="สลับโหมดมืด/สว่าง" style="border:none;background:transparent;width:32px;height:32px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
           </div>
         </div>
 
-        <!-- Hero with Floating Emblem -->
+        <!-- Hero with Enhanced 3D Dimensional Logo (ขยายขนาด + มีมิติออร่า) -->
         <div class="landing-hero">
           <div class="hero-logo-box">
             <img src="logo-512.png" alt="คลังระบบออนไลน์ ครูซอสสอนสังคม" class="hero-logo-img">
@@ -567,16 +1003,102 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
           <h1 class="landing-hero-title">
             <span class="hero-chunk">ศูนย์รวมระบบสารสนเทศ</span><span class="hero-chunk">และการเรียนรู้</span>
           </h1>
-          <p class="landing-hero-sub">รวบรวมสื่อการสอน แผนการสอน ใบงาน เอกสาร และระบบออนไลน์ทั้งหมดของครูซอสไว้ในที่เดียว เพื่อการทำงานที่รวดเร็วและทันสมัย</p>
+          <p class="landing-hero-sub">รวบรวมสื่อการสอน แผนการสอน ใบงาน เอกสาร และระบบออนไลน์ทั้งหมดของครูซอสไว้ในที่เดียว เพื่อการทำงานที่รวดเร็ว ทันสมัย และเข้าถึงได้ทุกที่ทุกเวลา</p>
+          
+          <!-- Hero Actions: 1) เข้าชมโหมดผู้ชม 2) เข้าสู่ระบบผู้ดูแล (แป้นตัวเลข) 3) ค้นหา -->
           <div class="hero-actions">
-            <button class="btn primary" id="btnEnterHub" style="font-size:15px;padding:11px 26px;box-shadow:0 8px 24px rgba(79,70,229,0.32);font-weight:600">🚀 เข้าสู่หน้าระบบ</button>
-            <button class="btn" id="btnSpotlightHero" style="font-size:14px;padding:10px 20px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>ค้นหาด่วน (Ctrl+K)</button>
+            <button class="btn primary" id="btnEnterHub" style="font-size:15px;padding:12px 26px;box-shadow:0 8px 24px rgba(79,70,229,0.35);font-weight:600">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:18px;height:18px"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <span>🚀 เข้าชมคลังระบบ (โหมดผู้ชม)</span>
+            </button>
+            <button class="btn btn-hero-admin" id="btnLoginKeypad" style="font-size:14.5px;padding:11px 22px;font-weight:600">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:17px;height:17px"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <span>🔐 เข้าสู่ระบบผู้ดูแล (รหัส PIN)</span>
+            </button>
+            <button class="btn ghost" id="btnSpotlightHero" style="font-size:14px;padding:11px 18px;border:1px solid var(--line);border-radius:14px">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+              <span>ค้นหาด่วน (Ctrl+K)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Live Metrics Bento Bar (สถิติคลังระบบแบบเรียลไทม์) -->
+        <div class="landing-metrics-bar">
+          <div class="landing-metric-item">
+            <div class="landing-metric-icon">📦</div>
+            <div>
+              <div class="landing-metric-val" id="landingMetricTotal">0</div>
+              <div class="landing-metric-label">ระบบทั้งหมดในคลัง</div>
+            </div>
+          </div>
+          <div class="landing-metric-sep"></div>
+          <div class="landing-metric-item">
+            <div class="landing-metric-icon" style="background:var(--live-soft);color:var(--live)">🟢</div>
+            <div>
+              <div class="landing-metric-val" id="landingMetricLive">0</div>
+              <div class="landing-metric-label">พร้อมใช้งานจริง</div>
+            </div>
+          </div>
+          <div class="landing-metric-sep"></div>
+          <div class="landing-metric-item">
+            <div class="landing-metric-icon" style="background:var(--surface);border:1px solid var(--line)">🗂️</div>
+            <div>
+              <div class="landing-metric-val" id="landingMetricCats">6</div>
+              <div class="landing-metric-label">ด้านการปฏิบัติงาน</div>
+            </div>
+          </div>
+          <div class="landing-metric-sep"></div>
+          <div class="landing-metric-item">
+            <div class="landing-metric-icon" style="background:var(--dev-soft);color:var(--dev)">⚡</div>
+            <div>
+              <div class="landing-metric-val" id="landingMetricClicks">0</div>
+              <div class="landing-metric-label">การเข้าใช้งานสะสม</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bento Features Showcase (ฟีเจอร์น่าสนใจ เพิ่มมิติให้หน้าแรกไม่จืด) -->
+        <div class="landing-features-wrap">
+          <div class="landing-features-head">
+            <span class="badge badge-primary">✨ จุดเด่นและนวัตกรรมระบบ</span>
+            <h2>เทคโนโลยีดิจิทัลเพื่อการเรียนรู้และการบริหารงานครู</h2>
+            <p>ออกแบบและพัฒนาอย่างพิถีพิถันเพื่อการทำงานที่มีประสิทธิภาพและเข้าถึงได้ง่ายที่สุด</p>
+          </div>
+
+          <div class="landing-bento-grid">
+            <div class="bento-card" style="--card-accent:#4F46E5" id="bentoCardMedia">
+              <div class="bento-icon" style="background:#EEF2FF;color:#4F46E5">📚</div>
+              <h3 class="bento-title">คลังสื่อ & แผนการสอนดิจิทัล</h3>
+              <p class="bento-desc">รวมสื่อการสอน ใบงาน สไลด์ แผนการจัดการเรียนรู้ และคู่มือวิชาสังคมศึกษา จัดเป็นหมวดหมู่ ค้นหาง่าย ใช้งานสะดวก</p>
+              <div class="bento-footer"><span>เข้าชมสื่อการสอน</span> <span>→</span></div>
+            </div>
+
+            <div class="bento-card" style="--card-accent:#10B981" id="bentoCardLive">
+              <div class="bento-icon" style="background:#ECFDF5;color:#10B981">🟢</div>
+              <h3 class="bento-title">พร้อมใช้งานจริง (Production)</h3>
+              <p class="bento-desc">ระบบงานและแอปพลิเคชันออนไลน์ที่ผ่านการทดสอบ พร้อมเปิดใช้งานจริงสำหรับครู นักเรียน และบุคลากรทางการศึกษา</p>
+              <div class="bento-footer" style="color:var(--live)"><span>ดูระบบพร้อมใช้</span> <span>→</span></div>
+            </div>
+
+            <div class="bento-card" style="--card-accent:#06B6D4" id="bentoCardQr">
+              <div class="bento-icon" style="background:#ECFEFF;color:#06B6D4">📱</div>
+              <h3 class="bento-title">ป้ายชื่อระบบ & QR Code</h3>
+              <p class="bento-desc">สร้างป้ายชื่อระบบอัจฉริยะพร้อม QR Code ความละเอียดสูงในคลิกเดียว เหมาะสำหรับพิมพ์ติดบอร์ดหรือแชร์ทางออนไลน์</p>
+              <div class="bento-footer" style="color:#06B6D4"><span>ดูตัวอย่างระบบ</span> <span>→</span></div>
+            </div>
+
+            <div class="bento-card" style="--card-accent:#F59E0B" id="bentoCardSec">
+              <div class="bento-icon" style="background:#FFFBEB;color:#F59E0B">🛡️</div>
+              <h3 class="bento-title">โหมดผู้ชม & ปลอดภัย 100%</h3>
+              <p class="bento-desc">เปิดให้บุคคลภายนอกเข้าชมและทดลองดูตัวอย่างได้ โดยล็อกสิทธิ์การเพิ่ม แก้ไข หรือลบข้อมูลด้วยรหัสผ่าน PIN ผู้ดูแล</p>
+              <div class="bento-footer" style="color:#F59E0B"><span>เข้าสู่ระบบผู้ดูแล</span> <span>→</span></div>
+            </div>
           </div>
         </div>
 
         <!-- Footer Note -->
-        <div class="landing-footer-note" style="text-align:center;font-size:12px;color:var(--muted);padding:8px 0">
-          คลังระบบออนไลน์ &middot; ครูซอสสอนสังคม (TS010)
+        <div class="landing-footer-note" style="text-align:center;font-size:12px;color:var(--muted);padding:14px 0 0">
+          คลังระบบออนไลน์ &middot; โรงเรียนวัดบางปูน &middot; ครูซอสสอนสังคม (TS010)
         </div>
       </div>
     </section>
@@ -586,28 +1108,68 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
          ============================================== -->
     <section class="view-catalog" id="viewCatalog">
       <div class="catalog-container">
-        <!-- Header -->
-        <div class="catalog-head">
-          <div>
-            <h1 id="catPageTitle">📦 ระบบทั้งหมด</h1>
-            <div class="sub" id="catPageSub">รายการระบบทั้งหมดในคลัง</div>
-          </div>
-          
-          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-            <div class="tab-segmented" id="segTab">
-              <button class="active" data-tab="all">ทั้งหมด</button>
-              <button data-tab="live">พร้อมใช้งานจริง 🟢</button>
-              <button data-tab="dev">ห้องทดลอง 🛠️</button>
+        <!-- EXECUTIVE CATALOG HEADER BANNER (ภาพที่ 2: สวยงาม มีระดับ เข้ากับแถบเมนูด้านซ้าย) -->
+        <header class="catalog-hero-header">
+          <!-- Top Utility Bar: Workspace Tag & Role Status -->
+          <div class="cat-header-top">
+            <div class="cat-header-brand">
+              <span class="brand-chip">
+                <span class="chip-glow"></span>
+                <span>TS010 · แพลตฟอร์มคลังระบบดิจิทัล</span>
+              </span>
+              <span class="cat-divider">/</span>
+              <span class="cat-school-tag">โรงเรียนวัดบางปูน ครูซอสสอนสังคม</span>
             </div>
-            <button class="btn primary" data-add id="btnAddTop">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>เพิ่มระบบ
-            </button>
-            <button class="btn ghost" id="topExitBtn" title="ออกจากระบบ / กลับสู่หน้าแรก (Exit to Portal)" style="font-size:13px;padding:7px 12px;border:1px solid var(--line);border-radius:10px;color:var(--muted)">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-              <span>ออกจากระบบ</span>
-            </button>
+
+            <!-- Role Badge & Admin Action (Rendered dynamically: Viewer vs Admin) -->
+            <div class="cat-role-container" id="headerRoleContainer">
+              <div class="role-badge-pill role-viewer" id="roleBadge">
+                <span class="role-pulse-dot"></span>
+                <span id="roleBadgeTxt">โหมดผู้ชม (Viewer)</span>
+              </div>
+              <button class="btn ghost" id="btnHeaderRoleAction" style="font-size:12px;padding:4px 10px;border-radius:8px">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <span id="btnHeaderRoleActionTxt">เข้าสู่ระบบผู้ดูแล</span>
+              </button>
+            </div>
           </div>
-        </div>
+
+          <!-- Main Title & Controls Bar -->
+          <div class="cat-header-main">
+            <div class="cat-header-titles">
+              <div class="cat-icon-badge" id="catHeaderIconBadge">📦</div>
+              <div>
+                <h1 id="catPageTitle" class="cat-page-title">ระบบทั้งหมด</h1>
+                <p id="catPageSub" class="cat-page-sub">ระบบงาน สื่อการสอน และนวัตกรรมดิจิทัลทั้งหมด</p>
+              </div>
+            </div>
+
+            <div class="cat-header-actions">
+              <!-- Segmented Tabs -->
+              <div class="tab-segmented" id="segTab">
+                <button class="active" data-tab="all">ทั้งหมด (<span id="tabCountAll">0</span>)</button>
+                <button data-tab="live">พร้อมใช้งานจริง 🟢 (<span id="tabCountLive">0</span>)</button>
+                <button data-tab="dev">ห้องทดลอง 🛠️ (<span id="tabCountDev">0</span>)</button>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="cat-action-group">
+                <button class="btn primary" id="btnAddTop" data-add title="เพิ่มระบบใหม่">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
+                  <span id="btnAddTopLabel">เพิ่มระบบ</span>
+                </button>
+                <button class="btn" id="btnHeaderSpotlight" title="ค้นหาด่วน (Ctrl+K)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                  <span>ค้นหา</span>
+                  <kbd style="font-size:10px;padding:1px 5px;border-radius:4px;background:var(--paper);border:1px solid var(--line);color:var(--muted)">⌘K</kbd>
+                </button>
+                <button class="btn ghost icon-btn" id="topExitBtn" title="กลับสู่หน้าแรก (Portal)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </header>
 
         <!-- Announcement Banner (แถบประกาศและแจ้งเตือนสถานะ ดีไซน์ทันสมัยเข้ากับระบบ) -->
         <div class="announce-banner" id="announceBanner" style="display:none">
@@ -921,6 +1483,18 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
         <button class="btn" id="openFbConfigBtn" style="width:100%;justify-content:center">เชื่อมต่อ Cloud แล้ว 🟢</button>
       </div>
 
+      <div style="border-top:1px solid var(--line);padding-top:14px;margin-bottom:18px">
+        <h4 style="margin:0 0 6px;font-size:14px">🔑 รหัสผ่านผู้ดูแลระบบ (Owner PIN)</h4>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:10px">รหัส PIN 4 หลัก สำหรับล็อกการแก้ไขและลบข้อมูลในระบบ</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn" id="btnChangePin" style="flex:1;justify-content:center">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span>เปลี่ยนรหัส PIN (เปิดแป้นตัวเลข)</span>
+          </button>
+          <button class="btn ghost" id="btnResetPin" style="font-size:12px;color:var(--muted)">คืนค่าเริ่มต้น</button>
+        </div>
+      </div>
+
       <div style="border-top:1px solid var(--line);padding-top:14px">
         <h4 style="margin:0 0 6px;font-size:14px">💾 สำรองและกู้คืนไฟล์ (JSON Backup)</h4>
         <div style="font-size:12px;color:var(--muted);margin-bottom:10px">ดาวน์โหลดฐานข้อมูลเก็บไว้ในคอมพิวเตอร์ หรือนำไฟล์กลับมาเปิด</div>
@@ -937,22 +1511,114 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
   </div>
 </div>
 
-<!-- 5. Owner PIN Modal -->
-<div class="overlay" id="pinOverlay" role="dialog" aria-modal="true" aria-labelledby="pinTitle">
-  <div class="modal sm">
+<!-- 5. Interactive Numeric Keypad PIN Modal (ภาพที่ 1 & 3: แป้นตัวเลขกดได้ทันที พร้อมใช้) -->
+<div class="overlay" id="keypadPinOverlay" role="dialog" aria-modal="true" aria-labelledby="keypadTitle">
+  <div class="keypad-modal-card">
+    <div class="keypad-lock-emblem" id="keypadEmblem">
+      <span id="keypadEmblemIcon">🔐</span>
+    </div>
+    <h2 class="keypad-title" id="keypadTitle">เข้าสู่ระบบผู้ดูแล (ครูซอส)</h2>
+    <p class="keypad-subtitle" id="keypadSub">กรอกรหัส PIN 4 หลัก เพื่อปลดล็อกสิทธิ์การจัดการ เพิ่ม แก้ไข หรือลบข้อมูลในระบบ</p>
+    
+    <!-- 4 PIN Dots Indicator -->
+    <div class="pin-dots-row" id="pinDotsRow">
+      <div class="pin-dot" id="pinDot0"></div>
+      <div class="pin-dot" id="pinDot1"></div>
+      <div class="pin-dot" id="pinDot2"></div>
+      <div class="pin-dot" id="pinDot3"></div>
+    </div>
+    
+    <div class="pin-feedback-msg" id="pinFeedbackMsg"></div>
+
+    <!-- 3x4 Touch/Click Numeric Keypad -->
+    <div class="keypad-grid" id="keypadGrid">
+      <button type="button" class="num-key" data-key="1">1</button>
+      <button type="button" class="num-key" data-key="2">2</button>
+      <button type="button" class="num-key" data-key="3">3</button>
+      <button type="button" class="num-key" data-key="4">4</button>
+      <button type="button" class="num-key" data-key="5">5</button>
+      <button type="button" class="num-key" data-key="6">6</button>
+      <button type="button" class="num-key" data-key="7">7</button>
+      <button type="button" class="num-key" data-key="8">8</button>
+      <button type="button" class="num-key" data-key="9">9</button>
+      <button type="button" class="num-key func-key" data-key="clear" title="ล้างตัวเลข">C</button>
+      <button type="button" class="num-key" data-key="0">0</button>
+      <button type="button" class="num-key func-key" data-key="backspace" title="ลบหลักล่าสุด">⌫</button>
+    </div>
+
+    <div class="keypad-foot-actions">
+      <button type="button" class="btn ghost" id="btnKeypadGuestMode" style="font-size:13px;width:100%;justify-content:center;color:var(--muted)">
+        👁️ เข้าชมในฐานะผู้ชมทั่วไป (ไม่ต้องใส่รหัส)
+      </button>
+      <button type="button" class="btn ghost" data-close style="font-size:12.5px;width:100%;justify-content:center;color:var(--muted)">
+        ✕ ปิดหน้าต่าง
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 6. Custom Confirmation Modal (ภาพที่ 1: แทนที่ confirm() ดั้งเดิม ไม่ธรรมดา) -->
+<div class="overlay" id="customConfirmOverlay" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle">
+  <div class="confirm-modal-card">
+    <div class="confirm-icon-box danger" id="confirmIconBox">⚠️</div>
+    <h3 class="confirm-title" id="confirmModalTitle">ยืนยันการทำรายการ</h3>
+    <p class="confirm-desc" id="confirmModalDesc">คุณแน่ใจหรือไม่ว่าต้องการดำเนินการนี้?</p>
+    <div style="display:flex;gap:10px;justify-content:center">
+      <button type="button" class="btn ghost" id="confirmCancelBtn" style="flex:1;justify-content:center">ยกเลิก</button>
+      <button type="button" class="btn danger" id="confirmOkBtn" style="flex:1;justify-content:center">ยืนยัน</button>
+    </div>
+  </div>
+</div>
+
+<!-- 7. System Interactive Preview Modal (เพิ่มเติม: ดูตัวอย่างระบบได้โดยไม่ต้องแก้ไข) -->
+<div class="overlay" id="previewOverlay" role="dialog" aria-modal="true" aria-labelledby="previewModalTitle">
+  <div class="modal" style="max-width:880px;max-height:92vh">
     <div class="modal-head">
-      <h2 id="pinTitle">🔒 รหัสผ่านเจ้าของระบบ (Owner Lock)</h2>
+      <div style="display:flex;align-items:center;gap:12px;min-width:0">
+        <span style="font-size:22px" id="previewIcon">💻</span>
+        <div style="min-width:0">
+          <h2 id="previewModalTitle" style="font-size:17px;font-weight:700;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">ตัวอย่างระบบ</h2>
+          <div id="previewModalSub" style="font-size:12px;color:var(--muted)">พรีวิวหน้าตาและการทำงานของระบบออนไลน์</div>
+        </div>
+      </div>
       <button class="btn ghost icon-btn" data-close><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
-    <div class="modal-body">
-      <p style="font-size:13px;color:var(--muted);margin-top:0">ใส่รหัส PIN 4 หลัก เพื่อเปิดสิทธิ์การเพิ่ม แก้ไข หรือลบข้อมูลในระบบ</p>
-      <div style="max-width:220px;margin:16px auto">
-        <input type="password" id="pinInput" maxlength="6" placeholder="••••" style="font-size:24px;text-align:center;letter-spacing:8px;padding:8px">
+    <div class="modal-body" style="padding:18px 22px">
+      <!-- Browser Window Mockup Frame -->
+      <div class="browser-mockup">
+        <div class="browser-bar">
+          <div class="browser-dots">
+            <span class="browser-dot" style="background:#EF4444"></span>
+            <span class="browser-dot" style="background:#F59E0B"></span>
+            <span class="browser-dot" style="background:#10B981"></span>
+          </div>
+          <div class="browser-url-bar">
+            <span style="color:var(--live)">🔒</span>
+            <span id="previewUrlBar">https://...</span>
+          </div>
+          <button class="btn ghost icon-btn" id="previewCopyUrlBtn" title="คัดลอกลิงก์" style="width:28px;height:28px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+        </div>
+        <div id="previewScreenBox" style="position:relative;aspect-ratio:16/9;background:var(--off-soft);overflow:hidden;display:grid;place-items:center">
+          <!-- Screenshot inserted here -->
+        </div>
       </div>
+
+      <!-- Preview Metadata -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px" id="previewBadges"></div>
+      <p id="previewShort" style="font-size:15px;font-weight:600;margin:0 0 10px;color:var(--ink)"></p>
+      <div id="previewDetailBox" style="font-size:13.5px;color:var(--muted);line-height:1.7;margin-bottom:12px;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px 14px"></div>
+      
+      <div id="previewFeaturesBox" style="margin-bottom:12px"></div>
+      <div id="previewTechList" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px"></div>
     </div>
-    <div class="modal-foot">
-      <button class="btn ghost" data-close>ยกเลิก</button>
-      <button class="btn primary" id="pinConfirmBtn">ยืนยัน</button>
+    <div class="modal-foot" style="display:flex;gap:10px;justify-content:space-between;align-items:center">
+      <div style="display:flex;gap:8px">
+        <button class="btn" id="previewQrBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>ป้าย QR Code</button>
+        <button class="btn ghost" data-close>ปิด</button>
+      </div>
+      <a class="btn primary" id="previewLaunchBtn" href="#" target="_blank" rel="noopener" style="padding:9px 20px;font-weight:600">
+        🚀 เปิดใช้งานระบบจริง ↗
+      </a>
     </div>
   </div>
 </div>
@@ -1100,6 +1766,12 @@ function listenFirestore(){
       applyAnnouncementUI();
     }
   }, err => console.error(err));
+
+  fbDb.collection("meta").doc("security").onSnapshot(doc => {
+    if(doc.exists && doc.data() && doc.data().pin){
+      setLS(PIN_KEY, doc.data().pin);
+    }
+  }, err => console.error(err));
 }
 
 async function syncToFirebase(){
@@ -1230,14 +1902,17 @@ function renderAll(){
   $("#viewLanding").classList.toggle("active", isLanding);
   $("#viewCatalog").classList.toggle("active", !isLanding);
 
-  if(isLanding){
-    document.body.style.overflow = "hidden";
-    document.documentElement.style.overflow = "hidden";
-  } else {
-    document.body.style.overflow = "";
-    document.documentElement.style.overflow = "";
-  }
+  document.body.style.overflow = "";
+  document.documentElement.style.overflow = "";
 
+  // Update Landing Live Metrics
+  if($("#landingMetricTotal")) $("#landingMetricTotal").textContent = items.length;
+  if($("#landingMetricLive")) $("#landingMetricLive").textContent = items.filter(i => i.status === "live").length;
+  if($("#landingMetricCats")) $("#landingMetricCats").textContent = cats.length;
+  const totalClicks = items.reduce((s, it) => s + (it.clicks || 0), 0);
+  if($("#landingMetricClicks")) $("#landingMetricClicks").textContent = totalClicks.toLocaleString();
+
+  updateRoleUI();
   renderNav();
   if(!isLanding){
     renderAnalytics();
@@ -1422,6 +2097,7 @@ function renderAnalytics(){
 /* Quick Launch Dock */
 function renderQuickDock(){
   const grid = $("#dockGrid");
+  if(!grid) return;
   const liveItems = items.filter(i => i.status === "live");
   const showList = liveItems.length ? liveItems.slice(0,6) : items.slice(0,6);
 
@@ -1490,22 +2166,28 @@ updateClock();
 
 /* ---------- Catalog Dashboard View ---------- */
 function renderCatalogView(route){
-  let title = "📦 ระบบทั้งหมด";
+  let icon = "📦";
+  let title = "ระบบทั้งหมด";
   let sub = "ระบบงาน สื่อการสอน และนวัตกรรมดิจิทัลทั้งหมด";
 
   if(route.sub === "live"){
-    title = "🟢 ระบบที่พร้อมใช้งานจริง";
-    sub = "เฉพาะระบบที่เปิดใช้งานแล้วและพร้อมให้บริการ";
+    icon = "🟢";
+    title = "ระบบที่พร้อมใช้งานจริง";
+    sub = "เฉพาะระบบที่เปิดใช้งานแล้วและพร้อมให้บริการแก่ทุกคน";
   } else if(route.sub === "dev"){
-    title = "🛠️ ห้องทดลอง / กำลังพัฒนา (Dev Lab)";
-    sub = "ระบบที่อยู่ระหว่างการสร้างและทดลอง";
+    icon = "🛠️";
+    title = "ห้องทดลอง / กำลังพัฒนา (Dev Lab)";
+    sub = "ระบบที่อยู่ระหว่างการค้นคว้า ทดสอบ และพัฒนาของครูซอส";
   } else if(route.sub === "cat"){
     const c = cats.find(x => x.id === route.catId);
-    title = c ? `${esc(c.icon||"🗂️")} ${esc(c.name)}` : "ด้านงาน";
-    sub = `ระบบในสังกัดหมวดหมู่ ${esc(c?.name||"")}`;
+    icon = c?.icon || "🗂️";
+    title = c ? c.name : "ด้านงาน";
+    sub = `ระบบในสังกัดหมวดหมู่ ${esc(c?.name||"")} ของครูซอส`;
   }
 
-  $("#catPageTitle").innerHTML = title;
+  const iconEl = $("#catHeaderIconBadge");
+  if(iconEl) iconEl.textContent = icon;
+  $("#catPageTitle").textContent = title;
   $("#catPageSub").textContent = sub;
 
   if(route.sub === "live") currentTab = "live";
@@ -1516,6 +2198,13 @@ function renderCatalogView(route){
     b.classList.toggle("active", b.dataset.tab === currentTab);
   });
 
+  const liveCount = items.filter(i => i.status === "live").length;
+  const devCount = items.filter(i => i.status === "dev").length;
+  if($("#tabCountAll")) $("#tabCountAll").textContent = items.length;
+  if($("#tabCountLive")) $("#tabCountLive").textContent = liveCount;
+  if($("#tabCountDev")) $("#tabCountDev").textContent = devCount;
+
+  updateRoleUI();
   renderTrendingDock();
   drawCards();
 }
@@ -1561,9 +2250,9 @@ function cardHTML(it){
   const c = catOf(it);
   return `
   <article class="sys-card" data-id="${it.id}">
-    <div class="card-shot" tabindex="0" role="button" data-act="preview">
+    <div class="card-shot" tabindex="0" role="button" data-act="preview" title="คลิกเพื่อดูตัวอย่างระบบ">
       ${shotHTML(it)}
-      <span class="peek">ดูตัวอย่าง</span>
+      <span class="peek">👁️ ดูตัวอย่าง</span>
     </div>
     <div class="card-content">
       <div class="card-meta">
@@ -1572,13 +2261,17 @@ function cardHTML(it){
         ${it.version ? `<span class="tag-chip" style="font-weight:600">${esc(it.version)}</span>` : ""}
         ${it.clicks ? `<span class="tag-chip" style="color:var(--primary)">👁️ ${it.clicks} ครั้ง</span>` : ""}
       </div>
-      <h3 data-act="detail">${esc(it.name)}</h3>
+      <h3 data-act="preview" title="คลิกเพื่อดูตัวอย่างระบบ">${esc(it.name)}</h3>
       ${it.short ? `<p class="desc">${esc(it.short)}</p>` : ""}
       ${(it.tech||[]).length ? `<div class="tag-list">${it.tech.map(t=>`<span class="tag-chip">${esc(t)}</span>`).join("")}</div>` : ""}
     </div>
     <div class="card-foot">
-      <button class="btn ghost" data-act="detail" style="font-weight:500">รายละเอียด</button>
-      <a class="btn live" href="${esc(it.url)}" target="_blank" rel="noopener" onclick="window.__click('${it.id}')">เปิดใช้งาน ↗</a>
+      <button class="btn ghost" data-act="preview" title="ดูตัวอย่างระบบ">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        <span>ดูตัวอย่าง</span>
+      </button>
+      <button class="btn ghost" data-act="detail" style="font-weight:500">ข้อมูล</button>
+      <a class="btn live" href="${esc(it.url)}" target="_blank" rel="noopener" onclick="window.__click('${it.id}')">เปิดใช้ ↗</a>
       <span style="flex:1"></span>
       <button class="btn icon-btn ghost" data-act="qr" title="สร้าง QR Code ป้ายชื่อระบบ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></button>
       <button class="btn icon-btn ghost" data-act="copy" title="คัดลอกลิงก์"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button>
@@ -1712,24 +2405,33 @@ function openDetail(it){
   $("#dBody").innerHTML = h;
 
   $("#dFoot").innerHTML = `
-    <button class="btn danger" id="dDelBtn">ลบระบบ</button>
-    <button class="btn" id="dEditBtn">แก้ไข</button>
+    <button class="btn danger" id="dDelBtn">${isUnlocked ? 'ลบระบบ' : '🔒 ลบระบบ'}</button>
+    <button class="btn" id="dEditBtn">${isUnlocked ? 'แก้ไข' : '🔒 แก้ไข'}</button>
+    <button class="btn" id="dPreviewBtn" title="ดูตัวอย่างหน้าตาระบบ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>ดูตัวอย่าง</button>
     <button class="btn" id="dQrBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>ป้าย QR Code</button>
     <span style="flex:1"></span>
     <a class="btn live" href="${esc(it.url)}" target="_blank" rel="noopener" onclick="window.__click('${it.id}')">เปิดใช้งานจริง ↗</a>`;
 
   $("#dCopyBtn").onclick = () => copyText(it.url);
   $("#dQrBtn").onclick = () => openQrModal(it);
+  $("#dPreviewBtn").onclick = () => { closeOverlay($("#detailOverlay")); openPreviewModal(it); };
   $("#dEditBtn").onclick = () => requireOwner(() => { closeOverlay($("#detailOverlay")); openForm(it); });
   $("#dDelBtn").onclick = () => requireOwner(() => {
-    if(confirm(`ยืนยันการลบ “${it.name}” ออกจากคลัง?`)){
-      items = items.filter(x => x.id !== it.id);
-      if(fbDb) fbDb.collection("systems").doc(it.id).delete();
-      persist();
-      renderAll();
-      closeOverlay($("#detailOverlay"));
-      toast("ลบระบบเรียบร้อย");
-    }
+    showCustomConfirm({
+      title: "ยืนยันการลบระบบ",
+      message: `คุณแน่ใจหรือไม่ว่าต้องการลบ “${it.name}” ออกจากคลังระบบ? การดำเนินการนี้ไม่สามารถย้อนกลับได้`,
+      confirmText: "ลบระบบทันที",
+      cancelText: "ยกเลิก",
+      isDanger: true,
+      onConfirm: () => {
+        items = items.filter(x => x.id !== it.id);
+        if(fbDb) fbDb.collection("systems").doc(it.id).delete();
+        persist();
+        renderAll();
+        closeOverlay($("#detailOverlay"));
+        toast("ลบระบบเรียบร้อย 🗑️");
+      }
+    });
   });
 
   openOverlay($("#detailOverlay"));
@@ -1927,50 +2629,315 @@ $("#catSaveBtn").onclick = () => {
   toast("บันทึกหมวดหมู่เรียบร้อย");
 };
 
-/* ---------- PIN Owner Lock ---------- */
-function requireOwner(callback){
-  const pin = getLS(PIN_KEY);
-  if(!pin || isUnlocked){ callback(); return; }
-  openOverlay($("#pinOverlay"));
-  $("#pinInput").value = "";
-  $("#pinInput").focus();
-  $("#pinConfirmBtn").onclick = () => {
-    if($("#pinInput").value.trim() === pin){
-      isUnlocked = true;
-      closeOverlay($("#pinOverlay"));
-      updateLockUI();
-      toast("ปลดล็อกโหมดเจ้าของระบบ 🔓");
-      callback();
-    } else {
-      toast("รหัส PIN ไม่ถูกต้อง");
-      $("#pinInput").select();
-    }
+/* ==========================================================================
+   CUSTOM CONFIRMATION DIALOG (ภาพที่ 1: แทนที่ confirm() ดั้งเดิม ไม่ธรรมดา)
+   ========================================================================== */
+function showCustomConfirm({ title = "ยืนยันการทำรายการ", message = "คุณแน่ใจหรือไม่ว่าต้องการดำเนินการนี้?", confirmText = "ยืนยัน", cancelText = "ยกเลิก", isDanger = true, onConfirm = null } = {}){
+  const ov = $("#customConfirmOverlay");
+  $("#confirmModalTitle").textContent = title;
+  $("#confirmModalDesc").textContent = message;
+  const okBtn = $("#confirmOkBtn");
+  const cancelBtn = $("#confirmCancelBtn");
+  const iconBox = $("#confirmIconBox");
+  
+  okBtn.textContent = confirmText;
+  cancelBtn.textContent = cancelText;
+  okBtn.className = isDanger ? "btn danger" : "btn primary";
+  iconBox.className = isDanger ? "confirm-icon-box danger" : "confirm-icon-box info";
+  iconBox.textContent = isDanger ? "⚠️" : "ℹ️";
+  
+  openOverlay(ov);
+  
+  okBtn.onclick = () => {
+    closeOverlay(ov);
+    if(typeof onConfirm === "function") onConfirm();
+  };
+  cancelBtn.onclick = () => {
+    closeOverlay(ov);
   };
 }
 
-function updateLockUI(){
-  const b = $("#ownerLockBtn");
-  if(b) b.style.color = isUnlocked ? "var(--live)" : "var(--side-text)";
+/* ==========================================================================
+   SYSTEM INTERACTIVE PREVIEW MODAL (เพิ่มเติม: ดูตัวอย่างระบบได้โดยไม่ต้องแก้ไข)
+   ========================================================================== */
+let curPreviewItem = null;
+function openPreviewModal(it){
+  curPreviewItem = it;
+  const c = catOf(it);
+  const src = imgOf(it);
+  
+  $("#previewIcon").textContent = c?.icon || "💻";
+  $("#previewModalTitle").textContent = it.name;
+  $("#previewModalSub").textContent = `${c ? c.name : 'ระบบทั่วไป'} · ${STATUS_LABELS[it.status] || ''}`;
+  $("#previewUrlBar").textContent = it.url;
+  
+  const screenBox = $("#previewScreenBox");
+  screenBox.innerHTML = src 
+    ? `<img src="${esc(src)}" alt="${esc(it.name)}" style="width:100%;height:100%;object-fit:cover;object-position:top" onerror="this.outerHTML=window.__ph(${esc(JSON.stringify(it.name))})">` 
+    : placeholder(it.name);
+    
+  let badgesHtml = `
+    <span class="badge badge-${it.status}">${STATUS_LABELS[it.status]||""}</span>
+    ${c ? `<span class="badge badge-primary">${esc(c.icon||"")} ${esc(c.name)}</span>` : ""}
+    ${it.version ? `<span class="tag-chip" style="font-weight:600">เวอร์ชัน ${esc(it.version)}</span>` : ""}
+    ${it.clicks ? `<span class="tag-chip" style="color:var(--primary)">👁️ เข้าใช้แล้ว ${it.clicks} ครั้ง</span>` : ""}
+  `;
+  $("#previewBadges").innerHTML = badgesHtml;
+  
+  $("#previewShort").textContent = it.short || "ศูนย์รวมระบบออนไลน์และนวัตกรรมดิจิทัล ครูซอสสอนสังคม";
+  
+  const detailBox = $("#previewDetailBox");
+  detailBox.textContent = it.detail || "ระบบงานนี้ได้รับการพัฒนาเพื่อสนับสนุนการจัดการเรียนรู้และการบริหารงานครู สามารถกดปุ่มด้านล่างเพื่อเปิดใช้งานระบบจริงได้ทันที";
+  
+  const featBox = $("#previewFeaturesBox");
+  if(it.features){
+    featBox.style.display = "block";
+    featBox.innerHTML = `<div style="font-weight:600;font-size:13px;margin-bottom:6px;color:var(--ink)">⚡ ฟีเจอร์เด่นของระบบ</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.6;white-space:pre-wrap;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 14px">${esc(it.features)}</div>`;
+  } else {
+    featBox.style.display = "none";
+  }
+  
+  const techBox = $("#previewTechList");
+  if((it.tech || []).length){
+    techBox.style.display = "flex";
+    techBox.innerHTML = it.tech.map(t => `<span class="tag-chip" style="font-size:11.5px">🛠️ ${esc(t)}</span>`).join("");
+  } else {
+    techBox.style.display = "none";
+  }
+  
+  const launchBtn = $("#previewLaunchBtn");
+  launchBtn.href = it.url;
+  launchBtn.onclick = () => recordClick(it.id);
+  
+  $("#previewQrBtn").onclick = () => {
+    closeOverlay($("#previewOverlay"));
+    openQrModal(it);
+  };
+  $("#previewCopyUrlBtn").onclick = () => copyText(it.url);
+  
+  openOverlay($("#previewOverlay"));
 }
 
-onClick("#ownerLockBtn", () => {
-  const pin = getLS(PIN_KEY);
-  if(!pin){
-    const n = prompt("ตั้งรหัส PIN 4 หลักสำหรับล็อกการแก้ไข (ใช้งานคนเดียว):");
-    if(n && n.trim().length >= 4){
-      setLS(PIN_KEY, n.trim());
-      isUnlocked = true;
-      updateLockUI();
-      toast("ตั้งรหัส PIN เรียบร้อย");
+/* ==========================================================================
+   INTERACTIVE NUMERIC KEYPAD & OWNER PIN (ภาพที่ 1 & 3: แป้นตัวเลขพร้อมใช้)
+   ========================================================================== */
+const DEFAULT_PINS = ["0000", "2569", "1234"];
+let keypadDigits = [];
+let keypadMode = "login"; // "login" | "verify" | "set"
+let keypadPendingCallback = null;
+
+function getStoredPin(){
+  return getLS(PIN_KEY) || "0000";
+}
+
+function verifyKeypadPin(input){
+  const stored = getLS(PIN_KEY);
+  if(stored && stored.trim()){
+    return input === stored.trim();
+  }
+  return DEFAULT_PINS.includes(input);
+}
+
+function saveOwnerPin(newPin){
+  setLS(PIN_KEY, newPin);
+  if(fbDb){
+    fbDb.collection("meta").doc("security").set({ pin: newPin, updatedAt: Date.now() }).catch(()=>{});
+  }
+}
+
+function openKeypadModal(mode = "login", callback = null, customTitle = "", customSub = ""){
+  keypadMode = mode;
+  keypadPendingCallback = callback;
+  keypadDigits = [];
+  
+  const titleEl = $("#keypadTitle");
+  const subEl = $("#keypadSub");
+  const emblem = $("#keypadEmblemIcon");
+  const msgEl = $("#pinFeedbackMsg");
+  
+  msgEl.textContent = "";
+  msgEl.className = "pin-feedback-msg";
+  $("#pinDotsRow").className = "pin-dots-row";
+  
+  if(mode === "set"){
+    titleEl.textContent = customTitle || "🔑 ตั้งรหัส PIN ผู้ดูแลระบบ";
+    subEl.textContent = customSub || "กดแป้นตัวเลข 4 หลัก เพื่อตั้งรหัส PIN ใหม่สำหรับคุณครู";
+    emblem.textContent = "🔑";
+  } else if(mode === "verify"){
+    titleEl.textContent = customTitle || "🔒 ยืนยันสิทธิ์ผู้ดูแลระบบ (ครูซอส)";
+    subEl.textContent = customSub || "กรอกรหัส PIN 4 หลัก เพื่อปลดล็อกสิทธิ์การจัดการ แก้ไข หรือลบระบบ";
+    emblem.textContent = "🔐";
+  } else {
+    titleEl.textContent = customTitle || "🔐 เข้าสู่ระบบผู้ดูแล (ครูซอส)";
+    subEl.textContent = customSub || "กรอกรหัส PIN 4 หลักเพื่อเข้าสู่ระบบ (รหัสเริ่มต้น: 0000 หรือ 2569)";
+    emblem.textContent = "👑";
+  }
+  
+  updateKeypadDotsUI();
+  openOverlay($("#keypadPinOverlay"));
+}
+
+function updateKeypadDotsUI(){
+  for(let i = 0; i < 4; i++){
+    const dot = $("#pinDot" + i);
+    if(dot){
+      dot.classList.toggle("filled", i < keypadDigits.length);
+    }
+  }
+}
+
+function handleKeypadInput(key){
+  if(key === "clear"){
+    keypadDigits = [];
+    updateKeypadDotsUI();
+    const msg = $("#pinFeedbackMsg");
+    if(msg){ msg.textContent = ""; msg.className = "pin-feedback-msg"; }
+    $("#pinDotsRow").className = "pin-dots-row";
+    return;
+  }
+  if(key === "backspace"){
+    if(keypadDigits.length > 0){
+      keypadDigits.pop();
+      updateKeypadDotsUI();
+      $("#pinDotsRow").className = "pin-dots-row";
     }
     return;
   }
+  if(keypadDigits.length < 4 && /^[0-9]$/.test(key)){
+    keypadDigits.push(key);
+    updateKeypadDotsUI();
+    
+    if(keypadDigits.length === 4){
+      const pinStr = keypadDigits.join("");
+      const dotsRow = $("#pinDotsRow");
+      const msg = $("#pinFeedbackMsg");
+      
+      if(keypadMode === "set"){
+        saveOwnerPin(pinStr);
+        isUnlocked = true;
+        dotsRow.className = "pin-dots-row success";
+        msg.textContent = `ตั้งรหัส PIN ใหม่ (${pinStr}) เรียบร้อย 🎉`;
+        msg.className = "pin-feedback-msg success";
+        updateRoleUI();
+        setTimeout(() => {
+          closeOverlay($("#keypadPinOverlay"));
+          toast(`บันทึกรหัส PIN ใหม่สำเร็จ 🔑`);
+          if(typeof keypadPendingCallback === "function"){
+            keypadPendingCallback();
+            keypadPendingCallback = null;
+          }
+        }, 600);
+      } else {
+        // verify or login mode
+        if(verifyKeypadPin(pinStr)){
+          isUnlocked = true;
+          dotsRow.className = "pin-dots-row success";
+          msg.textContent = "รหัสผ่านถูกต้อง ยินดีต้อนรับครับ 🔓";
+          msg.className = "pin-feedback-msg success";
+          updateRoleUI();
+          setTimeout(() => {
+            closeOverlay($("#keypadPinOverlay"));
+            toast("เข้าสู่โหมดผู้ดูแลระบบ (ครูซอส) เรียบร้อย 🔓");
+            if(typeof keypadPendingCallback === "function"){
+              keypadPendingCallback();
+              keypadPendingCallback = null;
+            }
+          }, 450);
+        } else {
+          dotsRow.className = "pin-dots-row error";
+          msg.textContent = "รหัส PIN ไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง";
+          msg.className = "pin-feedback-msg error";
+          setTimeout(() => {
+            keypadDigits = [];
+            updateKeypadDotsUI();
+            dotsRow.className = "pin-dots-row";
+          }, 600);
+        }
+      }
+    }
+  }
+}
+
+// Physical keyboard support for PIN keypad
+document.addEventListener("keydown", e => {
+  if(!$("#keypadPinOverlay") || !$("#keypadPinOverlay").classList.contains("open")) return;
+  if(e.key >= "0" && e.key <= "9"){
+    e.preventDefault();
+    handleKeypadInput(e.key);
+  } else if(e.key === "Backspace"){
+    e.preventDefault();
+    handleKeypadInput("backspace");
+  } else if(e.key.toLowerCase() === "c" || e.key === "Delete"){
+    e.preventDefault();
+    handleKeypadInput("clear");
+  }
+});
+
+// Keypad buttons click delegation
+$("#keypadGrid").addEventListener("click", e => {
+  const btn = e.target.closest("[data-key]");
+  if(btn){
+    handleKeypadInput(btn.dataset.key);
+  }
+});
+
+onClick("#btnKeypadGuestMode", () => {
+  closeOverlay($("#keypadPinOverlay"));
+  go("all");
+  toast("เข้าชมในโหมดผู้ชมทั่วไป (ดูตัวอย่างได้อย่างเดียว)");
+});
+
+/* ---------- Permissions & Role UI Update ---------- */
+function requireOwner(callback){
   if(isUnlocked){
-    isUnlocked = false;
-    updateLockUI();
-    toast("ล็อกโหมดเจ้าของระบบ 🔒");
+    callback();
+    return;
+  }
+  openKeypadModal("verify", callback, "🔒 กรุณายืนยันรหัส PIN ผู้ดูแล", "ใส่รหัส PIN 4 หลัก เพื่อปลดล็อกสิทธิ์การเพิ่ม แก้ไข หรือลบข้อมูลในระบบ");
+}
+
+function lockOwnerMode(){
+  isUnlocked = false;
+  updateRoleUI();
+  toast("สลับเป็นโหมดผู้ชมทั่วไปแล้ว 🔒");
+}
+
+function updateRoleUI(){
+  const lockBtn = $("#ownerLockBtn");
+  if(lockBtn){
+    lockBtn.style.color = isUnlocked ? "var(--live)" : "var(--side-text)";
+    lockBtn.title = isUnlocked ? "ผู้ดูแลระบบ: ปลดล็อกแล้ว (คลิกเพื่อล็อก)" : "โหมดเจ้าของระบบ (PIN)";
+  }
+  
+  const roleBadge = $("#roleBadge");
+  const roleBadgeTxt = $("#roleBadgeTxt");
+  const roleActionTxt = $("#btnHeaderRoleActionTxt");
+  const roleActionBtn = $("#btnHeaderRoleAction");
+  const addTopLabel = $("#btnAddTopLabel");
+  
+  if(roleBadge && roleBadgeTxt){
+    if(isUnlocked){
+      roleBadge.className = "role-badge-pill role-admin";
+      roleBadgeTxt.textContent = "👑 ผู้ดูแลระบบ (ครูซอส)";
+      if(roleActionTxt) roleActionTxt.textContent = "ล็อกโหมดผู้ชม";
+      if(roleActionBtn) roleActionBtn.title = "คลิกเพื่อสลับกลับเป็นโหมดผู้ชม";
+      if(addTopLabel) addTopLabel.textContent = "เพิ่มระบบ";
+    } else {
+      roleBadge.className = "role-badge-pill role-viewer";
+      roleBadgeTxt.textContent = "👁️ โหมดผู้ชม (Viewer)";
+      if(roleActionTxt) roleActionTxt.textContent = "เข้าสู่ระบบผู้ดูแล";
+      if(roleActionBtn) roleActionBtn.title = "คลิกเพื่อกรอกรหัส PIN ผู้ดูแลระบบ";
+      if(addTopLabel) addTopLabel.textContent = "🔒 เพิ่มระบบ";
+    }
+  }
+}
+
+onClick("#ownerLockBtn", () => {
+  if(isUnlocked){
+    lockOwnerMode();
   } else {
-    requireOwner(()=>{});
+    openKeypadModal("login");
   }
 });
 
@@ -2213,6 +3180,7 @@ document.addEventListener("click", e => {
   if(!it) return;
 
   const act = el.dataset.act;
+  if(act === "preview") openPreviewModal(it);
   if(act === "detail") openDetail(it);
   if(act === "copy") copyText(it.url);
   if(act === "qr") openQrModal(it);
@@ -2223,11 +3191,48 @@ function currentCatForAdd(){
   return (r.sub === "cat" && r.catId) ? r.catId : "";
 }
 
-/* Navigation & Exit Buttons */
+/* Navigation & Portal Entry Buttons */
 onClick("#brandBtn", () => go("landing"));
 onClick("#btnEnterHub", () => go("all"));
+onClick("#btnLoginKeypad", () => openKeypadModal("login"));
 onClick("#exitToLandingBtn", () => go("landing"));
 onClick("#topExitBtn", () => go("landing"));
+
+/* Header Action Buttons */
+onClick("#btnHeaderRoleAction", () => {
+  if(isUnlocked){
+    lockOwnerMode();
+  } else {
+    openKeypadModal("login");
+  }
+});
+onClick("#btnHeaderSpotlight", openSpotlight);
+
+/* Landing Bento Cards Interactions */
+onClick("#bentoCardMedia", () => go("all"));
+onClick("#bentoCardLive", () => go("live"));
+onClick("#bentoCardQr", () => {
+  if(items.length > 0) openPreviewModal(items[0]);
+  else go("all");
+});
+onClick("#bentoCardSec", () => openKeypadModal("login"));
+
+/* Settings PIN Management */
+onClick("#btnChangePin", () => {
+  openKeypadModal("set", null, "🔑 ตั้งรหัส PIN ใหม่", "กดแป้นตัวเลข 4 หลักเพื่อบันทึกรหัส PIN ใหม่สำหรับคุณครู");
+});
+onClick("#btnResetPin", () => {
+  showCustomConfirm({
+    title: "คืนค่ารหัส PIN เริ่มต้น",
+    message: "ต้องการคืนค่ารหัส PIN ผู้ดูแลระบบกลับเป็นค่าเริ่มต้น (0000) หรือไม่?",
+    confirmText: "รีเซ็ตรหัส PIN",
+    isDanger: false,
+    onConfirm: () => {
+      saveOwnerPin("0000");
+      toast("รีเซ็ตรหัส PIN เป็น 0000 เรียบร้อย 🔑");
+    }
+  });
+});
 
 /* Mobile Bottom Nav Buttons */
 onClick("#bNavAll", (e) => { e.preventDefault(); go("all"); });
@@ -2253,11 +3258,11 @@ onClick("#btnSaveAnnounce", () => {
 
 /* Sidebar Controls */
 onClick("#manageCatsBtn", () => requireOwner(openCatManager));
-onClick("#sideSettingsBtn", () => openOverlay($("#settingsOverlay")));
-onClick("#sideSyncPill", () => openOverlay($("#settingsOverlay")));
+onClick("#sideSettingsBtn", () => requireOwner(() => openOverlay($("#settingsOverlay"))));
+onClick("#sideSyncPill", () => requireOwner(() => openOverlay($("#settingsOverlay"))));
 onClick("#openFbConfigBtn", () => {
   closeOverlay($("#settingsOverlay"));
-  toast("เชื่อมต่อกับ ts010-2bf5d อัตโนมัติแล้ว");
+  toast("เชื่อมต่อกับ ts010-2bf5d อัตโนมัติแล้ว 🟢");
 });
 
 /* Export & Import */
