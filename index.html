@@ -685,7 +685,140 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
 .spotlight-input-row svg{width:20px;height:20px;color:var(--primary);flex:none}
 .spotlight-input-row input{flex:1;border:none;background:transparent;font-size:16px;outline:none;color:var(--ink);font-family:var(--font-main)}
 .spotlight-kbd{font-size:11px;font-weight:600;padding:3px 7px;border-radius:6px;background:var(--paper);color:var(--muted);border:1px solid var(--line)}
+.spotlight-close-btn{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;color:var(--muted);background:transparent;border:none;cursor:pointer;transition:all .15s ease;flex:none}
+.spotlight-close-btn:hover{background:var(--paper);color:var(--danger);transform:scale(1.05)}
 .spotlight-results{max-height:360px;overflow-y:auto;padding:8px}
+
+/* Role Selection Modal (เลือกรูปแบบการเข้าใช้งานระบบ) */
+.role-select-modal{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:24px;
+  width:min(640px,94vw);
+  padding:24px 24px 26px;
+  box-shadow:0 30px 90px -15px rgba(0,0,0,0.55);
+  animation:spotIn .2s cubic-bezier(0.16,1,0.3,1);
+}
+.role-select-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:20px;
+  padding-bottom:14px;
+  border-bottom:1px solid var(--line);
+}
+.role-select-title{font-size:20px;font-weight:700;color:var(--ink);margin:0 0 4px}
+.role-select-sub{font-size:13.5px;color:var(--muted);margin:0}
+.role-select-close{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;color:var(--muted);cursor:pointer;flex:none;transition:all .15s}
+.role-select-close:hover{background:var(--paper);color:var(--ink)}
+
+.role-cards-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:580px){
+  .role-cards-grid{grid-template-columns:1fr;gap:12px}
+  .role-select-modal{padding:20px 16px 22px}
+}
+.role-option-card{
+  background:var(--paper);
+  border:1.5px solid var(--line);
+  border-radius:18px;
+  padding:20px 18px 18px;
+  display:flex;
+  flex-direction:column;
+  position:relative;
+  cursor:pointer;
+  transition:all .22s cubic-bezier(0.16,1,0.3,1);
+  text-align:left;
+}
+.role-option-card:hover{
+  transform:translateY(-3px);
+  border-color:var(--primary);
+  box-shadow:0 12px 28px -6px rgba(79,70,229,0.18);
+  background:var(--surface);
+}
+.role-option-card.highlight{
+  border-color:rgba(79,70,229,0.4);
+  background:linear-gradient(180deg, var(--paper) 0%, var(--surface) 100%);
+}
+.role-option-card.highlight:hover{
+  border-color:var(--primary);
+  box-shadow:0 14px 32px -4px rgba(79,70,229,0.25);
+}
+.role-card-badge{
+  position:absolute;
+  top:14px;
+  right:14px;
+  font-size:10.5px;
+  font-weight:600;
+  padding:3px 8px;
+  border-radius:999px;
+  background:var(--line);
+  color:var(--muted);
+}
+.role-card-badge.admin{
+  background:var(--primary-soft);
+  color:var(--primary);
+  font-weight:700;
+}
+.role-card-icon-box{
+  width:48px;
+  height:48px;
+  border-radius:14px;
+  display:grid;
+  place-items:center;
+  font-size:24px;
+  margin-bottom:14px;
+}
+.role-card-icon-box.viewer{
+  background:var(--primary-soft);
+  box-shadow:0 4px 12px rgba(79,70,229,0.12);
+}
+.role-card-icon-box.admin{
+  background:linear-gradient(135deg, rgba(245,158,11,0.18), rgba(79,70,229,0.18));
+  box-shadow:0 4px 12px rgba(245,158,11,0.15);
+}
+.role-card-name{
+  font-size:16px;
+  font-weight:700;
+  color:var(--ink);
+  margin-bottom:6px;
+}
+.role-card-desc{
+  font-size:12.5px;
+  color:var(--muted);
+  line-height:1.55;
+  margin:0 0 16px;
+  flex:1;
+}
+.role-card-btn{
+  width:100%;
+  justify-content:center;
+  font-weight:600;
+  font-size:13.5px;
+  padding:9px 14px;
+  border-radius:10px;
+  transition:all .15s ease;
+}
+.role-card-btn.viewer{
+  background:var(--surface);
+  border:1.5px solid var(--line);
+  color:var(--ink);
+}
+.role-option-card:hover .role-card-btn.viewer{
+  background:var(--primary-soft);
+  border-color:var(--primary);
+  color:var(--primary);
+}
+.role-card-btn.admin{
+  background:linear-gradient(135deg, var(--primary) 0%, #4338CA 100%);
+  color:#fff;
+  border:none;
+  box-shadow:0 4px 14px rgba(79,70,229,0.3);
+}
+.role-option-card:hover .role-card-btn.admin{
+  box-shadow:0 6px 18px rgba(79,70,229,0.45);
+  transform:scale(1.02);
+}
 .spotlight-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;cursor:pointer;transition:all .12s}
 .spotlight-item:hover,.spotlight-item.selected{background:var(--primary-soft);color:var(--primary)}
 .spotlight-item .s-icon{width:36px;height:36px;border-radius:8px;background:var(--paper);display:grid;place-items:center;font-size:18px;flex:none}
@@ -1186,18 +1319,14 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
           </h1>
           <p class="landing-hero-sub">รวบรวมสื่อการสอน แผนการสอน ใบงาน เอกสาร และระบบออนไลน์ทั้งหมดของครูซอสไว้ในที่เดียว เพื่อการทำงานที่รวดเร็ว ทันสมัย และเข้าถึงได้ทุกที่ทุกเวลา</p>
           
-          <!-- Hero Actions: 1) เข้าชมโหมดผู้ชม 2) เข้าสู่ระบบผู้ดูแล (แป้นตัวเลข) 3) ค้นหา -->
+          <!-- Hero Actions: เหลือ 2 ปุ่มตามที่ครูซอสต้องการ 1) เข้าสู่คลังระบบ (เลือกโหมดผู้ชม หรือผู้ดูแล) 2) ค้นหาด่วน (Ctrl+K) มีปุ่มกากบาทออก -->
           <div class="hero-actions" id="heroActionsGroup">
-            <button class="btn btn-hero-action primary" id="btnEnterHub" title="คลิกเพื่อเข้าชมระบบในโหมดผู้ชม">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:18px;height:18px"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-              <span id="btnEnterHubTxt">🚀 เข้าชมคลังระบบ (โหมดผู้ชม)</span>
+            <button class="btn btn-hero-action primary" id="btnEnterHub" title="คลิกเพื่อเข้าสู่คลังระบบ (เลือกโหมดผู้ชม หรือผู้ดูแล)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:19px;height:19px"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              <span>🚀 เข้าสู่คลังระบบ</span>
             </button>
-            <button class="btn btn-hero-action outline" id="btnLoginKeypad" title="คลิกเพื่อกรอกรหัส PIN เข้าสู่ระบบผู้ดูแล">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:17px;height:17px"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              <span id="btnLoginKeypadTxt">🔐 เข้าสู่ระบบผู้ดูแล (รหัส PIN)</span>
-            </button>
-            <button class="btn ghost btn-hero-action" id="btnSpotlightHero" style="border:1px solid var(--line);border-radius:12px" title="ค้นหาด่วน (Ctrl+K)">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <button class="btn ghost btn-hero-action" id="btnSpotlightHero" style="border:1.5px solid var(--line);border-radius:12px" title="ค้นหาด่วน (Ctrl+K)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:17px;height:17px"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
               <span>ค้นหาด่วน (Ctrl+K)</span>
             </button>
           </div>
@@ -1477,8 +1606,60 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
       <input type="search" id="spotlightInput" placeholder="พิมพ์ชื่อระบบ หรือเทคโนโลยี... (กด ↑ ↓ เลือก, Enter เปิด)">
       <kbd class="spotlight-kbd">ESC</kbd>
+      <button class="btn icon-btn spotlight-close-btn" id="btnCloseSpotlight" title="ปิดหน้าต่างค้นหา (ESC)" aria-label="ปิดค้นหา">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:18px;height:18px"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
     </div>
     <div class="spotlight-results" id="spotlightResults"></div>
+  </div>
+</div>
+
+<!-- ==========================================================================
+     ROLE SELECTION MODAL (เข้าสู่คลังระบบในฐานะอะไร)
+     ========================================================================== -->
+<div class="overlay" id="roleSelectOverlay" role="dialog" aria-modal="true" aria-labelledby="roleSelectTitle">
+  <div class="role-select-modal">
+    <div class="role-select-head">
+      <div>
+        <h2 class="role-select-title" id="roleSelectTitle">เข้าสู่คลังระบบ TS010</h2>
+        <p class="role-select-sub">กรุณาเลือกรูปแบบการเข้าใช้งานระบบของครูซอส</p>
+      </div>
+      <button class="btn ghost icon-btn role-select-close" id="btnCloseRoleSelect" title="ปิดหน้าต่าง (ESC)" aria-label="ปิด">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:18px;height:18px"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <div class="role-cards-grid">
+      <!-- Card 1: โหมดผู้ชมทั่วไป -->
+      <div class="role-option-card" id="roleCardViewer" tabindex="0" role="button">
+        <div class="role-card-badge">สาธารณะ · ปลอดภัย</div>
+        <div class="role-card-icon-box viewer">
+          <span>👁️</span>
+        </div>
+        <div class="role-card-content">
+          <div class="role-card-name">ผู้ชมทั่วไป (Viewer Mode)</div>
+          <p class="role-card-desc">เข้าชมคลังสื่อการสอน นวัตกรรม และระบบงานทั้งหมด ดูตัวอย่างและทดลองใช้งานจริงได้ทันที (ไม่สามารถแก้ไขหรือลบข้อมูลได้)</p>
+        </div>
+        <button class="btn role-card-btn viewer" type="button">
+          <span>🚀 เข้าชมโหมดผู้ชม</span>
+        </button>
+      </div>
+
+      <!-- Card 2: โหมดผู้ดูแลระบบ (ครูซอส) -->
+      <div class="role-option-card highlight" id="roleCardAdmin" tabindex="0" role="button">
+        <div class="role-card-badge admin">สำหรับครูซอส</div>
+        <div class="role-card-icon-box admin">
+          <span>👑</span>
+        </div>
+        <div class="role-card-content">
+          <div class="role-card-name">ผู้ดูแลระบบ (Admin Mode)</div>
+          <p class="role-card-desc">สิทธิ์เต็มสำหรับครูซอสเพื่อเพิ่มระบบใหม่ แก้ไขข้อมูล ลบระบบ จัดการหมวดหมู่ และตั้งค่าระบบทั้งหมด (ใช้รหัส PIN 4 หลัก)</p>
+        </div>
+        <button class="btn role-card-btn admin" type="button">
+          <span id="roleCardAdminBtnTxt">🔐 ยืนยันรหัส PIN ผู้ดูแล</span>
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -3119,19 +3300,6 @@ function lockOwnerMode(){
   toast("สลับเป็นโหมดผู้ชมทั่วไปแล้ว 🔒");
 }
 
-function setHeroActiveButton(type){
-  const bEnter = $("#btnEnterHub");
-  const bLogin = $("#btnLoginKeypad");
-  if(!bEnter || !bLogin) return;
-  if(type === "admin" || (type === "auto" && isUnlocked)){
-    bLogin.className = "btn btn-hero-action primary";
-    bEnter.className = "btn btn-hero-action outline";
-  } else {
-    bEnter.className = "btn btn-hero-action primary";
-    bLogin.className = "btn btn-hero-action outline";
-  }
-}
-
 function updateRoleUI(){
   const lockBtn = $("#ownerLockBtn");
   if(lockBtn){
@@ -3161,24 +3329,10 @@ function updateRoleUI(){
     }
   }
 
-  /* Sync Landing Hero Action Buttons */
-  const bEnter = $("#btnEnterHub");
-  const bLogin = $("#btnLoginKeypad");
-  const bLoginTxt = $("#btnLoginKeypadTxt");
-  const bEnterTxt = $("#btnEnterHubTxt");
-
-  if(bEnter && bLogin){
-    if(isUnlocked){
-      setHeroActiveButton("admin");
-      if(bLoginTxt) bLoginTxt.textContent = "👑 เข้าสู่คลังระบบ (โหมดผู้ดูแล)";
-      if(bEnterTxt) bEnterTxt.textContent = "👁️ เข้าชมคลังระบบ (โหมดผู้ชม)";
-      bLogin.title = "เข้าสู่ระบบในฐานะผู้ดูแลระบบ (ครูซอส)";
-    } else {
-      setHeroActiveButton("viewer");
-      if(bLoginTxt) bLoginTxt.textContent = "🔐 เข้าสู่ระบบผู้ดูแล (รหัส PIN)";
-      if(bEnterTxt) bEnterTxt.textContent = "🚀 เข้าชมคลังระบบ (โหมดผู้ชม)";
-      bLogin.title = "กรอกรหัส PIN 4 หลักเพื่อเข้าสู่ระบบผู้ดูแล";
-    }
+  /* Sync Role Card Admin Button Text */
+  const roleCardAdminBtnTxt = $("#roleCardAdminBtnTxt");
+  if(roleCardAdminBtnTxt){
+    roleCardAdminBtnTxt.textContent = isUnlocked ? "👑 เข้าสู่ระบบทันที (ปลดล็อกแล้ว)" : "🔐 ยืนยันรหัส PIN ผู้ดูแล";
   }
 
   /* Sync Mobile Bottom Nav Lock Button */
@@ -3450,20 +3604,53 @@ function currentCatForAdd(){
 
 /* Navigation & Portal Entry Buttons */
 onClick("#brandBtn", () => go("landing"));
+
+// 1. ปุ่มเข้าสู่คลังระบบบนหน้าแรก -> เปิดโมดอลเลือกบทบาท
 onClick("#btnEnterHub", () => {
-  setHeroActiveButton("viewer");
-  go("all");
+  openOverlay($("#roleSelectOverlay"));
 });
-onClick("#btnLoginKeypad", () => {
-  setHeroActiveButton("admin");
+
+// ปุ่มปิดโมดอลเลือกบทบาท (✕)
+onClick("#btnCloseRoleSelect", () => {
+  closeOverlay($("#roleSelectOverlay"));
+});
+
+// การ์ด 1: ผู้ชมทั่วไป
+onClick("#roleCardViewer", () => {
+  closeOverlay($("#roleSelectOverlay"));
+  isUnlocked = false;
+  updateRoleUI();
+  go("all");
+  toast("เข้าสู่คลังระบบในโหมดผู้ชมทั่วไป 👁️");
+});
+
+// การ์ด 2: ผู้ดูแลระบบ
+onClick("#roleCardAdmin", () => {
+  closeOverlay($("#roleSelectOverlay"));
   if(isUnlocked){
     go("all");
+    toast("เข้าสู่คลังระบบในฐานะผู้ดูแลระบบ (ครูซอส) 👑");
   } else {
-    openKeypadModal("login", () => go("all"));
+    openKeypadModal("login", () => {
+      go("all");
+    }, "🔐 เข้าสู่ระบบผู้ดูแล (ครูซอส)", "กรอกรหัส PIN 4 หลักเพื่อเข้าสู่ระบบ (รหัสเริ่มต้น: 0000 หรือ 2569)");
   }
 });
-onClick("#exitToLandingBtn", () => go("landing"));
-onClick("#topExitBtn", () => go("landing"));
+
+// 2. ปุ่มกากบาทปิดหน้าต่างค้นหาด่วน
+onClick("#btnCloseSpotlight", () => {
+  closeOverlay($("#spotlightOverlay"));
+});
+
+// 3. ปุ่มออกจากระบบ (Logout & Exit) -> ต้องล็อกสิทธิ์ (isUnlocked = false) เสมอ!
+function logoutAndExit(){
+  isUnlocked = false;
+  updateRoleUI();
+  go("landing");
+  toast("ออกจากระบบและล็อกสิทธิ์เรียบร้อย 🔒");
+}
+onClick("#exitToLandingBtn", logoutAndExit);
+onClick("#topExitBtn", logoutAndExit);
 
 /* Header Action Buttons */
 onClick("#btnHeaderRoleAction", () => {
@@ -3483,7 +3670,6 @@ onClick("#bentoCardQr", () => {
   else go("all");
 });
 onClick("#bentoCardSec", () => {
-  setHeroActiveButton("admin");
   if(isUnlocked){
     go("all");
   } else {
@@ -3620,7 +3806,7 @@ onClick("#btnPwaInstall", async () => {
 });
 
 if("serviceWorker" in navigator){
-  navigator.serviceWorker.register("./sw.js?v=8").then(reg => {
+  navigator.serviceWorker.register("./sw.js?v=9").then(reg => {
     try{ reg.update(); }catch(_){}
   }).catch(() => {});
 }
