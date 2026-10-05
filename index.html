@@ -2398,15 +2398,42 @@ function recordClick(id){
 }
 
 /* ---------- Rendering Helpers ---------- */
-function autoShot(u){ return "https://image.thum.io/get/width/1000/crop/700/" + u; }
-function imgOf(it){ if(it.imgMode === "auto") return autoShot(it.url); if(it.imgMode === "none") return ""; return it.img || ""; }
-function catOf(it){ return cats.find(c => c.id === it.cat) || null; }
-function placeholder(name){ return `<div class="ph">${esc((name||"?").charAt(0).toUpperCase())}</div>`; }
+function autoShot(u){
+  if(!u) return "";
+  const norm = normUrl(u);
+  if(!norm) return "";
+  return "https://image.thum.io/get/width/800/crop/600/" + norm;
+}
+
+function autoShotFallback(u){
+  if(!u) return "";
+  const norm = normUrl(u);
+  if(!norm) return "";
+  return "https://api.microlink.io/?url=" + encodeURIComponent(norm) + "&screenshot=true&meta=false&embed=screenshot.url";
+}
+
+function imgOf(it){
+  if(!it) return "";
+  if(it.imgMode === "none") return "";
+  if(it.img && it.img.trim()) return it.img.trim();
+  // If no uploaded image exists, automatically fetch live website screenshot from URL!
+  if(it.url && it.url.trim()) return autoShot(it.url);
+  return "";
+}
+
+function placeholder(name){
+  return `<div class="ph">${esc((name||"?").charAt(0).toUpperCase())}</div>`;
+}
 window.__ph = placeholder;
+
 function shotHTML(it){
   const src = imgOf(it);
-  return `<div class="bar"><i></i><i></i><i></i><span>${esc(host(it.url))}</span></div>` +
-    (src ? `<img src="${esc(src)}" alt="${esc(it.name)}" loading="lazy" onerror="this.outerHTML=window.__ph(${esc(JSON.stringify(it.name))})">` : placeholder(it.name));
+  const fb = it.url ? autoShotFallback(it.url) : "";
+  const h = esc(host(it.url));
+  return `<div class="bar"><i></i><i></i><i></i><span>${h}</span></div>` +
+    (src 
+      ? `<img src="${esc(src)}" alt="${esc(it.name)}" loading="lazy" data-fallback="${esc(fb)}" onerror="if(!this.dataset.tried && this.dataset.fallback){ this.dataset.tried='1'; this.src=this.dataset.fallback; } else { this.outerHTML=window.__ph(${esc(JSON.stringify(it.name))}); }">` 
+      : placeholder(it.name));
 }
 
 let toastT;
@@ -3037,13 +3064,19 @@ function updateImgPreview(){
     src = u ? autoShot(u) : "";
   }
   box.style.display = imgMode === "none" ? "none" : "grid";
-  box.innerHTML = src ? `<img src="${esc(src)}" alt="พรีวิว" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.textContent='โหลดภาพไม่ได้'">` : "ยังไม่มีภาพ";
+  if(src){
+    const fb = imgMode === "auto" ? autoShotFallback($("#f_url").value) : "";
+    box.innerHTML = `<img src="${esc(src)}" alt="พรีวิว" style="width:100%;height:100%;object-fit:cover" data-fallback="${esc(fb)}" onerror="if(!this.dataset.tried && this.dataset.fallback){ this.dataset.tried='1'; this.src=this.dataset.fallback; } else { this.parentNode.textContent='กำลังดึงภาพหน้าเว็บ...'; }">`;
+  } else {
+    box.textContent = imgMode === "auto" ? "ระบุลิงก์ URL ด้านบนเพื่อดึงภาพอัตโนมัติ" : "ยังไม่มีภาพ";
+  }
 }
 
 document.querySelectorAll("#imgTabs button").forEach(b => {
   b.addEventListener("click", () => setImgMode(b.dataset.mode));
 });
 $("#f_imgUrl").addEventListener("input", updateImgPreview);
+$("#f_url").addEventListener("input", () => { if(imgMode==="auto") updateImgPreview(); });
 $("#f_url").addEventListener("change", () => { if(imgMode==="auto") updateImgPreview(); });
 
 function readImage(file){
@@ -3098,7 +3131,8 @@ function openForm(it, presetCat){
 
   imgData = (it && it.imgMode === "upload") ? (it.img || "") : "";
   $("#f_imgUrl").value = (it && it.imgMode === "url") ? (it.img || "") : "";
-  setImgMode(it?.imgMode || "upload");
+  const defaultMode = (it && it.img && it.img.trim()) ? (it.imgMode || "upload") : "auto";
+  setImgMode(it?.imgMode || defaultMode);
 
   openOverlay($("#formOverlay"));
   setTimeout(() => $("#f_name").focus(), 40);
@@ -3111,9 +3145,13 @@ $("#saveSystemBtn").onclick = () => {
   if(!url){ toast("กรุณาระบุลิงก์ URL"); $("#f_url").focus(); return; }
   try{ new URL(url); }catch(e){ toast("ลิงก์ URL ไม่ถูกต้อง"); return; }
 
+  let modeToSave = imgMode;
   let img = "";
   if(imgMode === "upload") img = imgData;
   if(imgMode === "url") img = $("#f_imgUrl").value.trim();
+  if(imgMode !== "none" && !img){
+    modeToSave = "auto";
+  }
 
   const data = {
     name, url,
@@ -3129,7 +3167,7 @@ $("#saveSystemBtn").onclick = () => {
     user: $("#f_user").value.trim(),
     pass: $("#f_pass").value.trim(),
     notes: $("#f_notes").value.trim(),
-    imgMode, img
+    imgMode: modeToSave, img
   };
 
   if(editingId){
