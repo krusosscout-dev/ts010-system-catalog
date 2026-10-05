@@ -1698,7 +1698,7 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
         </div>
         <div class="role-card-content">
           <div class="role-card-name">ผู้ดูแลระบบ (Admin Mode)</div>
-          <p class="role-card-desc">สิทธิ์เต็มสำหรับครูซอสเพื่อเพิ่มระบบใหม่ แก้ไขข้อมูล ลบระบบ จัดการหมวดหมู่ และตั้งค่าระบบทั้งหมด (ใช้รหัส PIN 4 หลัก)</p>
+          <p class="role-card-desc">สิทธิ์เต็มสำหรับครูซอสเพื่อเพิ่มระบบใหม่ แก้ไขข้อมูล ลบระบบ จัดการหมวดหมู่ และตั้งค่าระบบทั้งหมด (ใช้รหัส PIN 5 หลัก)</p>
         </div>
         <button class="btn role-card-btn admin" type="button">
           <span id="roleCardAdminBtnTxt">🔐 ยืนยันรหัส PIN ผู้ดูแล</span>
@@ -1872,7 +1872,7 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
 
       <div style="border-top:1px solid var(--line);padding-top:14px;margin-bottom:18px">
         <h4 style="margin:0 0 6px;font-size:14px">🔑 รหัสผ่านผู้ดูแลระบบ (Owner PIN)</h4>
-        <div style="font-size:12px;color:var(--muted);margin-bottom:10px">รหัส PIN 4 หลัก สำหรับล็อกการแก้ไขและลบข้อมูลในระบบ</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:10px">รหัส PIN 5 หลัก สำหรับล็อกการแก้ไขและลบข้อมูลในระบบ</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="btn" id="btnChangePin" style="flex:1;justify-content:center">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
@@ -1906,14 +1906,15 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
       <span id="keypadEmblemIcon">🔐</span>
     </div>
     <h2 class="keypad-title" id="keypadTitle">เข้าสู่ระบบผู้ดูแล (ครูซอส)</h2>
-    <p class="keypad-subtitle" id="keypadSub">กรอกรหัส PIN 4 หลัก เพื่อปลดล็อกสิทธิ์การจัดการ เพิ่ม แก้ไข หรือลบข้อมูลในระบบ</p>
+    <p class="keypad-subtitle" id="keypadSub">กรอกรหัส PIN 5 หลัก เพื่อปลดล็อกสิทธิ์การจัดการ เพิ่ม แก้ไข หรือลบข้อมูลในระบบ</p>
     
-    <!-- 4 PIN Dots Indicator -->
+    <!-- 5 PIN Dots Indicator -->
     <div class="pin-dots-row" id="pinDotsRow">
       <div class="pin-dot" id="pinDot0"></div>
       <div class="pin-dot" id="pinDot1"></div>
       <div class="pin-dot" id="pinDot2"></div>
       <div class="pin-dot" id="pinDot3"></div>
+      <div class="pin-dot" id="pinDot4"></div>
     </div>
     
     <div class="pin-feedback-msg" id="pinFeedbackMsg"></div>
@@ -2157,7 +2158,10 @@ function listenFirestore(){
 
   fbDb.collection("meta").doc("security").onSnapshot(doc => {
     if(doc.exists && doc.data() && doc.data().pin){
-      setLS(PIN_KEY, doc.data().pin);
+      const remotePin = String(doc.data().pin).trim();
+      if(remotePin.length === 5){
+        setLS(PIN_KEY, remotePin);
+      }
     }
   }, err => console.error(err));
 }
@@ -3125,20 +3129,23 @@ function openPreviewModal(it){
 }
 
 /* ==========================================================================
-   INTERACTIVE NUMERIC KEYPAD & OWNER PIN (ภาพที่ 1 & 3: แป้นตัวเลขพร้อมใช้)
+   INTERACTIVE NUMERIC KEYPAD & OWNER PIN (แป้นตัวเลข 5 หลัก พร้อมใช้)
    ========================================================================== */
-const DEFAULT_PINS = ["0000", "2569", "1234"];
+const PIN_LENGTH = 5;
+const DEFAULT_PINS = ["00000", "12345", "25690"];
 let keypadDigits = [];
 let keypadMode = "login"; // "login" | "verify" | "set"
 let keypadPendingCallback = null;
 
 function getStoredPin(){
-  return getLS(PIN_KEY) || "0000";
+  const s = getLS(PIN_KEY);
+  if(s && s.trim().length === PIN_LENGTH) return s.trim();
+  return "00000";
 }
 
 function verifyKeypadPin(input){
   const stored = getLS(PIN_KEY);
-  if(stored && stored.trim()){
+  if(stored && stored.trim() && stored.trim().length === PIN_LENGTH){
     return input === stored.trim();
   }
   return DEFAULT_PINS.includes(input);
@@ -3167,15 +3174,15 @@ function openKeypadModal(mode = "login", callback = null, customTitle = "", cust
   
   if(mode === "set"){
     titleEl.textContent = customTitle || "🔑 ตั้งรหัส PIN ผู้ดูแลระบบ";
-    subEl.textContent = customSub || "กดแป้นตัวเลข 4 หลัก เพื่อตั้งรหัส PIN ใหม่สำหรับคุณครู";
+    subEl.textContent = customSub || "กดแป้นตัวเลข 5 หลัก เพื่อตั้งรหัส PIN ใหม่สำหรับคุณครู";
     emblem.textContent = "🔑";
   } else if(mode === "verify"){
     titleEl.textContent = customTitle || "🔒 ยืนยันสิทธิ์ผู้ดูแลระบบ (ครูซอส)";
-    subEl.textContent = customSub || "กรอกรหัส PIN 4 หลัก เพื่อปลดล็อกสิทธิ์การจัดการ แก้ไข หรือลบระบบ";
+    subEl.textContent = customSub || "กรอกรหัส PIN 5 หลัก เพื่อปลดล็อกสิทธิ์การจัดการ แก้ไข หรือลบระบบ";
     emblem.textContent = "🔐";
   } else {
     titleEl.textContent = customTitle || "🔐 เข้าสู่ระบบผู้ดูแล (ครูซอส)";
-    subEl.textContent = customSub || "กรอกรหัส PIN 4 หลักเพื่อเข้าสู่ระบบ (รหัสเริ่มต้น: 0000 หรือ 2569)";
+    subEl.textContent = customSub || "กรอกรหัส PIN 5 หลักเพื่อเข้าสู่ระบบ (รหัสเริ่มต้น: 00000 หรือ 12345)";
     emblem.textContent = "👑";
   }
   
@@ -3184,7 +3191,7 @@ function openKeypadModal(mode = "login", callback = null, customTitle = "", cust
 }
 
 function updateKeypadDotsUI(){
-  for(let i = 0; i < 4; i++){
+  for(let i = 0; i < PIN_LENGTH; i++){
     const dot = $("#pinDot" + i);
     if(dot){
       dot.classList.toggle("filled", i < keypadDigits.length);
@@ -3209,11 +3216,11 @@ function handleKeypadInput(key){
     }
     return;
   }
-  if(keypadDigits.length < 4 && /^[0-9]$/.test(key)){
+  if(keypadDigits.length < PIN_LENGTH && /^[0-9]$/.test(key)){
     keypadDigits.push(key);
     updateKeypadDotsUI();
     
-    if(keypadDigits.length === 4){
+    if(keypadDigits.length === PIN_LENGTH){
       const pinStr = keypadDigits.join("");
       const dotsRow = $("#pinDotsRow");
       const msg = $("#pinFeedbackMsg");
@@ -3337,7 +3344,7 @@ function requireOwner(callback){
     callback();
     return;
   }
-  openKeypadModal("verify", callback, "🔒 กรุณายืนยันรหัส PIN ผู้ดูแล", "ใส่รหัส PIN 4 หลัก เพื่อปลดล็อกสิทธิ์การเพิ่ม แก้ไข หรือลบข้อมูลในระบบ");
+  openKeypadModal("verify", callback, "🔒 กรุณายืนยันรหัส PIN ผู้ดูแล", "ใส่รหัส PIN 5 หลัก เพื่อปลดล็อกสิทธิ์การเพิ่ม แก้ไข หรือลบข้อมูลในระบบ");
 }
 
 function lockOwnerMode(){
@@ -3679,7 +3686,7 @@ onClick("#roleCardAdmin", () => {
   } else {
     openKeypadModal("login", () => {
       go("all");
-    }, "🔐 เข้าสู่ระบบผู้ดูแล (ครูซอส)", "กรอกรหัส PIN 4 หลักเพื่อเข้าสู่ระบบ (รหัสเริ่มต้น: 0000 หรือ 2569)");
+    }, "🔐 เข้าสู่ระบบผู้ดูแล (ครูซอส)", "กรอกรหัส PIN 5 หลักเพื่อเข้าสู่ระบบ (รหัสเริ่มต้น: 00000 หรือ 12345)");
   }
 });
 
@@ -3725,17 +3732,17 @@ onClick("#bentoCardSec", () => {
 
 /* Settings PIN Management */
 onClick("#btnChangePin", () => {
-  openKeypadModal("set", null, "🔑 ตั้งรหัส PIN ใหม่", "กดแป้นตัวเลข 4 หลักเพื่อบันทึกรหัส PIN ใหม่สำหรับคุณครู");
+  openKeypadModal("set", null, "🔑 ตั้งรหัส PIN ใหม่", "กดแป้นตัวเลข 5 หลักเพื่อบันทึกรหัส PIN ใหม่สำหรับคุณครู");
 });
 onClick("#btnResetPin", () => {
   showCustomConfirm({
     title: "คืนค่ารหัส PIN เริ่มต้น",
-    message: "ต้องการคืนค่ารหัส PIN ผู้ดูแลระบบกลับเป็นค่าเริ่มต้น (0000) หรือไม่?",
+    message: "ต้องการคืนค่ารหัส PIN ผู้ดูแลระบบกลับเป็นค่าเริ่มต้น (00000) หรือไม่?",
     confirmText: "รีเซ็ตรหัส PIN",
     isDanger: false,
     onConfirm: () => {
-      saveOwnerPin("0000");
-      toast("รีเซ็ตรหัส PIN เป็น 0000 เรียบร้อย 🔑");
+      saveOwnerPin("00000");
+      toast("รีเซ็ตรหัส PIN เป็น 00000 เรียบร้อย 🔑");
     }
   });
 });

@@ -1,5 +1,5 @@
-// Service Worker for Kru Sauce PWA (TS010) - v10
-const CACHE_NAME = "sauce-hub-v10";
+// Service Worker for Kru Sauce PWA (TS010) - v11
+const CACHE_NAME = "sauce-hub-v11";
 
 self.addEventListener("install", (e) => {
   self.skipWaiting();
