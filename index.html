@@ -269,13 +269,13 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
   min-height:0;
 }
 .hero-logo-box{
-  width:clamp(80px, 11vh, 120px);
-  height:clamp(80px, 11vh, 120px);
-  margin:0 auto clamp(8px, 1.2vh, 14px);
+  width:clamp(100px, 15vh, 150px);
+  height:clamp(100px, 15vh, 150px);
+  margin:0 auto clamp(10px, 1.5vh, 18px);
   border-radius:50%;
-  padding:4px;
+  padding:4.5px;
   background:linear-gradient(135deg,#4F46E5 0%,#06B6D4 55%,#10B981 100%);
-  box-shadow:0 14px 35px -6px rgba(79,70,229,0.42), 0 0 0 5px rgba(79,70,229,0.12);
+  box-shadow:0 16px 42px -6px rgba(79,70,229,0.46), 0 0 0 6px rgba(79,70,229,0.14);
   animation:floatLogo 4s ease-in-out infinite;
   position:relative;
   flex:none;
@@ -283,15 +283,15 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
 .hero-logo-box::after{
   content:"";
   position:absolute;
-  inset:-12px;
+  inset:-14px;
   border-radius:50%;
-  background:radial-gradient(circle,rgba(79,70,229,0.28) 0%,rgba(6,182,212,0.12) 50%,transparent 70%);
+  background:radial-gradient(circle,rgba(79,70,229,0.32) 0%,rgba(6,182,212,0.15) 50%,transparent 70%);
   z-index:-1;
   animation:pulseAura 3s ease-in-out infinite alternate;
 }
 .hero-logo-img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block;background:#fff}
-@keyframes floatLogo{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-@keyframes pulseAura{0%{transform:scale(0.94);opacity:0.55}100%{transform:scale(1.12);opacity:1}}
+@keyframes floatLogo{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes pulseAura{0%{transform:scale(0.92);opacity:0.55}100%{transform:scale(1.15);opacity:1}}
 
 .hero-pill{
   display:inline-flex;
@@ -309,27 +309,30 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
   flex:none;
 }
 .landing-hero-title{
-  font-size:clamp(22px, 3.2vw, 38px);
+  font-size:clamp(20px, 4.2vw, 38px);
   font-weight:700;
-  line-height:1.22;
-  letter-spacing:-.02em;
+  line-height:1.24;
+  letter-spacing:-.01em;
   margin:0 0 clamp(6px, 0.9vh, 10px);
   background:linear-gradient(135deg,var(--ink) 35%,var(--primary) 100%);
   -webkit-background-clip:text;
   -webkit-text-fill-color:transparent;
-  word-break:keep-all;
+  word-break:normal;
+  overflow-wrap:break-word;
   flex:none;
 }
-.hero-chunk{display:inline-block;white-space:nowrap}
+.hero-chunk{display:inline}
 .landing-hero-sub{
-  font-size:clamp(12.5px, 1.3vw, 14.5px);
+  font-size:clamp(12.5px, 2.8vw, 14.5px);
   color:var(--muted);
-  margin:0 auto clamp(12px, 1.6vh, 18px);
+  margin:0 auto clamp(10px, 1.5vh, 18px);
   max-width:620px;
   font-weight:350;
-  line-height:1.55;
-  word-break:keep-all;
+  line-height:1.6;
+  word-break:normal;
+  overflow-wrap:break-word;
   flex:none;
+  padding:0 8px;
 }
 
 .hero-actions{
@@ -389,38 +392,6 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
 .landing-metric-sep{width:1px;height:28px;background:var(--line)}
 @media(max-width:700px){.landing-metric-sep{display:none}}
 
-/* Compact Feature Chips (1 บรรทัด จบในหน้าเดียว ไม่ต้องเลื่อน) */
-.landing-feature-chips{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-  flex-wrap:wrap;
-}
-.feature-chip{
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-  padding:4px 12px;
-  border-radius:999px;
-  background:var(--surface-card);
-  backdrop-filter:blur(10px);
-  -webkit-backdrop-filter:blur(10px);
-  border:1px solid var(--line);
-  font-size:12px;
-  font-weight:500;
-  color:var(--muted);
-  cursor:pointer;
-  transition:all .16s ease;
-  user-select:none;
-}
-.feature-chip:hover{
-  border-color:var(--primary);
-  color:var(--primary);
-  background:var(--primary-soft);
-  transform:translateY(-1px);
-}
-.feature-chip .chip-icon{font-size:13px}
 .landing-footer-note{
   font-size:11px;
   color:var(--muted);
@@ -729,16 +700,16 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
 .toast.show{opacity:1;transform:translate(-50%,0)}
 .scrim{display:none}
 
-/* ---------- Mobile Bottom Navigation Bar ---------- */
+/* ---------- Mobile & Tablet Bottom Navigation Dock (เลื่อนหาเมนูได้ สมส่วนทุกหน้าจอ) ---------- */
 .bottom-nav{display:none}
 .mobile-bar{display:none !important}
 
-@media (max-width:900px){
+@media (max-width:960px){
   .app{grid-template-columns:1fr !important}
   aside.side{display:none !important}
   .scrim{display:none !important}
 
-  /* Show Bottom Navigation on Mobile inside Catalog Dashboard */
+  /* Show Bottom Navigation Dock inside Catalog Dashboard */
   .bottom-nav{
     display:flex;
     position:fixed;
@@ -746,22 +717,29 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
     left:0;
     right:0;
     background:var(--surface-card);
-    backdrop-filter:blur(20px);
-    -webkit-backdrop-filter:blur(20px);
+    backdrop-filter:blur(24px);
+    -webkit-backdrop-filter:blur(24px);
     border-top:1px solid var(--line);
     padding:6px 12px calc(8px + env(safe-area-inset-bottom,0px));
     z-index:60;
-    justify-content:space-around;
     align-items:center;
-    box-shadow:0 -4px 20px rgba(0,0,0,0.06);
+    justify-content:flex-start;
+    box-shadow:0 -4px 20px rgba(0,0,0,0.08);
+    overflow-x:auto;
+    overflow-y:hidden;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+    gap:4px;
+    scroll-behavior:smooth;
   }
+  .bottom-nav::-webkit-scrollbar{display:none}
 
   .app.landing-active .bottom-nav{
     display:none !important;
   }
 
   .view-catalog{
-    padding:16px 14px calc(84px + env(safe-area-inset-bottom,0px)) !important;
+    padding:16px 14px calc(86px + env(safe-area-inset-bottom,0px)) !important;
   }
   .analytics-grid{grid-template-columns:1fr}
   .kpi-row{grid-template-columns:repeat(2,1fr)}
@@ -769,43 +747,104 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
 @media (max-width:640px){
   .f-grid{grid-template-columns:1fr}
   .kpi-row{grid-template-columns:1fr}
+  .catalog-hero-header{padding:16px 14px}
+  .cat-hero-title{font-size:22px !important}
+  
+  /* Mobile Landing adjustments */
+  .landing-top{padding:8px 12px !important}
+  .landing-brand{font-size:13px !important;gap:8px !important}
+  .landing-brand img{width:30px !important;height:30px !important}
+  #liveDate{display:none !important}
+  .landing-metrics-bar{
+    display:grid !important;
+    grid-template-columns:1fr 1fr !important;
+    gap:8px 12px !important;
+    padding:10px 14px !important;
+    max-width:360px !important;
+  }
+  .landing-metric-sep{display:none !important}
+  .landing-metric-item{gap:8px !important}
+  .landing-metric-icon{width:30px !important;height:30px !important;font-size:15px !important}
+  .landing-metric-val{font-size:16px !important}
+  .landing-metric-label{font-size:10.5px !important}
+  .hero-actions{flex-direction:column !important;width:100% !important;max-width:320px !important;margin:0 auto !important;gap:8px !important}
+  .hero-actions .btn{width:100% !important;justify-content:center !important;padding:10px 16px !important;font-size:14px !important}
 }
 
 .b-nav-item{
-  display:flex;
+  display:inline-flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
-  gap:3px;
+  gap:2px;
   color:var(--muted);
   text-decoration:none;
   font-size:11px;
   font-weight:500;
-  padding:4px 8px;
+  padding:5px 10px;
   border-radius:12px;
-  background:none;
+  background:transparent;
   border:none;
   cursor:pointer;
-  transition:all .15s ease;
-  min-width:54px;
+  transition:all .16s ease;
+  flex:none;
+  min-width:52px;
+  white-space:nowrap;
+  touch-action:manipulation;
 }
-.b-nav-item .b-icon{font-size:19px;line-height:1;transition:transform .15s ease}
-.b-nav-item.active{color:var(--primary);font-weight:600}
-.b-nav-item.active .b-icon{transform:scale(1.18)}
-.b-nav-add{color:var(--primary)}
+.b-nav-item:hover{
+  background:var(--paper);
+  color:var(--ink);
+}
+.b-nav-item.active{
+  color:var(--primary);
+  font-weight:600;
+  background:var(--primary-soft);
+}
+.b-nav-item .b-icon{
+  font-size:18px;
+  line-height:1;
+  transition:transform .15s ease;
+  display:grid;
+  place-items:center;
+}
+.b-nav-item.active .b-icon{
+  transform:scale(1.15);
+}
+.b-nav-item .b-label{
+  font-size:10.5px;
+  line-height:1.2;
+}
+.b-nav-sep{
+  width:1px;
+  height:24px;
+  background:var(--line);
+  margin:0 4px;
+  flex:none;
+}
+.b-nav-add{
+  color:var(--primary);
+}
 .b-icon-add{
-  width:32px;
-  height:32px;
+  width:28px;
+  height:28px;
   border-radius:50%;
   background:var(--primary);
   color:#fff;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:22px;
+  font-size:18px;
   font-weight:400;
-  box-shadow:0 4px 14px rgba(79,70,229,0.35);
+  box-shadow:0 3px 10px rgba(79,70,229,0.35);
   margin-bottom:2px;
+}
+.num-key.key-pressed{
+  transform:scale(0.92) !important;
+  background:var(--primary-soft) !important;
+  border-color:var(--primary) !important;
+  color:var(--primary) !important;
+  box-shadow:0 0 16px rgba(79,70,229,0.3) !important;
 }
 
 /* ==========================================================================
@@ -1176,29 +1215,9 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
             </div>
           </div>
 
-          <!-- Feature Chips (จุดเด่นและฟีเจอร์น่าสนใจ จบในหน้าเดียว) -->
-          <div class="landing-feature-chips">
-            <div class="feature-chip" id="bentoCardMedia" title="คลิกเพื่อเข้าสู่คลังสื่อและแผนการสอน">
-              <span class="chip-icon">📚</span>
-              <span>คลังสื่อ & แผนการสอนดิจิทัล</span>
-            </div>
-            <div class="feature-chip" id="bentoCardLive" title="คลิกเพื่อดูระบบพร้อมใช้งาน">
-              <span class="chip-icon">🟢</span>
-              <span>พร้อมใช้งานจริง (Production)</span>
-            </div>
-            <div class="feature-chip" id="bentoCardQr" title="คลิกเพื่อดูตัวอย่างระบบและ QR Code">
-              <span class="chip-icon">📱</span>
-              <span>ป้ายชื่อระบบ & QR Code</span>
-            </div>
-            <div class="feature-chip" id="bentoCardSec" title="คลิกเพื่อเข้าสู่ระบบผู้ดูแล">
-              <span class="chip-icon">🛡️</span>
-              <span>โหมดผู้ชม ปลอดภัย 100%</span>
-            </div>
-          </div>
-
           <!-- Footer Note -->
           <div class="landing-footer-note">
-            คลังระบบออนไลน์ &middot; โรงเรียนวัดบางปูน &middot; ครูซอสสอนสังคม (TS010)
+            คลังระบบออนไลน์ &middot; ครูซอสสอนสังคม (TS010)
           </div>
         </div>
       </div>
@@ -1219,7 +1238,7 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
                 <span>TS010 · แพลตฟอร์มคลังระบบดิจิทัล</span>
               </span>
               <span class="cat-divider">/</span>
-              <span class="cat-school-tag">โรงเรียนวัดบางปูน ครูซอสสอนสังคม</span>
+              <span class="cat-school-tag">ครูซอสสอนสังคม</span>
             </div>
 
             <!-- Role Badge & Admin Action (Rendered dynamically: Viewer vs Admin) -->
@@ -1382,27 +1401,43 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
       </div>
     </section>
 
-    <!-- Mobile Bottom Navigation (เมนูไอคอนด้านล่างสำหรับจอมือถือ) -->
+    <!-- Mobile Bottom Navigation (เมนูไอคอนด้านล่าง เลื่อนหาเมนูได้ สมส่วนทุกหน้าจอ) -->
     <nav class="bottom-nav" id="bottomNav">
-      <a href="#all" class="b-nav-item active" id="bNavAll">
+      <button type="button" class="b-nav-item" id="bNavLanding" title="กลับสู่หน้าแรก">
+        <span class="b-icon">🏠</span>
+        <span class="b-label">หน้าแรก</span>
+      </button>
+      <a href="#all" class="b-nav-item active" id="bNavAll" title="ดูระบบทั้งหมด">
         <span class="b-icon">📦</span>
         <span class="b-label">ทั้งหมด</span>
       </a>
-      <a href="#live" class="b-nav-item" id="bNavLive">
+      <a href="#live" class="b-nav-item" id="bNavLive" title="ระบบพร้อมใช้งานจริง">
         <span class="b-icon">🟢</span>
         <span class="b-label">พร้อมใช้</span>
       </a>
-      <a href="#dev" class="b-nav-item" id="bNavDev">
+      <a href="#dev" class="b-nav-item" id="bNavDev" title="ห้องทดลอง / ระหว่างพัฒนา">
         <span class="b-icon">🛠️</span>
         <span class="b-label">ห้องทดลอง</span>
       </a>
-      <button type="button" class="b-nav-item b-nav-add" data-add id="bNavAdd">
+      <div class="b-nav-sep"></div>
+      <!-- Scrollable Category Icons List -->
+      <div id="bNavCatList" style="display:flex;align-items:center;gap:4px"></div>
+      <div class="b-nav-sep"></div>
+      <button type="button" class="b-nav-item b-nav-add" data-add id="bNavAdd" title="เพิ่มระบบใหม่">
         <span class="b-icon-add">+</span>
         <span class="b-label">เพิ่มระบบ</span>
       </button>
-      <button type="button" class="b-nav-item" id="bNavExit" title="ออกจากระบบ">
-        <span class="b-icon">🚪</span>
-        <span class="b-label">ออก</span>
+      <button type="button" class="b-nav-item" id="bNavSearch" title="ค้นหาด่วน (Ctrl+K)">
+        <span class="b-icon">🔍</span>
+        <span class="b-label">ค้นหา</span>
+      </button>
+      <button type="button" class="b-nav-item" id="bNavLock" title="เข้าสู่ระบบผู้ดูแล (รหัส PIN)">
+        <span class="b-icon" id="bNavLockIcon">🔐</span>
+        <span class="b-label" id="bNavLockLabel">ผู้ดูแล</span>
+      </button>
+      <button type="button" class="b-nav-item" id="bNavTheme" title="สลับโหมดมืด/สว่าง">
+        <span class="b-icon">🌓</span>
+        <span class="b-label">ธีม</span>
       </button>
     </nav>
   </main>
@@ -2042,6 +2077,7 @@ function renderNav(){
   if($("#bNavDev")) $("#bNavDev").classList.toggle("active", r.page === "catalog" && r.sub === "dev");
 
   let h = "";
+  let bCatsHtml = "";
   cats.forEach(c => {
     const count = items.filter(i => i.cat === c.id).length;
     const isAct = r.page === "catalog" && r.sub === "cat" && r.catId === c.id;
@@ -2050,9 +2086,25 @@ function renderNav(){
             <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c.name)}</span>
             <span class="count">${count}</span>
           </a>`;
+    bCatsHtml += `
+      <a href="#cat/${encodeURIComponent(c.id)}" class="b-nav-item ${isAct?'active':''}" title="${esc(c.name)}">
+        <span class="b-icon">${esc(c.icon||"🗂️")}</span>
+        <span class="b-label">${esc(c.name)}</span>
+      </a>`;
   });
   const catList = $("#catNavList");
   if(catList) catList.innerHTML = h;
+
+  const bCatList = $("#bNavCatList");
+  if(bCatList) bCatList.innerHTML = bCatsHtml;
+
+  // Auto-scroll active item into view on bottom-nav dock
+  setTimeout(() => {
+    const activeBItem = $("#bottomNav .b-nav-item.active");
+    if(activeBItem && $("#bottomNav")){
+      activeBItem.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    }
+  }, 50);
 }
 
 /* ---------- Area Line Chart (สถิติการใช้งาน & แนวโน้มระบบ) ---------- */
@@ -2960,22 +3012,58 @@ function handleKeypadInput(key){
   }
 }
 
-// Physical keyboard support for PIN keypad
+// Physical keyboard & Numpad support for PIN keypad (รองรับทั้งแป้นพิมพ์ปกติ, Numpad และแป้นพิมพ์ภาษาไทย)
 document.addEventListener("keydown", e => {
-  if(!$("#keypadPinOverlay") || !$("#keypadPinOverlay").classList.contains("open")) return;
+  const overlay = $("#keypadPinOverlay");
+  if(!overlay || !overlay.classList.contains("open")) return;
+  
+  let digit = null;
   if(e.key >= "0" && e.key <= "9"){
+    digit = e.key;
+  } else if(/^Digit([0-9])$/.test(e.code)){
+    digit = e.code.replace("Digit", "");
+  } else if(/^Numpad([0-9])$/.test(e.code)){
+    digit = e.code.replace("Numpad", "");
+  } else {
+    // Thai layout mapping: ๅ=/ภถุึคตจ -> 1234567890
+    const thaiDigits = { "ๅ":"1", "/":"2", "-":"3", "ภ":"4", "ถ":"5", "ุ":"6", "ึ":"7", "ค":"8", "ต":"9", "จ":"0" };
+    if(thaiDigits[e.key]) digit = thaiDigits[e.key];
+  }
+
+  if(digit !== null){
     e.preventDefault();
-    handleKeypadInput(e.key);
-  } else if(e.key === "Backspace"){
+    const btn = $(`#keypadGrid [data-key="${digit}"]`);
+    if(btn){
+      btn.classList.add("key-pressed");
+      setTimeout(() => btn.classList.remove("key-pressed"), 150);
+    }
+    handleKeypadInput(digit);
+    return;
+  }
+
+  if(e.key === "Backspace"){
     e.preventDefault();
+    const btn = $(`#keypadGrid [data-key="backspace"]`);
+    if(btn){
+      btn.classList.add("key-pressed");
+      setTimeout(() => btn.classList.remove("key-pressed"), 150);
+    }
     handleKeypadInput("backspace");
   } else if(e.key.toLowerCase() === "c" || e.key === "Delete"){
     e.preventDefault();
+    const btn = $(`#keypadGrid [data-key="clear"]`);
+    if(btn){
+      btn.classList.add("key-pressed");
+      setTimeout(() => btn.classList.remove("key-pressed"), 150);
+    }
     handleKeypadInput("clear");
+  } else if(e.key === "Escape"){
+    e.preventDefault();
+    closeOverlay(overlay);
   }
 });
 
-// Keypad buttons click delegation
+// Keypad buttons click & touch delegation (กดด้วยมือบนหน้าจอสัมผัสหรือคลิกเมาส์)
 $("#keypadGrid").addEventListener("click", e => {
   const btn = e.target.closest("[data-key]");
   if(btn){
@@ -3031,6 +3119,14 @@ function updateRoleUI(){
       if(roleActionBtn) roleActionBtn.title = "คลิกเพื่อกรอกรหัส PIN ผู้ดูแลระบบ";
       if(addTopLabel) addTopLabel.textContent = "🔒 เพิ่มระบบ";
     }
+  }
+
+  /* Sync Mobile Bottom Nav Lock Button */
+  const bLockIcon = $("#bNavLockIcon");
+  const bLockLabel = $("#bNavLockLabel");
+  if(bLockIcon && bLockLabel){
+    bLockIcon.textContent = isUnlocked ? "👑" : "🔐";
+    bLockLabel.textContent = isUnlocked ? "ล็อกสิทธิ์" : "ผู้ดูแล";
   }
 }
 
@@ -3336,10 +3432,19 @@ onClick("#btnResetPin", () => {
 });
 
 /* Mobile Bottom Nav Buttons */
+onClick("#bNavLanding", (e) => { e.preventDefault(); go("landing"); });
 onClick("#bNavAll", (e) => { e.preventDefault(); go("all"); });
 onClick("#bNavLive", (e) => { e.preventDefault(); go("live"); });
 onClick("#bNavDev", (e) => { e.preventDefault(); go("dev"); });
-onClick("#bNavExit", (e) => { e.preventDefault(); go("landing"); });
+onClick("#bNavSearch", openSpotlight);
+onClick("#bNavLock", () => {
+  if(isUnlocked){
+    lockOwnerMode();
+  } else {
+    openKeypadModal("login");
+  }
+});
+onClick("#bNavTheme", toggleTheme);
 
 /* Announcement Banner Controls */
 onClick("#closeAnnounceBtn", () => {
