@@ -1006,110 +1006,133 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
 }
 
 /* ==========================================================================
-   NUMERIC KEYPAD PIN MODAL (ภาพที่ 1 & 3: แป้นตัวเลขกดได้ทันที สวย ทันสมัย)
+   NUMERIC KEYPAD PIN MODAL (กะทัดรัด สวยงาม สัดส่วนพอดี ไม่ล้นจอ)
    ========================================================================== */
 .keypad-modal-card{
   background:var(--surface-card);
   backdrop-filter:blur(24px);
   -webkit-backdrop-filter:blur(24px);
   border:1px solid var(--line);
-  border-radius:26px;
-  width:min(390px, 94vw);
-  padding:26px 22px 20px;
-  box-shadow:0 30px 90px -15px rgba(0,0,0,0.55);
+  border-radius:22px;
+  width:min(320px, 90vw);
+  padding:18px 18px 14px;
+  box-shadow:0 24px 60px -12px rgba(0,0,0,0.5);
   text-align:center;
   position:relative;
   overflow:hidden;
-  animation:keypadPop .22s cubic-bezier(0.34, 1.56, 0.64, 1);
+  max-height:calc(100vh - 32px);
+  animation:keypadPop .2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-@keyframes keypadPop{from{opacity:0;transform:scale(0.92)}to{opacity:1;transform:scale(1)}}
+@keyframes keypadPop{from{opacity:0;transform:scale(0.93)}to{opacity:1;transform:scale(1)}}
+
+.keypad-top-close{
+  position:absolute;
+  top:10px;
+  right:10px;
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  border:none;
+  background:transparent;
+  color:var(--muted);
+  font-size:14px;
+  display:grid;
+  place-items:center;
+  cursor:pointer;
+  transition:all .15s ease;
+  z-index:2;
+}
+.keypad-top-close:hover{
+  background:var(--paper);
+  color:var(--ink);
+}
 
 .keypad-lock-emblem{
-  width:58px;
-  height:58px;
+  width:40px;
+  height:40px;
   border-radius:50%;
-  margin:0 auto 12px;
+  margin:0 auto 8px;
   background:linear-gradient(135deg, rgba(79,70,229,0.14), rgba(6,182,212,0.14));
   border:1.5px solid rgba(79,70,229,0.25);
   display:grid;
   place-items:center;
-  font-size:26px;
-  box-shadow:0 8px 24px -4px rgba(79,70,229,0.22);
+  font-size:18px;
+  box-shadow:0 4px 16px -2px rgba(79,70,229,0.2);
   transition:all .2s ease;
 }
-.keypad-title{font-size:19px;font-weight:700;margin:0 0 6px;letter-spacing:-.01em;color:var(--ink)}
-.keypad-subtitle{font-size:12.5px;color:var(--muted);margin:0 auto 16px;max-width:300px;line-height:1.5}
+.keypad-title{font-size:16px;font-weight:700;margin:0 0 3px;letter-spacing:-.01em;color:var(--ink)}
+.keypad-subtitle{font-size:11.5px;color:var(--muted);margin:0 auto 10px;max-width:270px;line-height:1.4}
 
 /* 4 PIN Dots Indicator */
 .pin-dots-row{
   display:flex;
   justify-content:center;
   align-items:center;
-  gap:18px;
-  margin:0 auto 14px;
-  padding:6px 0;
+  gap:12px;
+  margin:0 auto 6px;
+  padding:3px 0;
 }
 .pin-dot{
-  width:16px;
-  height:16px;
+  width:12px;
+  height:12px;
   border-radius:50%;
-  border:2px solid var(--line);
+  border:1.5px solid var(--line);
   background:var(--paper);
-  transition:all .2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition:all .18s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .pin-dot.filled{
   border-color:var(--primary);
   background:var(--primary);
-  box-shadow:0 0 14px var(--primary);
-  transform:scale(1.18);
+  box-shadow:0 0 10px var(--primary);
+  transform:scale(1.15);
 }
 .pin-dots-row.error .pin-dot{
   border-color:var(--danger);
   background:var(--danger);
-  box-shadow:0 0 14px var(--danger);
+  box-shadow:0 0 10px var(--danger);
 }
 .pin-dots-row.success .pin-dot{
   border-color:var(--live);
   background:var(--live);
-  box-shadow:0 0 14px var(--live);
+  box-shadow:0 0 10px var(--live);
 }
 .pin-dots-row.error{
   animation:pinShake 0.4s ease;
 }
 @keyframes pinShake{
   0%,100%{transform:translateX(0)}
-  20%,60%{transform:translateX(-10px)}
-  40%,80%{transform:translateX(10px)}
+  20%,60%{transform:translateX(-8px)}
+  40%,80%{transform:translateX(8px)}
 }
 
 .pin-feedback-msg{
-  min-height:20px;
-  font-size:12.5px;
+  min-height:16px;
+  font-size:11.5px;
   font-weight:500;
-  margin-bottom:12px;
+  margin-bottom:8px;
   transition:all .15s ease;
 }
 .pin-feedback-msg.error{color:var(--danger)}
 .pin-feedback-msg.success{color:var(--live)}
 .pin-feedback-msg.muted{color:var(--muted)}
 
-/* Keypad Grid 3x4 */
+/* Keypad Grid 3x4 (กะทัดรัด สัมผัสง่าย) */
 .keypad-grid{
   display:grid;
   grid-template-columns:repeat(3, 1fr);
-  gap:12px;
-  max-width:280px;
-  margin:0 auto 16px;
+  gap:8px;
+  max-width:216px;
+  margin:0 auto 10px;
 }
 .num-key{
-  width:72px;
-  height:72px;
+  width:48px;
+  height:48px;
   margin:0 auto;
   border-radius:50%;
   border:1px solid var(--line);
   background:var(--surface);
   color:var(--ink);
-  font-size:24px;
+  font-size:18px;
   font-weight:600;
   font-family:inherit;
   display:flex;
@@ -1118,7 +1141,7 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
   justify-content:center;
   cursor:pointer;
   box-shadow:var(--shadow-sm);
-  transition:all .14s ease;
+  transition:all .12s ease;
   user-select:none;
   -webkit-user-select:none;
   touch-action:manipulation;
@@ -1127,7 +1150,7 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
   border-color:var(--primary);
   background:var(--primary-soft);
   color:var(--primary);
-  transform:scale(1.05);
+  transform:scale(1.06);
 }
 .num-key:active{
   transform:scale(0.92);
@@ -1135,8 +1158,8 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
   color:#fff;
 }
 .num-key.func-key{
-  font-size:13px;
-  font-weight:500;
+  font-size:11.5px;
+  font-weight:600;
   background:var(--paper);
   color:var(--muted);
 }
@@ -1147,10 +1170,32 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
 .keypad-foot-actions{
   display:flex;
   flex-direction:column;
-  gap:8px;
-  padding-top:10px;
+  gap:4px;
+  padding-top:8px;
   border-top:1px solid var(--line);
 }
+
+@media (max-height: 520px){
+  .keypad-modal-card{
+    padding:10px 14px 8px;
+  }
+  .keypad-lock-emblem{
+    display:none;
+  }
+  .keypad-subtitle{
+    display:none;
+  }
+  .num-key{
+    width:40px;
+    height:40px;
+    font-size:16px;
+  }
+  .keypad-grid{
+    gap:6px;
+    margin-bottom:6px;
+  }
+}
+
 
 /* Custom Confirmation Modal (ภาพที่ 1: แทนที่ confirm() น่าเกลียด) */
 .confirm-modal-card{
@@ -1856,6 +1901,7 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
 <!-- 5. Interactive Numeric Keypad PIN Modal (ภาพที่ 1 & 3: แป้นตัวเลขกดได้ทันที พร้อมใช้) -->
 <div class="overlay" id="keypadPinOverlay" role="dialog" aria-modal="true" aria-labelledby="keypadTitle">
   <div class="keypad-modal-card">
+    <button type="button" class="keypad-top-close" data-close title="ปิดหน้าต่าง (ESC)" aria-label="ปิด">✕</button>
     <div class="keypad-lock-emblem" id="keypadEmblem">
       <span id="keypadEmblemIcon">🔐</span>
     </div>
@@ -1889,10 +1935,10 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
     </div>
 
     <div class="keypad-foot-actions">
-      <button type="button" class="btn ghost" id="btnKeypadGuestMode" style="font-size:13px;width:100%;justify-content:center;color:var(--muted)">
+      <button type="button" class="btn ghost" id="btnKeypadGuestMode" style="font-size:11.5px;padding:5px 8px;min-height:30px;width:100%;justify-content:center;color:var(--muted)">
         👁️ เข้าชมในฐานะผู้ชมทั่วไป (ไม่ต้องใส่รหัส)
       </button>
-      <button type="button" class="btn ghost" data-close style="font-size:12.5px;width:100%;justify-content:center;color:var(--muted)">
+      <button type="button" class="btn ghost" data-close style="font-size:11px;padding:4px 8px;min-height:26px;width:100%;justify-content:center;color:var(--muted)">
         ✕ ปิดหน้าต่าง
       </button>
     </div>
