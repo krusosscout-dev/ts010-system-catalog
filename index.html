@@ -1231,30 +1231,32 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
 .confirm-desc{font-size:13.5px;color:var(--muted);margin:0 0 20px;line-height:1.6}
 
 /* Browser Mockup & Preview Dialog */
+/* Browser Mockup & Live Interactive Preview */
 .browser-mockup{
   background:var(--surface);
   border:1px solid var(--line);
   border-radius:14px;
   overflow:hidden;
   box-shadow:var(--shadow-sm);
-  margin-bottom:16px;
+  margin-bottom:14px;
+  transition:all .2s ease;
 }
 .browser-bar{
   background:var(--paper);
   border-bottom:1px solid var(--line);
-  padding:8px 14px;
+  padding:8px 12px;
   display:flex;
   align-items:center;
   gap:10px;
 }
-.browser-dots{display:flex;gap:6px}
+.browser-dots{display:flex;gap:6px;flex:none}
 .browser-dot{width:10px;height:10px;border-radius:50%}
 .browser-url-bar{
   flex:1;
   background:var(--surface);
   border:1px solid var(--line);
   border-radius:7px;
-  padding:4px 10px;
+  padding:5px 10px;
   font-size:12px;
   color:var(--muted);
   display:flex;
@@ -1263,6 +1265,114 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
   overflow:hidden;
   white-space:nowrap;
   text-overflow:ellipsis;
+  cursor:pointer;
+  transition:all .15s ease;
+}
+.browser-url-bar:hover{
+  border-color:var(--primary);
+  background:var(--paper);
+}
+
+.preview-screen-box{
+  position:relative;
+  width:100%;
+  height:540px;
+  min-height:360px;
+  max-height:68vh;
+  background:var(--surface);
+  overflow:hidden;
+}
+@media (max-width: 640px){
+  .preview-screen-box{
+    height:420px;
+  }
+}
+
+/* Fullscreen Live Preview Mode */
+#previewModalCard.is-fullscreen{
+  position:fixed !important;
+  inset:0 !important;
+  max-width:100vw !important;
+  width:100vw !important;
+  height:100vh !important;
+  max-height:100vh !important;
+  border-radius:0 !important;
+  margin:0 !important;
+  display:flex !important;
+  flex-direction:column !important;
+  z-index:99999 !important;
+}
+#previewModalCard.is-fullscreen .modal-body{
+  flex:1 !important;
+  display:flex !important;
+  flex-direction:column !important;
+  overflow-y:auto !important;
+  padding:10px 14px !important;
+}
+#previewModalCard.is-fullscreen .browser-mockup{
+  flex:1 !important;
+  display:flex !important;
+  flex-direction:column !important;
+  margin-bottom:8px !important;
+}
+#previewModalCard.is-fullscreen .preview-screen-box{
+  flex:1 !important;
+  height:100% !important;
+  max-height:none !important;
+}
+
+/* Mode Switcher Tabs */
+.btn-preview-mode{
+  border:none;
+  background:transparent;
+  color:var(--muted);
+  padding:5px 12px;
+  border-radius:8px;
+  font-size:12px;
+  font-weight:500;
+  cursor:pointer;
+  transition:all .16s ease;
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+}
+.btn-preview-mode:hover{
+  color:var(--ink);
+}
+.btn-preview-mode.active{
+  background:var(--surface);
+  color:var(--primary);
+  font-weight:600;
+  box-shadow:var(--shadow-sm);
+}
+
+/* Iframe Loading Overlay */
+.preview-iframe-loader{
+  position:absolute;
+  inset:0;
+  background:var(--surface);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  z-index:5;
+  transition:opacity .25s ease, visibility .25s ease;
+}
+.preview-iframe-loader.hidden{
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+}
+.preview-spinner{
+  width:36px;
+  height:36px;
+  border:3px solid var(--line);
+  border-top-color:var(--primary);
+  border-radius:50%;
+  animation:spin 0.8s linear infinite;
+}
+@keyframes spin{
+  to{transform:rotate(360deg)}
 }
 </style>
 </head>
@@ -1959,9 +2069,9 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
   </div>
 </div>
 
-<!-- 7. System Interactive Preview Modal (เพิ่มเติม: ดูตัวอย่างระบบได้โดยไม่ต้องแก้ไข) -->
+<!-- 7. System Interactive Preview Modal (ดูตัวอย่างระบบจริง โต้ตอบได้ ขยายเต็มจอ คัดลอกลิงก์) -->
 <div class="overlay" id="previewOverlay" role="dialog" aria-modal="true" aria-labelledby="previewModalTitle">
-  <div class="modal" style="max-width:880px;max-height:92vh">
+  <div class="modal" id="previewModalCard" style="max-width:980px;max-height:94vh;width:95vw">
     <div class="modal-head">
       <div style="display:flex;align-items:center;gap:12px;min-width:0">
         <span style="font-size:22px" id="previewIcon">💻</span>
@@ -1970,42 +2080,92 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
           <div id="previewModalSub" style="font-size:12px;color:var(--muted)">พรีวิวหน้าตาและการทำงานของระบบออนไลน์</div>
         </div>
       </div>
-      <button class="btn ghost icon-btn" data-close><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      <div style="display:flex;align-items:center;gap:6px">
+        <button class="btn ghost icon-btn" id="previewToggleFullscreenBtn" title="ขยายเต็มจอ / ย่อขนาด" style="width:34px;height:34px">
+          <svg id="previewFsIconExpand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:17px;height:17px"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+          <svg id="previewFsIconCompress" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:17px;height:17px;display:none"><path d="M4 14h6m0 0v6m0-6-7 7m17-11h-6m0 0V4m0 6 7-7m-7 17v-6m0 0h6m-6 0 7 7M3 7l7 7m0-7H4"/></svg>
+        </button>
+        <button class="btn ghost icon-btn" data-close title="ปิด (ESC)" style="width:34px;height:34px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      </div>
     </div>
-    <div class="modal-body" style="padding:18px 22px">
+    <div class="modal-body" style="padding:14px 18px">
+      <!-- Mode Switcher (หน้าเว็บสด vs ภาพตัวอย่าง) -->
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+        <div class="preview-mode-tabs" style="display:inline-flex;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:3px;gap:4px">
+          <button type="button" class="btn-preview-mode active" id="btnModeLiveIframe">
+            <span>🌐 หน้าเว็บสด (ลองเล่นได้)</span>
+          </button>
+          <button type="button" class="btn-preview-mode" id="btnModeScreenshot">
+            <span>🖼️ ภาพตัวอย่าง</span>
+          </button>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-size:11.5px;color:var(--muted)">💡 ทดลองคลิกและใช้งานระบบได้จริงในกรอบนี้</span>
+        </div>
+      </div>
+
       <!-- Browser Window Mockup Frame -->
-      <div class="browser-mockup">
+      <div class="browser-mockup" id="browserMockupFrame">
         <div class="browser-bar">
           <div class="browser-dots">
             <span class="browser-dot" style="background:#EF4444"></span>
             <span class="browser-dot" style="background:#F59E0B"></span>
             <span class="browser-dot" style="background:#10B981"></span>
           </div>
-          <div class="browser-url-bar">
-            <span style="color:var(--live)">🔒</span>
-            <span id="previewUrlBar">https://...</span>
+
+          <!-- Browser Navigation Buttons -->
+          <div style="display:flex;gap:4px;align-items:center">
+            <button class="btn ghost icon-btn" id="previewReloadBtn" title="โหลดหน้าระบบใหม่ (Refresh)" style="width:28px;height:28px">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:14px;height:14px"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
+            </button>
           </div>
-          <button class="btn ghost icon-btn" id="previewCopyUrlBtn" title="คัดลอกลิงก์" style="width:28px;height:28px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+
+          <!-- URL Input / Bar -->
+          <div class="browser-url-bar" id="previewUrlBarWrap" title="คลิกเพื่อคัดลอกลิงก์">
+            <span style="color:var(--live);font-size:12px">🔒</span>
+            <span id="previewUrlBar" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">https://...</span>
+          </div>
+
+          <!-- Action buttons inside browser bar -->
+          <button class="btn" id="previewCopyUrlBtn" title="คัดลอกลิงก์ไปใช้งาน" style="height:28px;padding:0 10px;font-size:12px;gap:5px;flex:none">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span id="previewCopyBtnText">คัดลอกลิงก์</span>
+          </button>
+          <button class="btn ghost icon-btn" id="previewBarFsBtn" title="ขยายเต็มจอ" style="width:28px;height:28px;flex:none">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+          </button>
         </div>
-        <div id="previewScreenBox" style="position:relative;aspect-ratio:16/9;background:var(--off-soft);overflow:hidden;display:grid;place-items:center">
-          <!-- Screenshot inserted here -->
+
+        <!-- Screen Area for Live Iframe or Screenshot -->
+        <div id="previewScreenBox" class="preview-screen-box">
+          <!-- Loading overlay -->
+          <div id="previewIframeLoader" class="preview-iframe-loader">
+            <div class="preview-spinner"></div>
+            <div style="font-size:13px;font-weight:600;color:var(--ink);margin-top:8px">กำลังโหลดหน้าระบบสด...</div>
+            <div style="font-size:11.5px;color:var(--muted)">เชื่อมต่อโดยตรงกับระบบของคุณครู</div>
+          </div>
+          <!-- Live iframe container -->
+          <iframe id="previewIframe" src="" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" loading="lazy" style="width:100%;height:100%;border:none;display:block"></iframe>
+          <!-- Image fallback container (hidden by default) -->
+          <div id="previewImgBox" style="display:none;width:100%;height:100%;overflow:auto;align-items:center;justify-content:center;background:var(--off-soft)"></div>
         </div>
       </div>
 
       <!-- Preview Metadata -->
-      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px" id="previewBadges"></div>
-      <p id="previewShort" style="font-size:15px;font-weight:600;margin:0 0 10px;color:var(--ink)"></p>
-      <div id="previewDetailBox" style="font-size:13.5px;color:var(--muted);line-height:1.7;margin-bottom:12px;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px 14px"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px" id="previewBadges"></div>
+      <p id="previewShort" style="font-size:14px;font-weight:600;margin:0 0 8px;color:var(--ink)"></p>
+      <div id="previewDetailBox" style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:10px;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 12px"></div>
       
-      <div id="previewFeaturesBox" style="margin-bottom:12px"></div>
-      <div id="previewTechList" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px"></div>
+      <div id="previewFeaturesBox" style="margin-bottom:10px"></div>
+      <div id="previewTechList" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"></div>
     </div>
-    <div class="modal-foot" style="display:flex;gap:10px;justify-content:space-between;align-items:center">
-      <div style="display:flex;gap:8px">
+    <div class="modal-foot" style="display:flex;gap:10px;justify-content:space-between;align-items:center;padding:10px 18px">
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn" id="previewQrBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>ป้าย QR Code</button>
+        <button class="btn ghost" id="previewFootCopyBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>คัดลอกลิงก์</button>
         <button class="btn ghost" data-close>ปิด</button>
       </div>
-      <a class="btn primary" id="previewLaunchBtn" href="#" target="_blank" rel="noopener" style="padding:9px 20px;font-weight:600">
+      <a class="btn primary" id="previewLaunchBtn" href="#" target="_blank" rel="noopener" style="padding:8px 18px;font-weight:600">
         🚀 เปิดใช้งานระบบจริง ↗
       </a>
     </div>
@@ -3067,9 +3227,11 @@ function showCustomConfirm({ title = "ยืนยันการทำราย
 }
 
 /* ==========================================================================
-   SYSTEM INTERACTIVE PREVIEW MODAL (เพิ่มเติม: ดูตัวอย่างระบบได้โดยไม่ต้องแก้ไข)
+   SYSTEM INTERACTIVE PREVIEW MODAL (ดูตัวอย่างระบบจริง โต้ตอบได้ ขยายเต็มจอ คัดลอกลิงก์)
    ========================================================================== */
 let curPreviewItem = null;
+let curPreviewMode = "live"; // "live" | "screenshot"
+
 function openPreviewModal(it){
   curPreviewItem = it;
   const c = catOf(it);
@@ -3080,10 +3242,31 @@ function openPreviewModal(it){
   $("#previewModalSub").textContent = `${c ? c.name : 'ระบบทั่วไป'} · ${STATUS_LABELS[it.status] || ''}`;
   $("#previewUrlBar").textContent = it.url;
   
-  const screenBox = $("#previewScreenBox");
-  screenBox.innerHTML = src 
-    ? `<img src="${esc(src)}" alt="${esc(it.name)}" style="width:100%;height:100%;object-fit:cover;object-position:top" onerror="this.outerHTML=window.__ph(${esc(JSON.stringify(it.name))})">` 
-    : placeholder(it.name);
+  const iframe = $("#previewIframe");
+  const loader = $("#previewIframeLoader");
+  const imgBox = $("#previewImgBox");
+  
+  // Prepare screenshot fallback
+  if(imgBox){
+    imgBox.innerHTML = src 
+      ? `<img src="${esc(src)}" alt="${esc(it.name)}" style="max-width:100%;max-height:100%;object-fit:contain;margin:auto" onerror="this.outerHTML=window.__ph(${esc(JSON.stringify(it.name))})">` 
+      : placeholder(it.name);
+  }
+
+  // Switch to live mode by default
+  setPreviewMode("live");
+  
+  if(loader) loader.classList.remove("hidden");
+  if(iframe){
+    iframe.src = it.url;
+    iframe.onload = () => {
+      if(loader) loader.classList.add("hidden");
+    };
+    // Fallback if onload doesn't trigger due to cross-origin sandbox
+    setTimeout(() => {
+      if(loader) loader.classList.add("hidden");
+    }, 4500);
+  }
     
   let badgesHtml = `
     <span class="badge badge-${it.status}">${STATUS_LABELS[it.status]||""}</span>
@@ -3123,9 +3306,60 @@ function openPreviewModal(it){
     closeOverlay($("#previewOverlay"));
     openQrModal(it);
   };
-  $("#previewCopyUrlBtn").onclick = () => copyText(it.url);
   
   openOverlay($("#previewOverlay"));
+}
+
+function setPreviewMode(mode){
+  curPreviewMode = mode;
+  const iframe = $("#previewIframe");
+  const imgBox = $("#previewImgBox");
+  const loader = $("#previewIframeLoader");
+  const btnLive = $("#btnModeLiveIframe");
+  const btnImg = $("#btnModeScreenshot");
+  
+  if(mode === "live"){
+    if(iframe) iframe.style.display = "block";
+    if(imgBox) imgBox.style.display = "none";
+    if(btnLive) btnLive.classList.add("active");
+    if(btnImg) btnImg.classList.remove("active");
+  } else {
+    if(iframe) iframe.style.display = "none";
+    if(loader) loader.classList.add("hidden");
+    if(imgBox) imgBox.style.display = "flex";
+    if(btnLive) btnLive.classList.remove("active");
+    if(btnImg) btnImg.classList.add("active");
+  }
+}
+
+function togglePreviewFullscreen(){
+  const card = $("#previewModalCard");
+  const iconExpand = $("#previewFsIconExpand");
+  const iconCompress = $("#previewFsIconCompress");
+  if(!card) return;
+  const isFs = card.classList.toggle("is-fullscreen");
+  if(iconExpand && iconCompress){
+    iconExpand.style.display = isFs ? "none" : "block";
+    iconCompress.style.display = isFs ? "block" : "none";
+  }
+  toast(isFs ? "ขยายตัวอย่างเต็มหน้าจอ ⛶" : "ย่อขนาดหน้าต่างตัวอย่าง");
+}
+
+function copyPreviewUrl(){
+  if(!curPreviewItem || !curPreviewItem.url) return;
+  copyText(curPreviewItem.url);
+  const copyBtn = $("#previewCopyUrlBtn");
+  const copyBtnText = $("#previewCopyBtnText");
+  const footBtn = $("#previewFootCopyBtn");
+  if(copyBtnText) copyBtnText.textContent = "✓ คัดลอกแล้ว!";
+  if(copyBtn) copyBtn.classList.add("primary");
+  if(footBtn) footBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:var(--live)"><path d="M20 6 9 17l-5-5"/></svg><span style="color:var(--live);font-weight:600">คัดลอกแล้ว!</span>`;
+  toast(`คัดลอกลิงก์เรียบร้อยแล้ว: ${curPreviewItem.url} 📋`);
+  setTimeout(() => {
+    if(copyBtnText) copyBtnText.textContent = "คัดลอกลิงก์";
+    if(copyBtn) copyBtn.classList.remove("primary");
+    if(footBtn) footBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>คัดลอกลิงก์`;
+  }, 2500);
 }
 
 /* ==========================================================================
@@ -3614,8 +3848,38 @@ $("#btnCopyQr").onclick = () => {
 function openOverlay(el){ el.classList.add("open"); document.body.style.overflow="hidden"; }
 function closeOverlay(el){
   el.classList.remove("open");
+  if(el.id === "previewOverlay"){
+    const iframe = $("#previewIframe");
+    if(iframe) iframe.src = "about:blank";
+    const card = $("#previewModalCard");
+    if(card) card.classList.remove("is-fullscreen");
+    const iconExpand = $("#previewFsIconExpand");
+    const iconCompress = $("#previewFsIconCompress");
+    if(iconExpand && iconCompress){
+      iconExpand.style.display = "block";
+      iconCompress.style.display = "none";
+    }
+  }
   if(!document.querySelector(".overlay.open")) document.body.style.overflow="";
 }
+
+/* Interactive Preview Controls */
+onClick("#btnModeLiveIframe", () => setPreviewMode("live"));
+onClick("#btnModeScreenshot", () => setPreviewMode("screenshot"));
+onClick("#previewToggleFullscreenBtn", togglePreviewFullscreen);
+onClick("#previewBarFsBtn", togglePreviewFullscreen);
+onClick("#previewCopyUrlBtn", copyPreviewUrl);
+onClick("#previewUrlBarWrap", copyPreviewUrl);
+onClick("#previewFootCopyBtn", copyPreviewUrl);
+onClick("#previewReloadBtn", () => {
+  const iframe = $("#previewIframe");
+  const loader = $("#previewIframeLoader");
+  if(iframe && curPreviewItem && curPreviewItem.url){
+    if(loader) loader.classList.remove("hidden");
+    iframe.src = curPreviewItem.url;
+    toast("กำลังโหลดหน้าระบบใหม่ ⟳");
+  }
+});
 document.querySelectorAll(".overlay").forEach(o => {
   o.addEventListener("click", e => {
     if(e.target === o || e.target.closest("[data-close]")) closeOverlay(o);
