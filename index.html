@@ -348,9 +348,34 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
   font-size:clamp(13px, 1.3vw, 14.5px);
   border-radius:12px;
   font-weight:600;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
 }
-.btn-hero-admin{background:var(--surface);border:1.5px solid rgba(79,70,229,0.3);color:var(--primary)}
-.btn-hero-admin:hover{background:var(--primary-soft);border-color:var(--primary);color:var(--primary-hover)}
+.btn-hero-action.primary{
+  background: linear-gradient(135deg, var(--primary) 0%, #4338CA 100%) !important;
+  color: #fff !important;
+  border: 1.5px solid transparent !important;
+  box-shadow: 0 8px 24px rgba(79,70,229,0.35) !important;
+}
+.btn-hero-action.primary:hover{
+  box-shadow: 0 12px 30px rgba(79,70,229,0.5) !important;
+  transform: translateY(-2px);
+}
+.btn-hero-action.outline{
+  background: var(--surface) !important;
+  border: 1.5px solid rgba(79,70,229,0.3) !important;
+  color: var(--primary) !important;
+  box-shadow: 0 2px 8px rgba(15,23,42,0.04) !important;
+}
+.btn-hero-action.outline:hover{
+  background: var(--primary-soft) !important;
+  border-color: var(--primary) !important;
+  color: var(--primary-hover) !important;
+  box-shadow: 0 4px 14px rgba(79,70,229,0.18) !important;
+  transform: translateY(-2px);
+}
 
 /* Landing Bottom Area (Metrics Bar + Feature Chips + Footer) */
 .landing-bottom-bar{
@@ -1162,16 +1187,16 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
           <p class="landing-hero-sub">รวบรวมสื่อการสอน แผนการสอน ใบงาน เอกสาร และระบบออนไลน์ทั้งหมดของครูซอสไว้ในที่เดียว เพื่อการทำงานที่รวดเร็ว ทันสมัย และเข้าถึงได้ทุกที่ทุกเวลา</p>
           
           <!-- Hero Actions: 1) เข้าชมโหมดผู้ชม 2) เข้าสู่ระบบผู้ดูแล (แป้นตัวเลข) 3) ค้นหา -->
-          <div class="hero-actions">
-            <button class="btn primary" id="btnEnterHub" style="box-shadow:0 8px 24px rgba(79,70,229,0.35)">
+          <div class="hero-actions" id="heroActionsGroup">
+            <button class="btn btn-hero-action primary" id="btnEnterHub" title="คลิกเพื่อเข้าชมระบบในโหมดผู้ชม">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:18px;height:18px"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-              <span>🚀 เข้าชมคลังระบบ (โหมดผู้ชม)</span>
+              <span id="btnEnterHubTxt">🚀 เข้าชมคลังระบบ (โหมดผู้ชม)</span>
             </button>
-            <button class="btn btn-hero-admin" id="btnLoginKeypad">
+            <button class="btn btn-hero-action outline" id="btnLoginKeypad" title="คลิกเพื่อกรอกรหัส PIN เข้าสู่ระบบผู้ดูแล">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:17px;height:17px"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              <span>🔐 เข้าสู่ระบบผู้ดูแล (รหัส PIN)</span>
+              <span id="btnLoginKeypadTxt">🔐 เข้าสู่ระบบผู้ดูแล (รหัส PIN)</span>
             </button>
-            <button class="btn ghost" id="btnSpotlightHero" style="border:1px solid var(--line);border-radius:12px">
+            <button class="btn ghost btn-hero-action" id="btnSpotlightHero" style="border:1px solid var(--line);border-radius:12px" title="ค้นหาด่วน (Ctrl+K)">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
               <span>ค้นหาด่วน (Ctrl+K)</span>
             </button>
@@ -2991,10 +3016,12 @@ function handleKeypadInput(key){
           updateRoleUI();
           setTimeout(() => {
             closeOverlay($("#keypadPinOverlay"));
-            toast("เข้าสู่โหมดผู้ดูแลระบบ (ครูซอส) เรียบร้อย 🔓");
+            toast("เข้าสู่โหมดผู้ดูแลระบบ (ครูซอส) เรียบร้อย 👑");
             if(typeof keypadPendingCallback === "function"){
               keypadPendingCallback();
               keypadPendingCallback = null;
+            } else if(keypadMode === "login" || currentRoute().page === "landing"){
+              go("all");
             }
           }, 450);
         } else {
@@ -3092,6 +3119,19 @@ function lockOwnerMode(){
   toast("สลับเป็นโหมดผู้ชมทั่วไปแล้ว 🔒");
 }
 
+function setHeroActiveButton(type){
+  const bEnter = $("#btnEnterHub");
+  const bLogin = $("#btnLoginKeypad");
+  if(!bEnter || !bLogin) return;
+  if(type === "admin" || (type === "auto" && isUnlocked)){
+    bLogin.className = "btn btn-hero-action primary";
+    bEnter.className = "btn btn-hero-action outline";
+  } else {
+    bEnter.className = "btn btn-hero-action primary";
+    bLogin.className = "btn btn-hero-action outline";
+  }
+}
+
 function updateRoleUI(){
   const lockBtn = $("#ownerLockBtn");
   if(lockBtn){
@@ -3118,6 +3158,26 @@ function updateRoleUI(){
       if(roleActionTxt) roleActionTxt.textContent = "เข้าสู่ระบบผู้ดูแล";
       if(roleActionBtn) roleActionBtn.title = "คลิกเพื่อกรอกรหัส PIN ผู้ดูแลระบบ";
       if(addTopLabel) addTopLabel.textContent = "🔒 เพิ่มระบบ";
+    }
+  }
+
+  /* Sync Landing Hero Action Buttons */
+  const bEnter = $("#btnEnterHub");
+  const bLogin = $("#btnLoginKeypad");
+  const bLoginTxt = $("#btnLoginKeypadTxt");
+  const bEnterTxt = $("#btnEnterHubTxt");
+
+  if(bEnter && bLogin){
+    if(isUnlocked){
+      setHeroActiveButton("admin");
+      if(bLoginTxt) bLoginTxt.textContent = "👑 เข้าสู่คลังระบบ (โหมดผู้ดูแล)";
+      if(bEnterTxt) bEnterTxt.textContent = "👁️ เข้าชมคลังระบบ (โหมดผู้ชม)";
+      bLogin.title = "เข้าสู่ระบบในฐานะผู้ดูแลระบบ (ครูซอส)";
+    } else {
+      setHeroActiveButton("viewer");
+      if(bLoginTxt) bLoginTxt.textContent = "🔐 เข้าสู่ระบบผู้ดูแล (รหัส PIN)";
+      if(bEnterTxt) bEnterTxt.textContent = "🚀 เข้าชมคลังระบบ (โหมดผู้ชม)";
+      bLogin.title = "กรอกรหัส PIN 4 หลักเพื่อเข้าสู่ระบบผู้ดูแล";
     }
   }
 
@@ -3390,8 +3450,18 @@ function currentCatForAdd(){
 
 /* Navigation & Portal Entry Buttons */
 onClick("#brandBtn", () => go("landing"));
-onClick("#btnEnterHub", () => go("all"));
-onClick("#btnLoginKeypad", () => openKeypadModal("login"));
+onClick("#btnEnterHub", () => {
+  setHeroActiveButton("viewer");
+  go("all");
+});
+onClick("#btnLoginKeypad", () => {
+  setHeroActiveButton("admin");
+  if(isUnlocked){
+    go("all");
+  } else {
+    openKeypadModal("login", () => go("all"));
+  }
+});
 onClick("#exitToLandingBtn", () => go("landing"));
 onClick("#topExitBtn", () => go("landing"));
 
@@ -3412,7 +3482,14 @@ onClick("#bentoCardQr", () => {
   if(items.length > 0) openPreviewModal(items[0]);
   else go("all");
 });
-onClick("#bentoCardSec", () => openKeypadModal("login"));
+onClick("#bentoCardSec", () => {
+  setHeroActiveButton("admin");
+  if(isUnlocked){
+    go("all");
+  } else {
+    openKeypadModal("login", () => go("all"));
+  }
+});
 
 /* Settings PIN Management */
 onClick("#btnChangePin", () => {
@@ -3543,7 +3620,7 @@ onClick("#btnPwaInstall", async () => {
 });
 
 if("serviceWorker" in navigator){
-  navigator.serviceWorker.register("./sw.js?v=7").then(reg => {
+  navigator.serviceWorker.register("./sw.js?v=8").then(reg => {
     try{ reg.update(); }catch(_){}
   }).catch(() => {});
 }
