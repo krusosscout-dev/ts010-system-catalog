@@ -1374,6 +1374,291 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
 @keyframes spin{
   to{transform:rotate(360deg)}
 }
+
+/* ==========================================================================
+   SETTINGS MODAL REDESIGNED (สไตล์มินิมอล โมเดิร์น พอดีหน้าจอ ไร้แถบเลื่อน)
+   ========================================================================== */
+.settings-modal-card{
+  width:min(540px, 95vw);
+  background:var(--surface);
+  border-radius:22px;
+  box-shadow:0 30px 80px -20px rgba(15,23,42,0.4), 0 0 0 1px var(--line);
+  display:flex;
+  flex-direction:column;
+  max-height:calc(100vh - 48px);
+  overflow:hidden;
+}
+.settings-modal-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:16px 20px;
+  border-bottom:1px solid var(--line);
+  background:var(--surface);
+}
+.settings-title-group{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.settings-title-icon{
+  width:42px;
+  height:42px;
+  border-radius:12px;
+  background:var(--primary-soft);
+  color:var(--primary);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:20px;
+  flex-shrink:0;
+}
+.settings-main-title{
+  font-size:16.5px;
+  font-weight:700;
+  margin:0;
+  color:var(--ink);
+  line-height:1.25;
+}
+.settings-sub-meta{
+  font-size:12px;
+  color:var(--muted);
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin-top:3px;
+  flex-wrap:wrap;
+}
+.settings-meta-dot{
+  font-size:10px;
+  color:var(--muted);
+}
+.settings-cloud-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-size:11.5px;
+  font-weight:600;
+  color:var(--live);
+  background:var(--live-soft);
+  border:1px solid rgba(16,185,129,0.25);
+  padding:2px 8px;
+  border-radius:999px;
+  cursor:pointer;
+  transition:all .15s ease;
+}
+.settings-cloud-badge:hover{
+  background:var(--live);
+  color:#FFFFFF;
+}
+.cloud-status-pulse{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:var(--live);
+  box-shadow:0 0 0 0 rgba(16,185,129,0.7);
+  animation:cloudPulse 2s infinite;
+}
+.settings-cloud-badge:hover .cloud-status-pulse{
+  background:#FFFFFF;
+}
+@keyframes cloudPulse{
+  0%{box-shadow:0 0 0 0 rgba(16,185,129,0.6)}
+  70%{box-shadow:0 0 0 6px rgba(16,185,129,0)}
+  100%{box-shadow:0 0 0 0 rgba(16,185,129,0)}
+}
+.settings-modal-content{
+  padding:16px 20px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  overflow-y:auto;
+}
+.settings-modal-content::-webkit-scrollbar{
+  width:5px;
+}
+.settings-modal-content::-webkit-scrollbar-thumb{
+  background:var(--line);
+  border-radius:999px;
+}
+.settings-card-section{
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:12px 14px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.settings-section-title{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+}
+.settings-section-title .sec-emoji{
+  font-size:18px;
+  line-height:1.2;
+}
+.settings-section-title b{
+  font-size:13.5px;
+  color:var(--ink);
+  font-weight:600;
+  display:block;
+}
+.settings-section-title .sec-desc{
+  font-size:12px;
+  color:var(--muted);
+  margin:2px 0 0;
+  line-height:1.4;
+}
+.settings-text-input{
+  width:100%;
+  padding:8px 12px;
+  border:1px solid var(--line);
+  border-radius:9px;
+  background:var(--surface);
+  color:var(--ink);
+  font-size:13.5px;
+  transition:border-color .15s, box-shadow .15s;
+}
+.settings-text-input:focus{
+  border-color:var(--primary);
+  box-shadow:0 0 0 3px var(--primary-soft);
+  outline:none;
+}
+.settings-section-foot{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+}
+/* Modern Toggle Switch */
+.modern-toggle-label{
+  display:inline-flex;
+  align-items:center;
+  gap:9px;
+  cursor:pointer;
+  user-select:none;
+  font-size:12.5px;
+  font-weight:500;
+  color:var(--ink);
+}
+.modern-toggle-chk{
+  position:absolute;
+  opacity:0;
+  pointer-events:none;
+}
+.modern-toggle-slider{
+  position:relative;
+  width:36px;
+  height:20px;
+  background:var(--line);
+  border-radius:999px;
+  transition:all .2s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink:0;
+}
+.modern-toggle-slider::after{
+  content:"";
+  position:absolute;
+  top:2px;
+  left:2px;
+  width:16px;
+  height:16px;
+  background:#FFFFFF;
+  border-radius:50%;
+  box-shadow:0 1px 3px rgba(0,0,0,0.25);
+  transition:all .2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.modern-toggle-chk:checked + .modern-toggle-slider{
+  background:var(--primary);
+}
+.modern-toggle-chk:checked + .modern-toggle-slider::after{
+  transform:translateX(16px);
+}
+.settings-pin-action-row{
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+.settings-pin-btn{
+  flex:1;
+  justify-content:center;
+  background:var(--surface);
+  border:1px solid var(--line);
+  padding:7px 12px;
+  font-size:13px;
+  font-weight:600;
+  border-radius:9px;
+  box-shadow:var(--shadow-sm);
+  transition:all .15s;
+}
+.settings-pin-btn:hover{
+  border-color:var(--primary);
+  color:var(--primary);
+  background:var(--primary-soft);
+}
+.reset-pin-btn{
+  font-size:12px;
+  color:var(--muted);
+  padding:6px 10px;
+}
+.reset-pin-btn:hover{
+  color:var(--danger);
+}
+/* Collapsible Details */
+.settings-advanced-details{
+  background:transparent;
+  border:1px dashed var(--line);
+  border-radius:12px;
+  overflow:hidden;
+  transition:all .2s;
+}
+.settings-advanced-details[open]{
+  background:var(--paper);
+  border-style:solid;
+}
+.settings-advanced-summary{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:8px 12px;
+  cursor:pointer;
+  user-select:none;
+  font-size:12px;
+  font-weight:500;
+  color:var(--muted);
+  list-style:none;
+  transition:color .15s;
+}
+.settings-advanced-summary::-webkit-details-marker{
+  display:none;
+}
+.settings-advanced-summary:hover{
+  color:var(--ink);
+}
+.adv-sum-left{
+  display:flex;
+  align-items:center;
+  gap:7px;
+}
+.adv-chevron{
+  font-size:10px;
+  transition:transform .2s ease;
+}
+.settings-advanced-details[open] .adv-chevron{
+  transform:rotate(180deg);
+}
+.settings-advanced-body{
+  padding:10px 12px 12px;
+  border-top:1px solid var(--line);
+}
+.settings-modal-footer{
+  display:flex;
+  justify-content:flex-end;
+  padding:10px 20px;
+  border-top:1px solid var(--line);
+  background:var(--surface);
+}
 </style>
 </head>
 <body>
@@ -1954,56 +2239,97 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
   </div>
 </div>
 
-<!-- 4. Settings, Announcement & Backup Modal -->
+<!-- 4. Settings, Announcement & Security Modal (Redesigned: Sleek, No Scrolling, Professional) -->
 <div class="overlay" id="settingsOverlay" role="dialog" aria-modal="true" aria-labelledby="setHead">
-  <div class="modal sm">
-    <div class="modal-head">
-      <h2 id="setHead">⚙️ ตั้งค่าระบบ & ประกาศข่าวสาร</h2>
-      <button class="btn ghost icon-btn" data-close><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
-    </div>
-    <div class="modal-body">
-      <!-- Announcement Config (ฟีเจอร์ที่ 4) -->
-      <div style="margin-bottom:18px">
-        <h4 style="margin:0 0 6px;font-size:14px">📢 ข้อความประกาศหน้าแรก (Announcement Banner)</h4>
-        <input id="setAnnounceInput" placeholder="พิมพ์ข้อความประกาศ เช่น แจ้งปรับปรุงระบบ หรือเปิดตัวระบบใหม่..." style="width:100%;padding:8px 12px;border:1px solid var(--line);border-radius:8px;font-size:13px;margin-bottom:8px">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <label style="font-size:13px;display:flex;align-items:center;gap:6px;cursor:pointer">
-            <input type="checkbox" id="setAnnounceEnable"> แสดงแถบประกาศบนหน้าแรก
-          </label>
-          <button class="btn primary" id="btnSaveAnnounce" style="padding:5px 12px;font-size:12px">บันทึกประกาศ</button>
+  <div class="settings-modal-card">
+    <div class="settings-modal-header">
+      <div class="settings-title-group">
+        <div class="settings-title-icon">⚙️</div>
+        <div>
+          <h2 id="setHead" class="settings-main-title">ตั้งค่าระบบ & สิทธิ์การจัดการ</h2>
+          <div class="settings-sub-meta">
+            <span>ศูนย์ควบคุมคลังระบบ TS010</span>
+            <span class="settings-meta-dot">•</span>
+            <button type="button" class="settings-cloud-badge" id="openFbConfigBtn" title="คลิกเพื่อตรวจสอบสถานะคลาวด์">
+              <span class="cloud-status-pulse"></span> คลาวด์ออนไลน์ (Auto-sync)
+            </button>
+          </div>
         </div>
       </div>
+      <button class="btn ghost icon-btn" data-close title="ปิดหน้าต่าง"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
 
-      <div style="border-top:1px solid var(--line);padding-top:14px;margin-bottom:18px">
-        <h4 style="margin:0 0 6px;font-size:14px">☁️ Firebase Cloud Sync</h4>
-        <div style="font-size:12px;color:var(--muted);margin-bottom:10px">ซิงค์กับ Firestore (ts010-2bf5d) อัตโนมัติ</div>
-        <button class="btn" id="openFbConfigBtn" style="width:100%;justify-content:center">เชื่อมต่อ Cloud แล้ว 🟢</button>
-      </div>
+    <div class="settings-modal-content">
+      <!-- Announcement Config -->
+      <section class="settings-card-section">
+        <div class="settings-section-title">
+          <span class="sec-emoji">📢</span>
+          <div style="flex:1">
+            <b>ข้อความประกาศหน้าแรก (Announcement Banner)</b>
+            <p class="sec-desc">แสดงแถบประชาสัมพันธ์ด้านบนสุดของหน้าคลังระบบ</p>
+          </div>
+        </div>
+        
+        <div>
+          <input id="setAnnounceInput" class="settings-text-input" placeholder="พิมพ์ข้อความประกาศ เช่น ยินดีต้อนรับ หรือแจ้งปรับปรุงระบบ...">
+        </div>
 
-      <div style="border-top:1px solid var(--line);padding-top:14px;margin-bottom:18px">
-        <h4 style="margin:0 0 6px;font-size:14px">🔑 รหัสผ่านผู้ดูแลระบบ (Owner PIN)</h4>
-        <div style="font-size:12px;color:var(--muted);margin-bottom:10px">รหัส PIN 5 หลัก สำหรับล็อกการแก้ไขและลบข้อมูลในระบบ</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn" id="btnChangePin" style="flex:1;justify-content:center">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <div class="settings-section-foot">
+          <label class="modern-toggle-label">
+            <input type="checkbox" id="setAnnounceEnable" class="modern-toggle-chk">
+            <span class="modern-toggle-slider"></span>
+            <span>แสดงแถบประกาศบนหน้าแรก</span>
+          </label>
+          <button class="btn primary" id="btnSaveAnnounce" style="padding:6px 14px;font-size:12.5px;gap:6px">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            บันทึกประกาศ
+          </button>
+        </div>
+      </section>
+
+      <!-- Owner PIN Security Config -->
+      <section class="settings-card-section">
+        <div class="settings-section-title">
+          <span class="sec-emoji">🔐</span>
+          <div style="flex:1">
+            <b>รหัสผ่านผู้ดูแลระบบ (Owner PIN)</b>
+            <p class="sec-desc">รหัส PIN 5 หลัก สำหรับล็อกสิทธิ์การเพิ่ม แก้ไข และลบข้อมูลระบบ</p>
+          </div>
+        </div>
+
+        <div class="settings-pin-action-row">
+          <button class="btn settings-pin-btn" id="btnChangePin">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
             <span>เปลี่ยนรหัส PIN (เปิดแป้นตัวเลข)</span>
           </button>
-          <button class="btn ghost" id="btnResetPin" style="font-size:12px;color:var(--muted)">คืนค่าเริ่มต้น</button>
+          <button class="btn ghost reset-pin-btn" id="btnResetPin" title="รีเซ็ตเป็น 00000">คืนค่าเริ่มต้น</button>
         </div>
-      </div>
+      </section>
 
-      <div style="border-top:1px solid var(--line);padding-top:14px">
-        <h4 style="margin:0 0 6px;font-size:14px">💾 สำรองและกู้คืนไฟล์ (JSON Backup)</h4>
-        <div style="font-size:12px;color:var(--muted);margin-bottom:10px">ดาวน์โหลดฐานข้อมูลเก็บไว้ในคอมพิวเตอร์ หรือนำไฟล์กลับมาเปิด</div>
-        <div style="display:flex;gap:8px">
-          <button class="btn" id="exportBtn" style="flex:1;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v3h16v-3"/></svg>สำรอง JSON</button>
-          <button class="btn" id="importBtn" style="flex:1;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V3m0 0L8 7m4-4 4 4M4 17v3h16v-3"/></svg>นำเข้า JSON</button>
-          <input type="file" id="importFileInput" accept=".json,application/json" hidden>
+      <!-- Advanced Emergency Tools (Collapsible - Zero scrollbar, 100% compact) -->
+      <details class="settings-advanced-details">
+        <summary class="settings-advanced-summary">
+          <div class="adv-sum-left">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span>เครื่องมือสำรองข้อมูลฉุกเฉิน (Offline JSON)</span>
+          </div>
+          <span class="adv-chevron">▼</span>
+        </summary>
+        <div class="settings-advanced-body">
+          <p style="font-size:11.5px;color:var(--muted);margin:0 0 8px;line-height:1.5">
+            * ฐานข้อมูลซิงค์และบันทึกลงระบบ Cloud Firestore อัตโนมัติอยู่แล้ว ปุ่มนี้มีไว้สำหรับดึงไฟล์สำรองฉุกเฉินภายนอกเท่านั้น
+          </p>
+          <div style="display:flex;gap:8px">
+            <button class="btn" id="exportBtn" style="flex:1;justify-content:center;font-size:12px;padding:6px 10px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v3h16v-3"/></svg>สำรอง JSON</button>
+            <button class="btn" id="importBtn" style="flex:1;justify-content:center;font-size:12px;padding:6px 10px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px"><path d="M12 15V3m0 0L8 7m4-4 4 4M4 17v3h16v-3"/></svg>นำเข้า JSON</button>
+            <input type="file" id="importFileInput" accept=".json,application/json" hidden>
+          </div>
         </div>
-      </div>
+      </details>
     </div>
-    <div class="modal-foot">
-      <button class="btn ghost" data-close>ปิด</button>
+
+    <div class="settings-modal-footer">
+      <button class="btn ghost" data-close style="min-width:80px">ปิด</button>
     </div>
   </div>
 </div>
@@ -2410,6 +2736,11 @@ function autoShotFallback(u){
   const norm = normUrl(u);
   if(!norm) return "";
   return "https://api.microlink.io/?url=" + encodeURIComponent(norm) + "&screenshot=true&meta=false&embed=screenshot.url";
+}
+
+function catOf(it){
+  if(!it) return null;
+  return cats.find(c => c.id === it.cat || c.id === it.catId) || null;
 }
 
 function imgOf(it){
@@ -4082,11 +4413,16 @@ onClick("#btnSaveAnnounce", () => {
 
 /* Sidebar Controls */
 onClick("#manageCatsBtn", () => requireOwner(openCatManager));
-onClick("#sideSettingsBtn", () => requireOwner(() => openOverlay($("#settingsOverlay"))));
-onClick("#sideSyncPill", () => requireOwner(() => openOverlay($("#settingsOverlay"))));
+onClick("#sideSettingsBtn", () => requireOwner(() => {
+  applyAnnouncementUI();
+  openOverlay($("#settingsOverlay"));
+}));
+onClick("#sideSyncPill", () => requireOwner(() => {
+  applyAnnouncementUI();
+  openOverlay($("#settingsOverlay"));
+}));
 onClick("#openFbConfigBtn", () => {
-  closeOverlay($("#settingsOverlay"));
-  toast("เชื่อมต่อกับ ts010-2bf5d อัตโนมัติแล้ว 🟢");
+  toast("ระบบฝังเชื่อมต่อกับ Cloud Firestore (ts010-2bf5d) อัตโนมัติแล้ว 🟢");
 });
 
 /* Export & Import */
