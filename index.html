@@ -654,11 +654,12 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
 .cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:20px}
 .sys-card{background:var(--surface);border-radius:16px;border:1px solid var(--line);box-shadow:var(--shadow-sm);overflow:hidden;display:flex;flex-direction:column;transition:all .18s ease}
 .sys-card:hover{border-color:var(--primary);transform:translateY(-2px);box-shadow:var(--shadow)}
-.card-shot{position:relative;aspect-ratio:16/9;background:var(--off-soft);overflow:hidden;cursor:pointer;border-bottom:1px solid var(--line)}
+.card-shot{position:relative;aspect-ratio:16/9.5;background:var(--off-soft);overflow:hidden;cursor:pointer;border-bottom:1px solid var(--line)}
 .card-shot .bar{position:absolute;inset:0 0 auto 0;height:22px;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:5px;padding:0 9px;z-index:2}
 .card-shot .bar i{width:6px;height:6px;border-radius:50%;background:var(--line)}
 .card-shot .bar span{margin-left:6px;font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.card-shot img{position:absolute;top:22px;left:0;width:100%;height:calc(100% - 22px);object-fit:cover;object-position:top}
+.card-shot img{position:absolute;top:22px;left:0;width:100%;height:calc(100% - 22px);object-fit:cover;object-position:center 30%;transition:transform .2s ease}
+.card-shot:hover img{transform:scale(1.02)}
 .card-shot .ph{position:absolute;top:22px;left:0;right:0;bottom:0;display:grid;place-items:center;font-size:46px;font-weight:700;color:var(--primary);background:var(--primary-soft)}
 .card-shot .peek{position:absolute;inset:auto 10px 10px auto;z-index:3;background:rgba(15,23,42,0.85);color:#fff;font-size:11px;padding:3px 8px;border-radius:6px;opacity:0;transition:opacity .15s}
 .card-shot:hover .peek{opacity:1}
@@ -1677,6 +1678,7 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
     <!-- Main Navigation Sections -->
     <div class="nav-section-title"><span>เมนูหลัก</span></div>
     <nav class="nav-list">
+      <a href="#dashboard" class="nav-item" id="navDashboard"><span class="icon">📊</span><span>หน้าแรก (สถิติรวม)</span></a>
       <a href="#all" class="nav-item" id="navAll"><span class="icon">📦</span><span>ระบบทั้งหมด</span><span class="count" id="countAll">0</span></a>
       <a href="#live" class="nav-item" id="navLive"><span class="icon">🟢</span><span>พร้อมใช้งานจริง</span><span class="count" id="countLive">0</span></a>
       <a href="#dev" class="nav-item" id="navDev"><span class="icon">🛠️</span><span>ห้องทดลอง / พัฒนา</span><span class="count" id="countDev">0</span></a>
@@ -1894,87 +1896,90 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
           <button class="announce-close" id="closeAnnounceBtn" title="ปิดการแจ้งเตือน">✕</button>
         </div>
 
-        <!-- 4 KPI Bento Stats (ภาพรวมสถิติคลังระบบ) -->
-        <div class="kpi-row" style="margin-bottom:20px">
-          <div class="kpi-card">
-            <div class="kpi-icon" style="background:var(--primary-soft);color:var(--primary)">📊</div>
-            <div class="kpi-val" id="kpiTotal">0</div>
-            <div class="kpi-title">ระบบทั้งหมดในคลัง</div>
+        <!-- Container สำหรับข้อมูลสถิติ ภาพรวม และระบบยอดนิยม (แสดงเฉพาะหน้า Dashboard) -->
+        <div id="catalogStatsSection" style="display:none">
+          <!-- 4 KPI Bento Stats (ภาพรวมสถิติคลังระบบ) -->
+          <div class="kpi-row" style="margin-bottom:20px">
+            <div class="kpi-card">
+              <div class="kpi-icon" style="background:var(--primary-soft);color:var(--primary)">📊</div>
+              <div class="kpi-val" id="kpiTotal">0</div>
+              <div class="kpi-title">ระบบทั้งหมดในคลัง</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-icon" style="background:var(--live-soft);color:var(--live)">🟢</div>
+              <div class="kpi-val" id="kpiLive">0</div>
+              <div class="kpi-title">พร้อมใช้งานจริง (Live)</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-icon" style="background:var(--dev-soft);color:var(--dev)">🛠️</div>
+              <div class="kpi-val" id="kpiDev">0</div>
+              <div class="kpi-title">ห้องทดลอง / กำลังพัฒนา</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-icon" style="background:var(--surface);border:1px solid var(--line)">🗂️</div>
+              <div class="kpi-val" id="kpiCats">0</div>
+              <div class="kpi-title">ด้านงานที่ดูแล</div>
+            </div>
           </div>
-          <div class="kpi-card">
-            <div class="kpi-icon" style="background:var(--live-soft);color:var(--live)">🟢</div>
-            <div class="kpi-val" id="kpiLive">0</div>
-            <div class="kpi-title">พร้อมใช้งานจริง (Live)</div>
+
+          <!-- Visual Analytics Section (สถิติ กราฟเส้น และแผนภูมิวงกลมมาตรฐานสากล) -->
+          <div class="analytics-grid">
+            <!-- Area Line Chart Card -->
+            <div class="chart-card">
+              <div class="chart-card-head">
+                <div>
+                  <h3>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;color:var(--primary)"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+                    <span>สถิติการใช้งาน & แนวโน้มระบบ</span>
+                  </h3>
+                  <div style="font-size:12px;color:var(--muted);margin-top:2px">แนวโน้มการเข้าใช้งานระบบและแอปพลิเคชันสะสม</div>
+                </div>
+                <div style="text-align:right">
+                  <span class="badge badge-primary" style="font-size:11px">Real-time Activity</span>
+                  <div style="font-size:11px;color:var(--muted);margin-top:2px">คลิกรวม: <b id="chartTotalClicks" style="color:var(--primary)">0</b> ครั้ง</div>
+                </div>
+              </div>
+              <div id="lineChartBox" style="min-height:160px;margin-top:6px"></div>
+            </div>
+
+            <!-- Donut Distribution Card -->
+            <div class="chart-card">
+              <div class="chart-card-head">
+                <div>
+                  <h3>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;color:var(--accent)"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+                    <span>สัดส่วนระบบตามหมวดหมู่งาน</span>
+                  </h3>
+                  <div style="font-size:12px;color:var(--muted);margin-top:2px">จำแนกตามภารกิจและการปฏิบัติงาน</div>
+                </div>
+                <span class="badge badge-live" id="readinessRate">100% พร้อมใช้</span>
+              </div>
+
+              <div class="donut-box">
+                <svg viewBox="0 0 36 36" class="donut-svg" id="donutSvg"></svg>
+                <div class="donut-legend" id="donutLegend"></div>
+              </div>
+
+              <!-- Readiness Meter -->
+              <div class="status-meter" style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)">
+                <div class="meter-label" style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:5px">
+                  <span style="color:var(--live);display:flex;align-items:center;gap:4px">● พร้อมใช้: <b id="meterLiveTxt">0 ระบบ</b></span>
+                  <span style="color:var(--dev);display:flex;align-items:center;gap:4px">● พัฒนา: <b id="meterDevTxt">0 ระบบ</b></span>
+                </div>
+                <div class="meter-bar" style="height:8px;border-radius:999px;background:var(--line);overflow:hidden;display:flex">
+                  <div id="barLive" class="meter-seg" style="background:var(--live);width:100%;transition:width .3s"></div>
+                  <div id="barDev" class="meter-seg" style="background:var(--dev);width:0%;transition:width .3s"></div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="kpi-card">
-            <div class="kpi-icon" style="background:var(--dev-soft);color:var(--dev)">🛠️</div>
-            <div class="kpi-val" id="kpiDev">0</div>
-            <div class="kpi-title">ห้องทดลอง / กำลังพัฒนา</div>
+
+          <!-- Trending Section (ฟีเจอร์ที่ 1: ระบบยอดนิยม) -->
+          <div class="section-head" id="trendingHead" style="display:none;margin:20px 0 12px">
+            <h2 style="font-size:16px;font-weight:600;display:flex;align-items:center;gap:8px">🔥 ระบบยอดนิยมที่มีการเข้าใช้งานสูงสุด</h2>
           </div>
-          <div class="kpi-card">
-            <div class="kpi-icon" style="background:var(--surface);border:1px solid var(--line)">🗂️</div>
-            <div class="kpi-val" id="kpiCats">0</div>
-            <div class="kpi-title">ด้านงานที่ดูแล</div>
-          </div>
+          <div class="dock-grid" id="trendingGrid" style="display:none;margin-bottom:24px"></div>
         </div>
-
-        <!-- Visual Analytics Section (สถิติ กราฟเส้น และแผนภูมิวงกลมมาตรฐานสากล) -->
-        <div class="analytics-grid">
-          <!-- Area Line Chart Card -->
-          <div class="chart-card">
-            <div class="chart-card-head">
-              <div>
-                <h3>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;color:var(--primary)"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
-                  <span>สถิติการใช้งาน & แนวโน้มระบบ</span>
-                </h3>
-                <div style="font-size:12px;color:var(--muted);margin-top:2px">แนวโน้มการเข้าใช้งานระบบและแอปพลิเคชันสะสม</div>
-              </div>
-              <div style="text-align:right">
-                <span class="badge badge-primary" style="font-size:11px">Real-time Activity</span>
-                <div style="font-size:11px;color:var(--muted);margin-top:2px">คลิกรวม: <b id="chartTotalClicks" style="color:var(--primary)">0</b> ครั้ง</div>
-              </div>
-            </div>
-            <div id="lineChartBox" style="min-height:160px;margin-top:6px"></div>
-          </div>
-
-          <!-- Donut Distribution Card -->
-          <div class="chart-card">
-            <div class="chart-card-head">
-              <div>
-                <h3>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;color:var(--accent)"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
-                  <span>สัดส่วนระบบตามหมวดหมู่งาน</span>
-                </h3>
-                <div style="font-size:12px;color:var(--muted);margin-top:2px">จำแนกตามภารกิจและการปฏิบัติงาน</div>
-              </div>
-              <span class="badge badge-live" id="readinessRate">100% พร้อมใช้</span>
-            </div>
-
-            <div class="donut-box">
-              <svg viewBox="0 0 36 36" class="donut-svg" id="donutSvg"></svg>
-              <div class="donut-legend" id="donutLegend"></div>
-            </div>
-
-            <!-- Readiness Meter -->
-            <div class="status-meter" style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)">
-              <div class="meter-label" style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:5px">
-                <span style="color:var(--live);display:flex;align-items:center;gap:4px">● พร้อมใช้: <b id="meterLiveTxt">0 ระบบ</b></span>
-                <span style="color:var(--dev);display:flex;align-items:center;gap:4px">● พัฒนา: <b id="meterDevTxt">0 ระบบ</b></span>
-              </div>
-              <div class="meter-bar" style="height:8px;border-radius:999px;background:var(--line);overflow:hidden;display:flex">
-                <div id="barLive" class="meter-seg" style="background:var(--live);width:100%;transition:width .3s"></div>
-                <div id="barDev" class="meter-seg" style="background:var(--dev);width:0%;transition:width .3s"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Trending Section (ฟีเจอร์ที่ 1: ระบบยอดนิยม) -->
-        <div class="section-head" id="trendingHead" style="display:none;margin:20px 0 12px">
-          <h2 style="font-size:16px;font-weight:600;display:flex;align-items:center;gap:8px">🔥 ระบบยอดนิยมที่มีการเข้าใช้งานสูงสุด</h2>
-        </div>
-        <div class="dock-grid" id="trendingGrid" style="display:none;margin-bottom:24px"></div>
 
         <!-- Filter & Search Toolbar -->
         <div class="toolbar-bar">
@@ -1997,10 +2002,10 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
 
     <!-- Mobile Bottom Navigation (เมนูไอคอนด้านล่าง เลื่อนหาเมนูได้ สมส่วนทุกหน้าจอ) -->
     <nav class="bottom-nav" id="bottomNav">
-      <button type="button" class="b-nav-item" id="bNavLanding" title="กลับสู่หน้าแรก">
-        <span class="b-icon">🏠</span>
+      <a href="#dashboard" class="b-nav-item" id="bNavDashboard" title="ภาพรวมสถิติ">
+        <span class="b-icon">📊</span>
         <span class="b-label">หน้าแรก</span>
-      </button>
+      </a>
       <a href="#all" class="b-nav-item active" id="bNavAll" title="ดูระบบทั้งหมด">
         <span class="b-icon">📦</span>
         <span class="b-label">ทั้งหมด</span>
@@ -2128,16 +2133,8 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
     </div>
     <div class="modal-body">
       <div class="f-grid">
-        <div class="f-field full">
-          <label for="f_name">ชื่อระบบ <span class="req">*</span></label>
-          <input id="f_name" placeholder="เช่น ระบบคลังสื่อการสอนครูซอส">
-        </div>
-        <div class="f-field full">
-          <label for="f_url">ลิงก์ใช้งานจริง (URL) <span class="req">*</span></label>
-          <input id="f_url" type="url" placeholder="https://...">
-        </div>
         <div class="f-field">
-          <label for="f_cat">ด้าน / หมวดหมู่</label>
+          <label for="f_cat">ด้าน / หมวดหมู่ <span class="req">*</span></label>
           <select id="f_cat"></select>
         </div>
         <div class="f-field">
@@ -2147,6 +2144,44 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
             <option value="dev">ห้องทดลอง / กำลังพัฒนา (Dev Lab)</option>
             <option value="off">ปิดปรับปรุงชั่วคราว</option>
           </select>
+        </div>
+
+        <!-- ฟีเจอร์ออกหมายเลขสื่อและตั้งชื่ออัตโนมัติ -->
+        <div class="f-field full" style="background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:12px 14px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px">
+            <label style="font-size:13px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:6px">
+              <span>🏷️ ระบบออกหมายเลขสื่ออัตโนมัติ (Media Code & Numbering)</span>
+            </label>
+            <button type="button" class="btn ghost" id="btnGenMediaCode" style="font-size:12px;padding:4px 10px;height:28px;gap:5px;color:var(--primary);border:1px solid var(--line)" title="ออกหมายเลขลำดับถัดไปตามหมวดหมู่ที่เลือก">
+              <span>⚡ ออกรหัสตามหมวด</span>
+            </button>
+          </div>
+          
+          <div style="display:grid;grid-template-columns:100px 1fr auto;gap:8px;align-items:center">
+            <div>
+              <input id="f_media_code" placeholder="เช่น TS01" style="width:100%;font-weight:700;letter-spacing:0.5px;text-align:center;color:var(--primary);background:var(--surface);font-size:14px" title="รหัสสื่อตามหมวดหมู่">
+            </div>
+            <div>
+              <input id="f_media_title" placeholder="พิมพ์ชื่อสื่อ (เช่น ไทม์แมชชีนกาลเวลา)" style="width:100%;font-size:14px">
+            </div>
+            <button type="button" class="btn primary" id="btnApplyMediaCode" style="font-size:12px;padding:7px 12px;white-space:nowrap" title="นำรหัสและชื่อไปรวมเป็นชื่อระบบอัตโนมัติ">
+              ✨ ผสานชื่อสื่อ
+            </button>
+          </div>
+          
+          <div style="font-size:12px;color:var(--muted);margin-top:6px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px">
+            <span>ตัวอย่างชื่อระบบ: <b id="previewMediaName" style="color:var(--primary)">TS01_ชื่อสื่อ</b></span>
+            <span id="previewCatCodeHint" style="color:var(--muted);font-size:11.5px">หมวดหมู่: สื่อการสอน (TS)</span>
+          </div>
+        </div>
+
+        <div class="f-field full">
+          <label for="f_name">ชื่อระบบที่จะแสดงผล <span class="req">*</span></label>
+          <input id="f_name" placeholder="เช่น TS01_ไทม์แมชชีนกาลเวลา">
+        </div>
+        <div class="f-field full">
+          <label for="f_url">ลิงก์ใช้งานจริง (URL) <span class="req">*</span></label>
+          <input id="f_url" type="url" placeholder="https://...">
         </div>
         <div class="f-field full">
           <label for="f_short">คำอธิบายสั้น (1 บรรทัด)</label>
@@ -2488,7 +2523,6 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
     <div class="modal-foot" style="display:flex;gap:10px;justify-content:space-between;align-items:center;padding:10px 18px">
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn" id="previewQrBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>ป้าย QR Code</button>
-        <button class="btn ghost" id="previewFootCopyBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>คัดลอกลิงก์</button>
         <button class="btn ghost" data-close>ปิด</button>
       </div>
       <a class="btn primary" id="previewLaunchBtn" href="#" target="_blank" rel="noopener" style="padding:8px 18px;font-weight:600">
@@ -2728,14 +2762,14 @@ function autoShot(u){
   if(!u) return "";
   const norm = normUrl(u);
   if(!norm) return "";
-  return "https://image.thum.io/get/width/800/crop/600/" + norm;
+  return "https://image.thum.io/get/width/1200/crop/675/" + norm;
 }
 
 function autoShotFallback(u){
   if(!u) return "";
   const norm = normUrl(u);
   if(!norm) return "";
-  return "https://api.microlink.io/?url=" + encodeURIComponent(norm) + "&screenshot=true&meta=false&embed=screenshot.url";
+  return "https://api.microlink.io/?url=" + encodeURIComponent(norm) + "&screenshot=true&meta=false&embed=screenshot.url&viewport.width=1200&viewport.height=675";
 }
 
 function catOf(it){
@@ -2786,6 +2820,7 @@ async function copyText(text, msg){
 function currentRoute(){
   const h = decodeURIComponent(location.hash.slice(1) || "landing");
   if(h === "landing") return { page:"landing" };
+  if(h === "dashboard" || h === "stats") return { page:"catalog", sub:"dashboard" };
   if(h === "all") return { page:"catalog", sub:"all" };
   if(h === "live") return { page:"catalog", sub:"live" };
   if(h === "dev") return { page:"catalog", sub:"dev" };
@@ -2825,7 +2860,7 @@ function renderAll(){
   updateRoleUI();
   renderNav();
   if(!isLanding){
-    renderAnalytics();
+    if(r.sub === "dashboard") renderAnalytics();
     renderCatalogView(r);
   }
 }
@@ -2841,11 +2876,13 @@ function renderNav(){
   if($("#countDev")) $("#countDev").textContent = devCount;
 
   if($("#navLanding")) $("#navLanding").classList.toggle("active", r.page === "landing");
+  if($("#navDashboard")) $("#navDashboard").classList.toggle("active", r.page === "catalog" && r.sub === "dashboard");
   if($("#navAll")) $("#navAll").classList.toggle("active", r.page === "catalog" && r.sub === "all");
   if($("#navLive")) $("#navLive").classList.toggle("active", r.page === "catalog" && r.sub === "live");
   if($("#navDev")) $("#navDev").classList.toggle("active", r.page === "catalog" && r.sub === "dev");
 
   /* Sync Mobile Bottom Nav */
+  if($("#bNavDashboard")) $("#bNavDashboard").classList.toggle("active", r.page === "catalog" && r.sub === "dashboard");
   if($("#bNavAll")) $("#bNavAll").classList.toggle("active", r.page === "catalog" && r.sub === "all");
   if($("#bNavLive")) $("#bNavLive").classList.toggle("active", r.page === "catalog" && r.sub === "live");
   if($("#bNavDev")) $("#bNavDev").classList.toggle("active", r.page === "catalog" && r.sub === "dev");
@@ -3093,11 +3130,16 @@ updateClock();
 
 /* ---------- Catalog Dashboard View ---------- */
 function renderCatalogView(route){
+  const isDashboard = route.sub === "dashboard";
   let icon = "📦";
   let title = "ระบบทั้งหมด";
   let sub = "ระบบงาน สื่อการสอน และนวัตกรรมดิจิทัลทั้งหมด";
 
-  if(route.sub === "live"){
+  if(isDashboard){
+    icon = "📊";
+    title = "หน้าแรก (ภาพรวมสถิติ & แดชบอร์ด)";
+    sub = "สรุปข้อมูลสถิติ สัดส่วนการใช้งาน และแนวโน้มระบบดิจิทัลของครูซอส";
+  } else if(route.sub === "live"){
     icon = "🟢";
     title = "ระบบที่พร้อมใช้งานจริง";
     sub = "เฉพาะระบบที่เปิดใช้งานแล้วและพร้อมให้บริการแก่ทุกคน";
@@ -3117,6 +3159,10 @@ function renderCatalogView(route){
   $("#catPageTitle").textContent = title;
   $("#catPageSub").textContent = sub;
 
+  // ควบคุมการแสดงผลส่วนสถิติ: แสดงเฉพาะหน้าแรก (Dashboard) เท่านั้น หากเข้าเมนูอื่นจะซ่อนไว้เพื่อแสดงระบบทันที
+  const statsBox = $("#catalogStatsSection");
+  if(statsBox) statsBox.style.display = isDashboard ? "block" : "none";
+
   if(route.sub === "live") currentTab = "live";
   else if(route.sub === "dev") currentTab = "dev";
   else currentTab = "all";
@@ -3132,7 +3178,7 @@ function renderCatalogView(route){
   if($("#tabCountDev")) $("#tabCountDev").textContent = devCount;
 
   updateRoleUI();
-  renderTrendingDock();
+  if(isDashboard) renderTrendingDock();
   drawCards();
 }
 
@@ -3175,6 +3221,8 @@ function drawCards(){
 
 function cardHTML(it){
   const c = catOf(it);
+  const codeMatch = (it.name || "").match(/^([A-Za-z]{2,5}\d{1,4})([_ -]|$)/);
+  const mediaCode = codeMatch ? codeMatch[1].toUpperCase() : null;
   return `
   <article class="sys-card" data-id="${it.id}">
     <div class="card-shot" tabindex="0" role="button" data-act="preview" title="คลิกเพื่อดูตัวอย่างระบบ">
@@ -3183,6 +3231,7 @@ function cardHTML(it){
     </div>
     <div class="card-content">
       <div class="card-meta">
+        ${mediaCode ? `<span class="badge" style="background:var(--primary-soft);color:var(--primary);font-weight:700">🏷️ ${esc(mediaCode)}</span>` : ""}
         <span class="badge badge-${it.status}">${STATUS_LABELS[it.status]||""}</span>
         ${c ? `<span class="badge badge-primary">${esc(c.icon||"")} ${esc(c.name)}</span>` : ""}
         ${it.version ? `<span class="tag-chip" style="font-weight:600">${esc(it.version)}</span>` : ""}
@@ -3289,10 +3338,13 @@ function openDetail(it){
   $("#dTitle").textContent = it.name;
   const c = catOf(it);
   const src = imgOf(it);
+  const codeMatch = (it.name || "").match(/^([A-Za-z]{2,5}\d{1,4})([_ -]|$)/);
+  const mediaCode = codeMatch ? codeMatch[1].toUpperCase() : null;
 
   let h = `
     ${src ? `<div class="d-shot"><img src="${esc(src)}" alt="${esc(it.name)}" onerror="this.parentNode.remove()"></div>` : ""}
     <div class="card-meta">
+      ${mediaCode ? `<span class="badge" style="background:var(--primary-soft);color:var(--primary);font-weight:700">🏷️ รหัส ${esc(mediaCode)}</span>` : ""}
       <span class="badge badge-${it.status}">${STATUS_LABELS[it.status]}</span>
       ${c ? `<span class="badge badge-primary">${esc(c.icon||"")} ${esc(c.name)}</span>` : ""}
       ${it.version ? `<span class="tag-chip" style="font-weight:600">เวอร์ชัน ${esc(it.version)}</span>` : ""}
@@ -3439,14 +3491,114 @@ document.addEventListener("paste", e => {
   if(f){ setImgMode("upload"); readImage(f); }
 });
 
+/* ---------- Auto Media Code & Auto Numbering ---------- */
+function getCategoryCodePrefix(catId){
+  const c = cats.find(x => x.id === catId);
+  if(!c) return "TS";
+  const name = (c.name || "").trim();
+  if(name.includes("สื่อ")) return "TS";      // สื่อการสอน (Teaching Sauce / Teaching Social)
+  if(name.includes("แผน")) return "TP";      // แผนการสอน (Teaching Plan)
+  if(name.includes("ใบงาน") || name.includes("แบบฝึก")) return "WS"; // ใบงาน (Worksheet)
+  if(name.includes("เอกสาร") || name.includes("คู่มือ")) return "DOC"; // เอกสาร (Document)
+  if(name.includes("อำนวยการ")) return "AS"; // ระบบอำนวยการ (Admin System)
+  if(name.includes("ประเมิน")) return "ES";  // ระบบประเมินผล (Eval System)
+  
+  const en = name.match(/[A-Za-z]+/);
+  if(en) return en[0].toUpperCase().slice(0, 3);
+  return "TS";
+}
+
+function calculateNextMediaCode(catId){
+  const prefix = getCategoryCodePrefix(catId);
+  let maxNum = 0;
+  items.forEach(it => {
+    const raw = (it.name || "").trim();
+    const reg = new RegExp(`^${prefix}[-_]?(\\d+)`, "i");
+    const m = raw.match(reg);
+    if(m){
+      const val = parseInt(m[1], 10);
+      if(!isNaN(val) && val > maxNum) maxNum = val;
+    } else if(it.cat === catId){
+      const m2 = raw.match(/^[A-Za-z]{1,4}[-_]?(\d+)/);
+      if(m2){
+        const val = parseInt(m2[1], 10);
+        if(!isNaN(val) && val > maxNum) maxNum = val;
+      }
+    }
+  });
+  const nextNum = maxNum + 1;
+  const numStr = nextNum < 10 ? `0${nextNum}` : `${nextNum}`;
+  return `${prefix}${numStr}`;
+}
+
+function updateMediaCodeUI(catId){
+  const code = calculateNextMediaCode(catId);
+  const codeInp = $("#f_media_code");
+  if(codeInp) codeInp.value = code;
+  const c = cats.find(x => x.id === catId);
+  const prefix = getCategoryCodePrefix(catId);
+  const hintEl = $("#previewCatCodeHint");
+  if(hintEl) hintEl.textContent = `หมวดหมู่: ${c ? c.name : 'ทั่วไป'} (${prefix})`;
+  syncMediaNameCombined();
+}
+
+function syncMediaNameCombined(){
+  const code = ($("#f_media_code")?.value || "").trim();
+  const title = ($("#f_media_title")?.value || "").trim();
+  let combined = "";
+  if(code && title) combined = `${code}_${title}`;
+  else if(code) combined = `${code}_`;
+  else combined = title;
+
+  const previewEl = $("#previewMediaName");
+  if(previewEl) previewEl.textContent = combined || "TS01_ชื่อสื่อ";
+  
+  const nameInp = $("#f_name");
+  if(nameInp){
+    nameInp.value = combined;
+  }
+  return combined;
+}
+
 function openForm(it, presetCat){
   editingId = it ? it.id : null;
   $("#fTitle").textContent = it ? "แก้ไขระบบ" : "เพิ่มระบบใหม่";
   $("#saveSystemBtn").textContent = it ? "บันทึกการแก้ไข" : "บันทึกระบบ";
 
-  $("#f_name").value = it?.name || "";
+  const targetCat = it ? it.cat : (presetCat || (cats[0]?.id || ""));
+  fillCatSelect(targetCat);
+
+  if(it){
+    // Parse existing code and title
+    const raw = (it.name || "").trim();
+    const parts = raw.split("_");
+    if(parts.length >= 2){
+      $("#f_media_code").value = parts[0];
+      $("#f_media_title").value = parts.slice(1).join("_");
+    } else {
+      const match = raw.match(/^([A-Za-z]{2,5}\d{1,4})/);
+      if(match){
+        $("#f_media_code").value = match[1];
+        $("#f_media_title").value = raw.slice(match[1].length).replace(/^[-_ ]/, "");
+      } else {
+        $("#f_media_code").value = calculateNextMediaCode(targetCat);
+        $("#f_media_title").value = raw;
+      }
+    }
+    const c = cats.find(x => x.id === targetCat);
+    const prefix = getCategoryCodePrefix(targetCat);
+    if($("#previewCatCodeHint")) $("#previewCatCodeHint").textContent = `หมวดหมู่: ${c ? c.name : 'ทั่วไป'} (${prefix})`;
+    $("#f_name").value = it.name || "";
+    if($("#previewMediaName")) $("#previewMediaName").textContent = it.name || "TS01_ชื่อสื่อ";
+  } else {
+    // New item: automatically generate code!
+    updateMediaCodeUI(targetCat);
+    $("#f_media_title").value = "";
+    $("#f_name").value = "";
+    syncMediaNameCombined();
+  }
+
   $("#f_url").value = it?.url || "";
-  fillCatSelect(it ? it.cat : (presetCat || ""));
   $("#f_status").value = it?.status || "live";
   $("#f_short").value = it?.short || "";
   $("#f_detail").value = it?.detail || "";
@@ -3466,7 +3618,10 @@ function openForm(it, presetCat){
   setImgMode(it?.imgMode || defaultMode);
 
   openOverlay($("#formOverlay"));
-  setTimeout(() => $("#f_name").focus(), 40);
+  setTimeout(() => {
+    if(!it && $("#f_media_title")) $("#f_media_title").focus();
+    else $("#f_name").focus();
+  }, 40);
 }
 
 $("#saveSystemBtn").onclick = () => {
@@ -3513,6 +3668,41 @@ $("#saveSystemBtn").onclick = () => {
   renderAll();
   closeOverlay($("#formOverlay"));
 };
+
+/* ---------- Auto Media Code Event Listeners ---------- */
+$("#f_cat")?.addEventListener("change", e => {
+  const catId = e.target.value;
+  if(!editingId){
+    updateMediaCodeUI(catId);
+  } else {
+    const c = cats.find(x => x.id === catId);
+    const prefix = getCategoryCodePrefix(catId);
+    if($("#previewCatCodeHint")) $("#previewCatCodeHint").textContent = `หมวดหมู่: ${c ? c.name : 'ทั่วไป'} (${prefix})`;
+  }
+});
+
+onClick("#btnGenMediaCode", () => {
+  const catId = $("#f_cat")?.value || "";
+  updateMediaCodeUI(catId);
+  toast("สร้างรหัสสื่อลำดับถัดไปเรียบร้อย");
+});
+
+onClick("#btnApplyMediaCode", () => {
+  const combined = syncMediaNameCombined();
+  toast(combined ? `ผสานชื่อเป็น "${combined}" เรียบร้อย` : "กรุณาระบุรหัสหรือชื่อสื่อ");
+});
+
+$("#f_media_code")?.addEventListener("input", () => {
+  syncMediaNameCombined();
+});
+
+$("#f_media_title")?.addEventListener("input", () => {
+  syncMediaNameCombined();
+});
+
+$("#f_name")?.addEventListener("input", e => {
+  if($("#previewMediaName")) $("#previewMediaName").textContent = e.target.value || "TS01_ชื่อสื่อ";
+});
 
 /* ---------- Category Manager ---------- */
 let catDraft = [];
@@ -3636,8 +3826,12 @@ function openPreviewModal(it){
       if(loader) loader.classList.add("hidden");
     }, 4500);
   }
-    
+
+  const codeMatch = (it.name || "").match(/^([A-Za-z]{2,5}\d{1,4})([_ -]|$)/);
+  const mediaCode = codeMatch ? codeMatch[1].toUpperCase() : null;
+
   let badgesHtml = `
+    ${mediaCode ? `<span class="badge" style="background:var(--primary-soft);color:var(--primary);font-weight:700">🏷️ รหัส ${esc(mediaCode)}</span>` : ""}
     <span class="badge badge-${it.status}">${STATUS_LABELS[it.status]||""}</span>
     ${c ? `<span class="badge badge-primary">${esc(c.icon||"")} ${esc(c.name)}</span>` : ""}
     ${it.version ? `<span class="tag-chip" style="font-weight:600">เวอร์ชัน ${esc(it.version)}</span>` : ""}
