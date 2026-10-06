@@ -658,7 +658,7 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
 .card-shot .bar{position:absolute;inset:0 0 auto 0;height:22px;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:5px;padding:0 9px;z-index:2}
 .card-shot .bar i{width:6px;height:6px;border-radius:50%;background:var(--line)}
 .card-shot .bar span{margin-left:6px;font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.card-shot img{position:absolute;top:22px;left:0;width:100%;height:calc(100% - 22px);object-fit:cover;object-position:center 30%;transition:transform .2s ease}
+.card-shot img{position:absolute;top:22px;left:0;width:100%;height:calc(100% - 22px);object-fit:cover;object-position:center center;transition:transform .2s ease}
 .card-shot:hover img{transform:scale(1.02)}
 .card-shot .ph{position:absolute;top:22px;left:0;right:0;bottom:0;display:grid;place-items:center;font-size:46px;font-weight:700;color:var(--primary);background:var(--primary-soft)}
 .card-shot .peek{position:absolute;inset:auto 10px 10px auto;z-index:3;background:rgba(15,23,42,0.85);color:#fff;font-size:11px;padding:3px 8px;border-radius:6px;opacity:0;transition:opacity .15s}
@@ -849,7 +849,7 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
 .req{color:var(--danger)}
 
 .d-shot{border-radius:12px;overflow:hidden;border:1px solid var(--line);margin-bottom:14px}
-.d-shot img{width:100%;max-height:340px;object-fit:cover;object-position:top}
+.d-shot img{width:100%;max-height:340px;object-fit:cover;object-position:center center}
 .d-link{display:flex;gap:6px;align-items:center;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:6px 6px 6px 12px;margin:12px 0}
 .d-link code{flex:1;font-size:13px;color:var(--primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .d-section{font-size:14px;font-weight:600;margin:16px 0 6px;color:var(--ink)}
@@ -2241,7 +2241,7 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
             <input id="f_imgUrl" type="url" placeholder="https://.../screenshot.png">
           </div>
           <div id="panel_auto" hidden style="font-size:12px;color:var(--muted)">
-            ระบบจะดึงภาพ Screenshot จาก thum.io อัตโนมัติเมื่อกดบันทึก
+            ระบบจะดึงภาพ Screenshot หน้าจอระบบอัตโนมัติ (ความคมชัดระดับ HD 1280px สมส่วนทุกระบบ)
           </div>
           <div id="imgPreviewBox" style="margin-top:10px;aspect-ratio:16/9;max-width:280px;border-radius:10px;border:1px dashed var(--line);overflow:hidden;display:grid;place-items:center;background:var(--paper);font-size:12px;color:var(--muted)">ยังไม่มีภาพ</div>
         </div>
@@ -2757,19 +2757,28 @@ function recordClick(id){
   }
 }
 
-/* ---------- Rendering Helpers ---------- */
+/* ---------- Rendering Helpers (ระบบจับภาพหน้าจอระดับ HD สัดส่วนถูกต้อง ไร้ขอบดำส่วนเกิน) ---------- */
 function autoShot(u){
   if(!u) return "";
   const norm = normUrl(u);
   if(!norm) return "";
-  return "https://image.thum.io/get/width/1200/crop/675/" + norm;
+  // WordPress mShots: Render at true 1280px desktop resolution, crystal clear, fast CDN
+  return "https://s0.wp.com/mshots/v1/" + encodeURIComponent(norm) + "?w=1280";
 }
 
 function autoShotFallback(u){
   if(!u) return "";
   const norm = normUrl(u);
   if(!norm) return "";
-  return "https://api.microlink.io/?url=" + encodeURIComponent(norm) + "&screenshot=true&meta=false&embed=screenshot.url&viewport.width=1200&viewport.height=675";
+  // Microlink: Real browser 1280x720 HD 16:9 viewport
+  return "https://api.microlink.io/?url=" + encodeURIComponent(norm) + "&screenshot=true&meta=false&embed=screenshot.url&viewport.width=1280&viewport.height=720";
+}
+
+function autoShotFallback2(u){
+  if(!u) return "";
+  const norm = normUrl(u);
+  if(!norm) return "";
+  return "https://image.thum.io/get/width/1200/" + norm;
 }
 
 function catOf(it){
@@ -2780,8 +2789,11 @@ function catOf(it){
 function imgOf(it){
   if(!it) return "";
   if(it.imgMode === "none") return "";
+  // If img is set to auto or contains old thum.io link that caused excess black sky, upgrade to new HD autoShot!
+  if(it.imgMode === "auto" || (it.img && it.img.includes("thum.io"))){
+    if(it.url && it.url.trim()) return autoShot(it.url);
+  }
   if(it.img && it.img.trim()) return it.img.trim();
-  // If no uploaded image exists, automatically fetch live website screenshot from URL!
   if(it.url && it.url.trim()) return autoShot(it.url);
   return "";
 }
@@ -2793,11 +2805,12 @@ window.__ph = placeholder;
 
 function shotHTML(it){
   const src = imgOf(it);
-  const fb = it.url ? autoShotFallback(it.url) : "";
+  const fb1 = it.url ? autoShotFallback(it.url) : "";
+  const fb2 = it.url ? autoShotFallback2(it.url) : "";
   const h = esc(host(it.url));
   return `<div class="bar"><i></i><i></i><i></i><span>${h}</span></div>` +
     (src 
-      ? `<img src="${esc(src)}" alt="${esc(it.name)}" loading="lazy" data-fallback="${esc(fb)}" onerror="if(!this.dataset.tried && this.dataset.fallback){ this.dataset.tried='1'; this.src=this.dataset.fallback; } else { this.outerHTML=window.__ph(${esc(JSON.stringify(it.name))}); }">` 
+      ? `<img src="${esc(src)}" alt="${esc(it.name)}" loading="lazy" data-fb1="${esc(fb1)}" data-fb2="${esc(fb2)}" onerror="if(!this.dataset.step && this.dataset.fb1){ this.dataset.step='1'; this.src=this.dataset.fb1; } else if(this.dataset.step==='1' && this.dataset.fb2){ this.dataset.step='2'; this.src=this.dataset.fb2; } else { this.outerHTML=window.__ph(${esc(JSON.stringify(it.name))}); }">` 
       : placeholder(it.name));
 }
 
@@ -3449,7 +3462,7 @@ function updateImgPreview(){
   box.style.display = imgMode === "none" ? "none" : "grid";
   if(src){
     const fb = imgMode === "auto" ? autoShotFallback($("#f_url").value) : "";
-    box.innerHTML = `<img src="${esc(src)}" alt="พรีวิว" style="width:100%;height:100%;object-fit:cover" data-fallback="${esc(fb)}" onerror="if(!this.dataset.tried && this.dataset.fallback){ this.dataset.tried='1'; this.src=this.dataset.fallback; } else { this.parentNode.textContent='กำลังดึงภาพหน้าเว็บ...'; }">`;
+    box.innerHTML = `<img src="${esc(src)}" alt="พรีวิว" style="width:100%;height:100%;object-fit:cover;object-position:center center" data-fallback="${esc(fb)}" onerror="if(!this.dataset.tried && this.dataset.fallback){ this.dataset.tried='1'; this.src=this.dataset.fallback; } else { this.parentNode.textContent='กำลังดึงภาพหน้าเว็บ...'; }">`;
   } else {
     box.textContent = imgMode === "auto" ? "ระบุลิงก์ URL ด้านบนเพื่อดึงภาพอัตโนมัติ" : "ยังไม่มีภาพ";
   }
