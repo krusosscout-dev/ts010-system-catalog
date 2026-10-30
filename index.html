@@ -2256,14 +2256,23 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
 
 <!-- 3. Category Manager Modal -->
 <div class="overlay" id="catOverlay" role="dialog" aria-modal="true" aria-labelledby="catTitle">
-  <div class="modal sm">
+  <div class="modal sm" style="max-width:540px">
     <div class="modal-head">
-      <h2 id="catTitle">จัดการด้านการปฏิบัติงาน</h2>
+      <h2 id="catTitle">จัดการหมวดหมู่ & รหัสย่อสื่อ</h2>
       <button class="btn ghost icon-btn" data-close><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
     <div class="modal-body">
+      <div style="display:grid;grid-template-columns:44px 1fr 75px 36px;gap:8px;font-size:11.5px;color:var(--muted);font-weight:600;margin-bottom:6px;padding:0 2px">
+        <span>ไอคอน</span>
+        <span>ชื่อหมวดหมู่</span>
+        <span style="text-align:center" title="รหัสย่อสำหรับออกหมายเลขสื่ออัตโนมัติ เช่น TS, PP, BP, OS">รหัสย่อ</span>
+        <span></span>
+      </div>
       <div id="catRowsList"></div>
-      <button class="btn" id="catAddBtn" style="margin-top:8px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>เพิ่มด้านใหม่</button>
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+        <button class="btn" id="catAddBtn" style="flex:1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>เพิ่มด้านใหม่</button>
+        <button type="button" class="btn" id="btnRealignCodes" style="flex:1;border:1px solid var(--primary);color:var(--primary);font-size:12.5px" title="อัปเดตรหัสสื่อทุกระบบให้ตรงตามรหัสย่อหมวดหมู่ เช่น PP01, TS01, BP01, OS01">⚡ จัดระเบียบรหัสทุกหมวด</button>
+      </div>
       <p style="font-size:12px;color:var(--muted);margin:14px 0 6px">ไอคอนแนะนำ:</p>
       <div id="emojiPickBox" style="display:flex;flex-wrap:wrap;gap:4px"></div>
     </div>
@@ -2610,8 +2619,9 @@ const ANNOUNCE_KEY = "sauce-announcement";
 const STATUS_LABELS = { live:"พร้อมใช้งานจริง", dev:"ห้องทดลอง / พัฒนา", off:"ปิดปรับปรุง" };
 const NONE = "__none";
 const DEFAULT_CATS = [
-  ["สื่อการสอน","📚"],["แผนการสอน","📋"],["ใบงาน/แบบฝึกหัด","🖼️"],
-  ["เอกสาร/คู่มือ","📑"],["ระบบอำนวยการ","⚙️"],["ระบบประเมินผล","📊"]
+  ["สื่อการสอน","📚","TS"],["ระบบ ปพ. ออนไลน์","🖥️","PP"],["ระบบออนไลน์","💻","OS"],
+  ["แผนการสอน","📋","TP"],["ใบงาน/แบบฝึกหัด","🖼️","WS"],
+  ["เอกสาร/คู่มือ","📑","DOC"],["ระบบอำนวยการ","⚙️","AS"],["ระบบประเมินผล","📊","ES"]
 ];
 const EMOJIS = ["📚","📋","🖼️","📑","⚙️","📊","💻","📱","📝","🏛️","👥","💰","📦","🤝","🏥","🧾","📅","🗂️","🛠️","🚗","🏫","🍽️","🔐","📣","🌱","💡"];
 const CHART_COLORS = ["#4F46E5","#06B6D4","#10B981","#F59E0B","#EC4899","#8B5CF6","#3B82F6"];
@@ -2656,6 +2666,7 @@ function listenFirestore(){
     if(list.length > 0){
       items = list;
       persist(false);
+      checkAndAutoRealignLegacyCodes();
       renderAll();
     }
   }, err => console.error(err));
@@ -2663,7 +2674,11 @@ function listenFirestore(){
   fbDb.collection("meta").doc("categories").onSnapshot(doc => {
     if(doc.exists && Array.isArray(doc.data().list)){
       cats = doc.data().list;
+      cats.forEach(c => {
+        if(!c.code) c.code = getCategoryCodePrefix(c.id, c.name);
+      });
       persist(false);
+      checkAndAutoRealignLegacyCodes();
       renderNav();
       renderAnalytics();
     }
@@ -2712,12 +2727,17 @@ function loadAll(){
 
   if(!Array.isArray(cats)){
     cats = [];
-    DEFAULT_CATS.forEach(([name,icon]) => cats.push({ id:uid(), name, icon }));
+    DEFAULT_CATS.forEach(([name,icon,code]) => cats.push({ id:uid(), name, icon, code: code || getCategoryCodePrefix(null, name) }));
+  } else {
+    cats.forEach(c => {
+      if(!c.code) c.code = getCategoryCodePrefix(c.id, c.name);
+    });
   }
   items.forEach(it => {
     if(!it.status) it.status = "live";
     if(typeof it.clicks !== "number") it.clicks = 0;
   });
+  checkAndAutoRealignLegacyCodes();
   persist(false);
   applyAnnouncementUI();
 }
@@ -3503,44 +3523,110 @@ document.addEventListener("paste", e => {
   if(f){ setImgMode("upload"); readImage(f); }
 });
 
-/* ---------- Auto Media Code & Auto Numbering ---------- */
-function getCategoryCodePrefix(catId){
+/* ---------- Auto Media Code & Auto Numbering (แยกตามหมวดหมู่ชัดเจน) ---------- */
+function getCategoryCodePrefix(catId, optionalName){
   const c = cats.find(x => x.id === catId);
-  if(!c) return "TS";
-  const name = (c.name || "").trim();
-  if(name.includes("สื่อ")) return "TS";      // สื่อการสอน (Teaching Sauce / Teaching Social)
-  if(name.includes("แผน")) return "TP";      // แผนการสอน (Teaching Plan)
-  if(name.includes("ใบงาน") || name.includes("แบบฝึก")) return "WS"; // ใบงาน (Worksheet)
-  if(name.includes("เอกสาร") || name.includes("คู่มือ")) return "DOC"; // เอกสาร (Document)
-  if(name.includes("อำนวยการ")) return "AS"; // ระบบอำนวยการ (Admin System)
-  if(name.includes("ประเมิน")) return "ES";  // ระบบประเมินผล (Eval System)
+  if(c && c.code && c.code.trim()){
+    return c.code.trim().toUpperCase();
+  }
+  const name = (optionalName || c?.name || "").trim();
+  if(!name) return "TS";
+
+  // Check English abbreviations (e.g. "BP2569" -> "BP", "LINE" -> "LINE")
+  const en = name.match(/[A-Za-z]{2,5}/);
+  if(en) return en[0].toUpperCase();
+
+  // Check explicit Thai keywords
+  if(name.includes("ปพ") || name.includes("ป.พ")) return "PP";  // ระบบ ปพ. ออนไลน์
+  if(name.includes("สื่อ")) return "TS";                       // สื่อการสอน
+  if(name.includes("แผน")) return "TP";                       // แผนการสอน
+  if(name.includes("ใบงาน") || name.includes("แบบฝึก")) return "WS";  // ใบงาน/แบบฝึกหัด
+  if(name.includes("เอกสาร") || name.includes("คู่มือ")) return "DOC"; // เอกสาร/คู่มือ
+  if(name.includes("อำนวยการ") || name.includes("ธุรการ")) return "AS"; // ระบบอำนวยการ
+  if(name.includes("ประเมิน") || name.includes("เกรด") || name.includes("วัดผล")) return "ES";   // ระบบประเมินผล
+  if(name.includes("ออนไลน์") || name.includes("เว็บ") || name.includes("ระบบ")) return "OS";   // ระบบออนไลน์ (Online System)
   
-  const en = name.match(/[A-Za-z]+/);
-  if(en) return en[0].toUpperCase().slice(0, 3);
-  return "TS";
+  return "SYS";
 }
 
 function calculateNextMediaCode(catId){
   const prefix = getCategoryCodePrefix(catId);
   let maxNum = 0;
   items.forEach(it => {
+    // Only count items matching this specific category prefix
     const raw = (it.name || "").trim();
     const reg = new RegExp(`^${prefix}[-_]?(\\d+)`, "i");
     const m = raw.match(reg);
     if(m){
       const val = parseInt(m[1], 10);
       if(!isNaN(val) && val > maxNum) maxNum = val;
-    } else if(it.cat === catId){
-      const m2 = raw.match(/^[A-Za-z]{1,4}[-_]?(\d+)/);
-      if(m2){
-        const val = parseInt(m2[1], 10);
-        if(!isNaN(val) && val > maxNum) maxNum = val;
-      }
     }
   });
   const nextNum = maxNum + 1;
   const numStr = nextNum < 10 ? `0${nextNum}` : `${nextNum}`;
   return `${prefix}${numStr}`;
+}
+
+function realignCategoryMediaCodes(showFeedback = true){
+  let countChanged = 0;
+  cats.forEach(c => {
+    const prefix = getCategoryCodePrefix(c.id, c.name);
+    // Find all items belonging to this category
+    const catItems = items.filter(it => it.cat === c.id);
+    // Sort items by their existing number or created date
+    catItems.sort((a,b) => {
+      const numA = parseInt((a.name.match(/\d+/) || [9999])[0], 10);
+      const numB = parseInt((b.name.match(/\d+/) || [9999])[0], 10);
+      if(numA !== numB) return numA - numB;
+      return (a.created || 0) - (b.created || 0);
+    });
+
+    catItems.forEach((it, idx) => {
+      const nextNum = idx + 1;
+      const numStr = nextNum < 10 ? `0${nextNum}` : `${nextNum}`;
+      const newCode = `${prefix}${numStr}`;
+
+      // Extract existing title without old code prefix
+      let title = (it.name || "").trim();
+      const parts = title.split("_");
+      if(parts.length >= 2){
+        title = parts.slice(1).join("_").trim();
+      } else {
+        title = title.replace(/^[A-Za-z]{2,5}\d{1,4}[-_ ]?/, "").trim();
+      }
+      const newName = `${newCode}_${title}`;
+      if(it.name !== newName){
+        it.name = newName;
+        it.updated = Date.now();
+        countChanged++;
+      }
+    });
+  });
+
+  if(countChanged > 0){
+    persist();
+    renderAll();
+    if(showFeedback) toast(`จัดระเบียบรหัสสื่อเรียบร้อยแล้ว (${countChanged} รายการ) 🏷️`);
+  } else {
+    if(showFeedback) toast("รหัสสื่อทุกระบบถูกต้องตามหมวดหมู่แล้ว ✨");
+  }
+  return countChanged;
+}
+
+function checkAndAutoRealignLegacyCodes(){
+  // Check if any non-TS category has legacy TS codes (e.g. PP has TS21 or OS has TS04)
+  const hasMismatch = items.some(it => {
+    if(!it.cat) return false;
+    const prefix = getCategoryCodePrefix(it.cat);
+    if(prefix !== "TS" && /^TS\d+/i.test(it.name)){
+      return true;
+    }
+    return false;
+  });
+  if(hasMismatch){
+    console.log("Auto-realigning legacy codes to distinct category prefixes...");
+    realignCategoryMediaCodes(false);
+  }
 }
 
 function updateMediaCodeUI(catId){
@@ -3684,12 +3770,18 @@ $("#saveSystemBtn").onclick = () => {
 /* ---------- Auto Media Code Event Listeners ---------- */
 $("#f_cat")?.addEventListener("change", e => {
   const catId = e.target.value;
+  const c = cats.find(x => x.id === catId);
+  const prefix = getCategoryCodePrefix(catId);
+  if($("#previewCatCodeHint")) $("#previewCatCodeHint").textContent = `หมวดหมู่: ${c ? c.name : 'ทั่วไป'} (รหัสหมวด: ${prefix})`;
   if(!editingId){
     updateMediaCodeUI(catId);
   } else {
-    const c = cats.find(x => x.id === catId);
-    const prefix = getCategoryCodePrefix(catId);
-    if($("#previewCatCodeHint")) $("#previewCatCodeHint").textContent = `หมวดหมู่: ${c ? c.name : 'ทั่วไป'} (${prefix})`;
+    // If editing and code prefix differs from new category prefix, auto-update to match!
+    const curCode = ($("#f_media_code")?.value || "").toUpperCase();
+    if(!curCode.startsWith(prefix)){
+      updateMediaCodeUI(catId);
+      toast(`อัปเดตรหัสเป็น ${$("#f_media_code")?.value} ตามหมวดหมู่ ${c?.name || ''}`);
+    }
   }
 });
 
@@ -3716,12 +3808,15 @@ $("#f_name")?.addEventListener("input", e => {
   if($("#previewMediaName")) $("#previewMediaName").textContent = e.target.value || "TS01_ชื่อสื่อ";
 });
 
-/* ---------- Category Manager ---------- */
+/* ---------- Category Manager (จัดการด้าน & รหัสย่อสื่อ) ---------- */
 let catDraft = [];
 let emojiTarget = null;
 
 function openCatManager(){
-  catDraft = cats.map(c => ({...c}));
+  catDraft = cats.map(c => ({
+    ...c,
+    code: c.code || getCategoryCodePrefix(c.id, c.name)
+  }));
   drawCatRows();
   $("#emojiPickBox").innerHTML = EMOJIS.map(e => `<button type="button" class="btn icon-btn ghost" data-e="${e}" style="font-size:18px">${e}</button>`).join("");
   openOverlay($("#catOverlay"));
@@ -3729,16 +3824,21 @@ function openCatManager(){
 
 function drawCatRows(){
   $("#catRowsList").innerHTML = catDraft.length ? catDraft.map((c,i) => `
-    <div style="display:grid;grid-template-columns:48px 1fr auto;gap:8px;align-items:center;margin-bottom:8px">
-      <input class="emo" data-i="${i}" data-f="icon" value="${esc(c.icon||"")}" maxlength="4" style="text-align:center;font-size:18px;padding:6px;border:1px solid var(--line);border-radius:8px">
-      <input data-i="${i}" data-f="name" value="${esc(c.name)}" placeholder="ชื่อด้าน" style="padding:7px 10px;border:1px solid var(--line);border-radius:8px">
-      <button class="btn icon-btn danger" data-rm="${i}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+    <div style="display:grid;grid-template-columns:44px 1fr 75px auto;gap:8px;align-items:center;margin-bottom:8px">
+      <input class="emo" data-i="${i}" data-f="icon" value="${esc(c.icon||"")}" maxlength="4" style="text-align:center;font-size:18px;padding:6px;border:1px solid var(--line);border-radius:8px" title="ไอคอน">
+      <input data-i="${i}" data-f="name" value="${esc(c.name)}" placeholder="ชื่อหมวดหมู่" style="padding:7px 10px;border:1px solid var(--line);border-radius:8px">
+      <input data-i="${i}" data-f="code" value="${esc(c.code||getCategoryCodePrefix(c.id, c.name))}" placeholder="รหัส" maxlength="5" style="text-align:center;font-weight:700;color:var(--primary);text-transform:uppercase;padding:7px 6px;border:1px solid var(--line);border-radius:8px" title="รหัสย่อสื่อประจำหมวด (เช่น TS, PP, BP, OS)">
+      <button class="btn icon-btn danger" data-rm="${i}" title="ลบหมวดหมู่"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
     </div>`).join("") : `<p style="color:var(--muted)">ยังไม่มีหมวดหมู่</p>`;
 }
 
 $("#catRowsList").addEventListener("input", e => {
   const t = e.target;
-  if(t.dataset.i != null) catDraft[+t.dataset.i][t.dataset.f] = t.value;
+  if(t.dataset.i != null) {
+    let val = t.value;
+    if(t.dataset.f === "code") val = val.trim().toUpperCase();
+    catDraft[+t.dataset.i][t.dataset.f] = val;
+  }
 });
 $("#catRowsList").addEventListener("focusin", e => {
   if(e.target.classList.contains("emo")) emojiTarget = +e.target.dataset.i;
@@ -3756,18 +3856,44 @@ $("#emojiPickBox").addEventListener("click", e => {
   if(idx >= 0){ catDraft[idx].icon = b.dataset.e; drawCatRows(); }
 });
 $("#catAddBtn").onclick = () => {
-  catDraft.push({ id:uid(), name:"", icon:"🗂️" });
+  catDraft.push({ id:uid(), name:"", icon:"🗂️", code:"" });
   drawCatRows();
   emojiTarget = catDraft.length - 1;
 };
 $("#catSaveBtn").onclick = () => {
-  cats = catDraft.map(c => ({ ...c, name:c.name.trim(), icon:(c.icon||"").trim() || "🗂️" })).filter(c => c.name);
+  cats = catDraft.map(c => ({
+    ...c,
+    name: c.name.trim(),
+    icon: (c.icon||"").trim() || "🗂️",
+    code: ((c.code||"").trim().toUpperCase() || getCategoryCodePrefix(c.id, c.name))
+  })).filter(c => c.name);
   items.forEach(it => { if(it.cat && !cats.some(c=>c.id===it.cat)) it.cat = ""; });
   persist();
   closeOverlay($("#catOverlay"));
   renderAll();
-  toast("บันทึกหมวดหมู่เรียบร้อย");
+  toast("บันทึกหมวดหมู่และรหัสย่อเรียบร้อย 🏷️");
 };
+
+onClick("#btnRealignCodes", () => {
+  showCustomConfirm({
+    title: "จัดระเบียบรหัสสื่อทุกระบบ?",
+    message: "ระบบจะปรับรหัสสื่อทุกระบบให้ตรงกับรหัสหมวดหมู่ของตนเอง เช่น ระบบ ปพ. ➔ PP01.. สื่อการสอน ➔ TS01.. ระบบออนไลน์ ➔ OS01.. ยืนยันหรือไม่?",
+    confirmText: "จัดระเบียบทันที",
+    cancelText: "ยกเลิก",
+    isDanger: false,
+    onConfirm: () => {
+      cats = catDraft.map(c => ({
+        ...c,
+        name: c.name.trim(),
+        icon: (c.icon||"").trim() || "🗂️",
+        code: ((c.code||"").trim().toUpperCase() || getCategoryCodePrefix(c.id, c.name))
+      })).filter(c => c.name);
+      persist();
+      realignCategoryMediaCodes(true);
+      closeOverlay($("#catOverlay"));
+    }
+  });
+});
 
 /* ==========================================================================
    CUSTOM CONFIRMATION DIALOG (ภาพที่ 1: แทนที่ confirm() ดั้งเดิม ไม่ธรรมดา)
