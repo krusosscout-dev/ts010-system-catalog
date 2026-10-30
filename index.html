@@ -930,6 +930,78 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
   .hero-actions .btn{width:100% !important;justify-content:center !important;padding:10px 16px !important;font-size:14px !important}
 }
 
+/* ==========================================================================
+   SMALL SCREENS (≤640px) — modal footers, preview title, spotlight wrap
+   ========================================================================== */
+@media (max-width:640px){
+  .modal-foot{flex-wrap:wrap !important;gap:6px !important;padding:10px 12px !important}
+  .modal-foot > span[style*="flex:1"]{display:none}
+  .modal-foot .btn{flex:1 1 calc(50% - 6px);min-width:0;justify-content:center;text-align:center;white-space:normal}
+  .modal-foot .btn.live,.modal-foot .btn.primary{flex-basis:100%}
+  .modal-foot > div{flex:1 1 100%}
+  #previewModalTitle{white-space:normal !important;overflow:visible !important;text-overflow:clip !important;line-height:1.35;word-break:break-word}
+  #previewCopyBtnText{display:none}
+  .spotlight-item .s-title{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:normal;line-height:1.35}
+  .spotlight-item .s-sub{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:normal;line-height:1.4}
+}
+
+/* ==========================================================================
+   EXTRA-SMALL SCREENS (≤400px) — fix overflow & truncation on 320-375px
+   ========================================================================== */
+@media (max-width:400px){
+  /* 1. page-level padding & card grid */
+  .view-catalog{padding:10px 10px calc(86px + env(safe-area-inset-bottom,0px)) !important}
+  .cards-grid{grid-template-columns:1fr !important}
+  .catalog-hero-header{padding:10px 10px !important}
+  .cat-header-top{flex-direction:column;align-items:flex-start}
+  .cat-header-main{flex-direction:column;gap:8px}
+  .cat-header-actions{width:100%;flex-direction:column;gap:8px}
+  .cat-role-container{flex-wrap:wrap;gap:6px}
+
+  /* 2. tab-segmented — stack buttons vertically on 320px */
+  .tab-segmented{flex-direction:column;width:100%;gap:3px}
+  .tab-segmented button{padding:6px 10px;font-size:12px;text-align:center;border-radius:9px}
+
+  /* 3. modal footer buttons — tighter on 320px */
+  .modal-foot .btn{font-size:12px;padding:6px 8px}
+
+  /* 4. card footer — wrap icon buttons instead of overflowing card */
+  .card-foot{flex-wrap:wrap;padding:10px 12px 12px}
+  .card-foot .btn{padding:5px 8px;font-size:12.5px}
+
+  /* 5. header action group, charts, spotlight */
+  .cat-action-group{flex-wrap:wrap;width:100%}
+  .chart-card{padding:14px;min-width:0}
+  .analytics-grid > *{min-width:0}
+  .spotlight-kbd{display:none}
+  #spotlightInput{min-width:0}
+  .spotlight-item{gap:10px;padding:10px}
+  .spotlight-item .badge{font-size:10px;padding:2px 6px;max-width:72px;white-space:normal;text-align:center;line-height:1.25}
+  .spotlight-item .s-icon{width:30px;height:30px;font-size:15px}
+
+  /* 6. preview browser bar — give URL more room */
+  .browser-dots{display:none}
+  .browser-bar{gap:6px;padding:6px 8px}
+
+  /* 7. donut legend — wrap long category names */
+  .legend-label{white-space:normal;overflow:visible;line-height:1.3}
+  .legend-row{gap:8px}
+  .legend-val{flex:none}
+
+  /* 6. general — prevent any child from blowing out the page */
+  body,html{overflow-x:hidden}
+  .main-body{min-width:0 !important;width:100% !important;overflow-x:hidden}
+  .overlay{padding:10px !important}
+  .modal{border-radius:14px}
+  .modal-body{padding:14px 12px !important}
+  .modal-head{padding:12px 14px !important}
+  .modal-head h2{font-size:15px !important;white-space:normal !important;word-break:break-word}
+
+  /* toolbar/search */
+  .toolbar-bar{padding:8px 10px;gap:8px}
+  .search-box{flex:1 1 100%}
+}
+
 .b-nav-item{
   display:inline-flex;
   flex-direction:column;
