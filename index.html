@@ -2506,7 +2506,7 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
             <div style="font-size:11.5px;color:var(--muted)">เชื่อมต่อโดยตรงกับระบบของคุณครู</div>
           </div>
           <!-- Live iframe container -->
-          <iframe id="previewIframe" src="" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" loading="lazy" style="width:100%;height:100%;border:none;display:block"></iframe>
+          <iframe id="previewIframe" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" loading="lazy" style="width:100%;height:100%;border:none;display:block"></iframe>
           <!-- Image fallback container (hidden by default) -->
           <div id="previewImgBox" style="display:none;width:100%;height:100%;overflow:auto;align-items:center;justify-content:center;background:var(--off-soft)"></div>
         </div>
@@ -2757,28 +2757,27 @@ function recordClick(id){
   }
 }
 
-/* ---------- Rendering Helpers (ระบบจับภาพหน้าจอระดับ HD สัดส่วนถูกต้อง ไร้ขอบดำส่วนเกิน) ---------- */
+/* ---------- Rendering Helpers (ระบบจับภาพหน้าจอระดับ HD สัดส่วนถูกต้อง ไร้ขอบดำ และไร้ลายน้ำ WordPress) ---------- */
 function autoShot(u){
   if(!u) return "";
   const norm = normUrl(u);
   if(!norm) return "";
-  // WordPress mShots: Render at true 1280px desktop resolution, crystal clear, fast CDN
-  return "https://s0.wp.com/mshots/v1/" + encodeURIComponent(norm) + "?w=1280";
+  // Microlink: Real browser 1280x720 HD 16:9 viewport - instant real render without WordPress watermark
+  return "https://api.microlink.io/?url=" + encodeURIComponent(norm) + "&screenshot=true&meta=false&embed=screenshot.url&viewport.width=1280&viewport.height=720";
 }
 
 function autoShotFallback(u){
   if(!u) return "";
   const norm = normUrl(u);
   if(!norm) return "";
-  // Microlink: Real browser 1280x720 HD 16:9 viewport
-  return "https://api.microlink.io/?url=" + encodeURIComponent(norm) + "&screenshot=true&meta=false&embed=screenshot.url&viewport.width=1280&viewport.height=720";
+  return "https://image.thum.io/get/width/1200/" + norm;
 }
 
 function autoShotFallback2(u){
   if(!u) return "";
   const norm = normUrl(u);
   if(!norm) return "";
-  return "https://image.thum.io/get/width/1200/" + norm;
+  return "https://s0.wp.com/mshots/v1/" + encodeURIComponent(norm) + "?w=1280";
 }
 
 function catOf(it){
@@ -2789,8 +2788,8 @@ function catOf(it){
 function imgOf(it){
   if(!it) return "";
   if(it.imgMode === "none") return "";
-  // If img is set to auto or contains old thum.io link that caused excess black sky, upgrade to new HD autoShot!
-  if(it.imgMode === "auto" || (it.img && it.img.includes("thum.io"))){
+  // If img is set to auto or contains old thum.io / WordPress placeholder, upgrade to new HD autoShot!
+  if(it.imgMode === "auto" || (it.img && (it.img.includes("thum.io") || it.img.includes("s0.wp.com")))){
     if(it.url && it.url.trim()) return autoShot(it.url);
   }
   if(it.img && it.img.trim()) return it.img.trim();
@@ -4704,7 +4703,7 @@ onClick("#btnPwaInstall", async () => {
 });
 
 if("serviceWorker" in navigator){
-  navigator.serviceWorker.register("./sw.js?v=9").then(reg => {
+  navigator.serviceWorker.register("./sw.js?v=15").then(reg => {
     try{ reg.update(); }catch(_){}
   }).catch(() => {});
 }
