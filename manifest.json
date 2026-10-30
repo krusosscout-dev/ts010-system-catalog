@@ -1,6 +1,6 @@
 {
   "name": "คลังระบบออนไลน์ · ครูซอสสอนสังคม",
-  "short_name": "ครูซอส Hub",
+  "short_name": "TS010 ครูซอส",
   "description": "ศูนย์รวมนวัตกรรม สื่อการเรียนรู้ และระบบดิจิทัลของครูซอส",
   "start_url": "./",
   "scope": "./",
@@ -9,6 +9,12 @@
   "theme_color": "#4F46E5",
   "orientation": "any",
   "icons": [
+    {
+      "src": "logo-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
     {
       "src": "logo-512.png",
       "sizes": "512x512",

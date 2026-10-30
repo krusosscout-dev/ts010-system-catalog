@@ -1698,8 +1698,8 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
       <button class="btn ghost" id="btnSideSpotlight" style="width:100%;justify-content:center;color:var(--side-text);font-size:13px">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>ค้นหาด่วน (Ctrl+K)
       </button>
-      <button class="btn ghost" id="btnPwaInstall" style="display:none;width:100%;justify-content:center;color:var(--accent);font-size:13px">
-        📲 ติดตั้งแอปบนเครื่อง
+      <button class="btn ghost" id="btnPwaInstall" style="width:100%;justify-content:center;color:var(--accent);font-size:13px;border:1px solid rgba(6,182,212,0.35);background:rgba(6,182,212,0.08);padding:8px 10px;border-radius:10px" title="ติดตั้งแอปลงคอมพิวเตอร์ แท็บเล็ต หรือมือถือ">
+        📲 ติดตั้งแอปลงบนเครื่อง
       </button>
     </div>
 
@@ -1839,6 +1839,9 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
 
             <!-- Role Badge & Admin Action (Rendered dynamically: Viewer vs Admin) -->
             <div class="cat-role-container" id="headerRoleContainer">
+              <button class="btn ghost" id="btnHeaderInstall" style="font-size:12px;padding:4px 10px;border-radius:8px;border:1px solid rgba(6,182,212,0.3);color:var(--accent);display:inline-flex;align-items:center;gap:5px" title="ติดตั้งแอปลงอุปกรณ์">
+                <span>📲 ติดตั้งแอป</span>
+              </button>
               <div class="role-badge-pill role-viewer" id="roleBadge">
                 <span class="role-pulse-dot"></span>
                 <span id="roleBadgeTxt">โหมดผู้ชม (Viewer)</span>
@@ -2033,6 +2036,10 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
       <button type="button" class="b-nav-item" id="bNavLock" title="เข้าสู่ระบบผู้ดูแล (รหัส PIN)">
         <span class="b-icon" id="bNavLockIcon">🔐</span>
         <span class="b-label" id="bNavLockLabel">ผู้ดูแล</span>
+      </button>
+      <button type="button" class="b-nav-item" id="bNavInstall" title="ติดตั้งแอปลงอุปกรณ์">
+        <span class="b-icon">📲</span>
+        <span class="b-label">ติดตั้ง</span>
       </button>
       <button type="button" class="b-nav-item" id="bNavTheme" title="สลับโหมดมืด/สว่าง">
         <span class="b-icon">🌓</span>
@@ -2575,6 +2582,72 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
         <button class="btn" id="btnCopyQr" style="flex:1;justify-content:center">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>คัดลอกรูปภาพ
         </button>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn ghost" data-close>ปิด</button>
+    </div>
+  </div>
+</div>
+
+<!-- 8. PWA Install Guide Modal (แนะนำวิธีการติดตั้งแอปลงอุปกรณ์ทุกแพลตฟอร์ม) -->
+<div class="overlay" id="installOverlay" role="dialog" aria-modal="true" aria-labelledby="installModalTitle">
+  <div class="modal sm" style="max-width:540px">
+    <div class="modal-head">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:24px">📲</span>
+        <div>
+          <h2 id="installModalTitle" style="font-size:17px;font-weight:700;margin:0">ติดตั้งแอป TS010 ลงบนอุปกรณ์</h2>
+          <div style="font-size:12px;color:var(--muted)">ใช้งานสะดวกรวดเร็ว เหมือนแอปพลิเคชันจริง</div>
+        </div>
+      </div>
+      <button class="btn ghost icon-btn" data-close title="ปิด"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+    <div class="modal-body" style="padding:16px 20px">
+      <!-- One-click Install Button (If browser supports native prompt) -->
+      <div id="nativeInstallBox" style="display:none;background:var(--primary-soft);border:1.5px solid var(--primary);border-radius:14px;padding:16px;text-align:center;margin-bottom:16px">
+        <div style="font-size:15px;font-weight:700;color:var(--primary);margin-bottom:4px">เบราว์เซอร์ของคุณพร้อมติดตั้งทันที!</div>
+        <p style="font-size:12.5px;color:var(--ink);margin:0 0 12px">กดปุ่มด้านล่างเพื่อเพิ่มไอคอนแอปลงหน้าจอและเข้าใช้งานได้ทันใจ</p>
+        <button type="button" class="btn primary" id="btnModalNativeInstall" style="width:100%;justify-content:center;padding:10px;font-size:14px;font-weight:600">
+          📥 คลิกเพื่อติดตั้งแอปทันที
+        </button>
+      </div>
+
+      <!-- Platform Guide Tabs -->
+      <div style="font-size:13px;font-weight:600;margin-bottom:10px;color:var(--ink)">
+        📌 คำแนะนำในการติดตั้งตามอุปกรณ์ของคุณ:
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <!-- 1. Windows / Mac / PC (Chrome / Edge) -->
+        <div style="background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px 14px">
+          <div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:13.5px;color:var(--ink);margin-bottom:6px">
+            <span>💻</span> <span>คอมพิวเตอร์ (Windows / Mac / PC)</span>
+          </div>
+          <p style="font-size:12px;color:var(--muted);margin:0;line-height:1.5">
+            คลิกไอคอน <b>ติดตั้ง (Install) 📥</b> บริเวณด้านขวาของแถบที่อยู่เว็บ (URL bar) หรือกดเมนู <b>3 จุด (⋮)</b> ด้านบนขวาของเบราว์เซอร์ ➔ เลือก <b>"ติดตั้ง TS010..." (Install app)</b>
+          </p>
+        </div>
+
+        <!-- 2. Android (Chrome) -->
+        <div style="background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px 14px">
+          <div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:13.5px;color:var(--ink);margin-bottom:6px">
+            <span>🤖</span> <span>มือถือ Android (Google Chrome)</span>
+          </div>
+          <p style="font-size:12px;color:var(--muted);margin:0;line-height:1.5">
+            แตะที่ปุ่มเมนู <b>3 จุด (⋮)</b> ที่มุมบนขวา ➔ เลือก <b>"ติดตั้งแอปพลิเคชัน" (Install app)</b> หรือ <b>"เพิ่มลงในหน้าจอหลัก" (Add to Home screen)</b>
+          </p>
+        </div>
+
+        <!-- 3. iOS (iPhone / iPad - Safari) -->
+        <div style="background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px 14px">
+          <div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:13.5px;color:var(--ink);margin-bottom:6px">
+            <span>🍎</span> <span>iPhone / iPad (Safari)</span>
+          </div>
+          <p style="font-size:12px;color:var(--muted);margin:0;line-height:1.5">
+            แตะปุ่ม <b>แชร์ (Share) 📤</b> ที่แถบเมนูด้านล่าง ➔ เลื่อนลงแล้วแตะ <b>"เพิ่มไปยังหน้าจอโฮม" (Add to Home Screen) ➕</b> ➔ แตะ <b>"เพิ่ม" (Add)</b>
+          </p>
+        </div>
       </div>
     </div>
     <div class="modal-foot">
@@ -4809,24 +4882,52 @@ onClick("#themeBtn", toggleTheme);
 onClick("#landingThemeBtn", toggleTheme);
 
 /* ---------- PWA Installation & Service Worker (ฟีเจอร์ที่ 3) ---------- */
+function openInstallModal(){
+  const nativeBox = $("#nativeInstallBox");
+  if(deferredPwaPrompt){
+    if(nativeBox) nativeBox.style.display = "block";
+  } else {
+    if(nativeBox) nativeBox.style.display = "none";
+  }
+  openOverlay($("#installOverlay"));
+}
+
 window.addEventListener("beforeinstallprompt", (e) => {
   e.preventDefault();
   deferredPwaPrompt = e;
   const pwaBtn = $("#btnPwaInstall");
   if(pwaBtn) pwaBtn.style.display = "flex";
+  const hBtn = $("#btnHeaderInstall");
+  if(hBtn) hBtn.style.display = "inline-flex";
+  const nativeBox = $("#nativeInstallBox");
+  if(nativeBox) nativeBox.style.display = "block";
 });
 
-onClick("#btnPwaInstall", async () => {
-  if(!deferredPwaPrompt) return;
-  deferredPwaPrompt.prompt();
-  const { outcome } = await deferredPwaPrompt.userChoice;
-  if(outcome === "accepted"){
-    toast("ติดตั้งแอปพลิเคชันเรียบร้อย 🎉");
-    const p = $("#btnPwaInstall");
-    if(p) p.style.display = "none";
-  }
+window.addEventListener("appinstalled", () => {
   deferredPwaPrompt = null;
+  toast("ติดตั้งแอปพลิเคชันลงบนเครื่องเรียบร้อยแล้ว 🎉");
 });
+
+async function triggerInstallFlow(){
+  if(deferredPwaPrompt){
+    try {
+      deferredPwaPrompt.prompt();
+      const { outcome } = await deferredPwaPrompt.userChoice;
+      if(outcome === "accepted"){
+        toast("ติดตั้งแอปพลิเคชันเรียบร้อย 🎉");
+        closeOverlay($("#installOverlay"));
+      }
+      deferredPwaPrompt = null;
+      return;
+    } catch(err){}
+  }
+  openInstallModal();
+}
+
+onClick("#btnPwaInstall", triggerInstallFlow);
+onClick("#btnHeaderInstall", triggerInstallFlow);
+onClick("#bNavInstall", triggerInstallFlow);
+onClick("#btnModalNativeInstall", triggerInstallFlow);
 
 if("serviceWorker" in navigator){
   navigator.serviceWorker.register("./sw.js?v=15").then(reg => {
