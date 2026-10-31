@@ -934,6 +934,18 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
    SMALL SCREENS (≤640px) — modal footers, preview title, spotlight wrap
    ========================================================================== */
 @media (max-width:640px){
+  /* landing top bar — กันชื่อแบรนด์/นาฬิกาตกบรรทัด */
+  .landing-brand{min-width:0;flex:1 1 auto}
+  .landing-brand img{flex:none}
+  .landing-brand-text{display:flex;flex-direction:column;min-width:0;line-height:1.25}
+  .landing-brand-text .lb-main{white-space:nowrap}
+  .landing-brand-text .lb-sub{font-size:11px;font-weight:500;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .landing-brand-text .lb-sep{display:none}
+  .landing-meta{gap:6px !important;flex:none}
+  .live-indicator{white-space:nowrap;font-size:11.5px;padding:3px 9px}
+  .hero-pill-sub{display:none}
+  .hero-pill{white-space:nowrap;max-width:100%}
+
   .modal-foot{flex-wrap:wrap !important;gap:6px !important;padding:10px 12px !important}
   .modal-foot > span[style*="flex:1"]{display:none}
   .modal-foot .btn{flex:1 1 calc(50% - 6px);min-width:0;justify-content:center;text-align:center;white-space:normal}
@@ -1436,6 +1448,25 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
   visibility:hidden;
   pointer-events:none;
 }
+/* Embed-blocked help bar */
+.preview-embed-help{
+  position:absolute;left:10px;right:10px;bottom:10px;z-index:6;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;
+  padding:8px 10px 8px 14px;border-radius:12px;
+  background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);
+  font-size:12.5px;color:var(--ink);
+}
+.preview-embed-help.hidden{display:none}
+.preview-embed-help .peh-text{flex:1 1 220px;min-width:0;line-height:1.4}
+.preview-embed-help .peh-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.preview-embed-help .btn{padding:5px 10px;font-size:12px}
+.preview-embed-help .icon-btn{width:28px;height:28px;padding:0}
+.preview-embed-help.is-centered{
+  top:50%;bottom:auto;transform:translateY(-50%);
+  flex-direction:column;text-align:center;padding:16px;
+}
+.preview-embed-help.is-centered .peh-text{flex:none}
+.preview-embed-help.is-centered .peh-actions{justify-content:center}
 .preview-spinner{
   width:36px;
   height:36px;
@@ -1813,7 +1844,7 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
         <div class="landing-top">
           <div class="landing-brand">
             <img src="logo-512.png" alt="ครูซอส" style="width:36px;height:36px;border-radius:50%;object-fit:cover;box-shadow:0 2px 8px rgba(79,70,229,0.3)">
-            <span>คลังระบบออนไลน์ · ครูซอสสอนสังคม</span>
+            <span class="landing-brand-text"><span class="lb-main">คลังระบบออนไลน์</span><span class="lb-sep"> · </span><span class="lb-sub">ครูซอสสอนสังคม</span></span>
           </div>
           <div class="landing-meta">
             <span class="live-indicator"><span class="sync-dot"></span><span id="liveTime">00:00:00 น.</span></span>
@@ -1827,7 +1858,7 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
           <div class="hero-logo-box">
             <img src="logo-512.png" alt="คลังระบบออนไลน์ ครูซอสสอนสังคม" class="hero-logo-img">
           </div>
-          <div class="hero-pill">✨ แพลตฟอร์มนวัตกรรมและคลังระบบดิจิทัล · ครูซอสสอนสังคม</div>
+          <div class="hero-pill">✨ แพลตฟอร์มนวัตกรรมและคลังระบบดิจิทัล<span class="hero-pill-sub"> · ครูซอสสอนสังคม</span></div>
           <h1 class="landing-hero-title">
             <span class="hero-chunk">ศูนย์รวมระบบสารสนเทศ</span><span class="hero-chunk">และการเรียนรู้</span>
           </h1>
@@ -2597,6 +2628,15 @@ aside.side{background:var(--side);position:sticky;top:0;height:100vh;overflow-y:
           <iframe id="previewIframe" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" loading="lazy" style="width:100%;height:100%;border:none;display:block"></iframe>
           <!-- Image fallback container (hidden by default) -->
           <div id="previewImgBox" style="display:none;width:100%;height:100%;overflow:auto;align-items:center;justify-content:center;background:var(--off-soft)"></div>
+          <!-- แถบช่วยเหลือ: เว็บบางระบบไม่อนุญาตให้แสดงในกรอบ (X-Frame-Options) -->
+          <div id="previewEmbedHelp" class="preview-embed-help hidden">
+            <span class="peh-text">😕 หน้าว่าง/ไอคอนหน้าเศร้า? ระบบนี้ไม่อนุญาตให้แสดงในกรอบ</span>
+            <span class="peh-actions">
+              <button type="button" class="btn" id="pehShotBtn">🖼️ ดูภาพตัวอย่าง</button>
+              <a class="btn primary" id="pehOpenBtn" href="#" target="_blank" rel="noopener">เปิดแท็บใหม่ ↗</a>
+              <button type="button" class="btn ghost icon-btn" id="pehCloseBtn" title="ซ่อน" aria-label="ซ่อน">✕</button>
+            </span>
+          </div>
         </div>
       </div>
 
@@ -4095,19 +4135,38 @@ function openPreviewModal(it){
       : placeholder(it.name);
   }
 
-  // Switch to live mode by default
-  setPreviewMode("live");
-  
-  if(loader) loader.classList.remove("hidden");
-  if(iframe){
-    iframe.src = it.url;
-    iframe.onload = () => {
-      if(loader) loader.classList.add("hidden");
-    };
-    // Fallback if onload doesn't trigger due to cross-origin sandbox
-    setTimeout(() => {
-      if(loader) loader.classList.add("hidden");
-    }, 4500);
+  // Switch to live mode by default (ยกเว้นเว็บที่เคยพบว่าไม่อนุญาตให้ฝังในกรอบ)
+  const help = $("#previewEmbedHelp");
+  const host = embedHostOf(it.url);
+  if(help){
+    help.classList.add("hidden");
+    help.classList.remove("is-centered");
+    $("#pehOpenBtn").href = it.url;
+    $("#pehOpenBtn").onclick = () => recordClick(it.id);
+  }
+  clearTimeout(window.__pehTimer);
+
+  if(host && getNoEmbedHosts().includes(host)){
+    if(iframe) iframe.src = "about:blank";
+    setPreviewMode("screenshot");
+  } else {
+    setPreviewMode("live");
+    if(loader) loader.classList.remove("hidden");
+    if(iframe){
+      iframe.src = it.url;
+      const showHelp = () => {
+        if(loader) loader.classList.add("hidden");
+        clearTimeout(window.__pehTimer);
+        window.__pehTimer = setTimeout(() => {
+          if(curPreviewMode === "live" && curPreviewItem === it && help) help.classList.remove("hidden");
+        }, 1200);
+      };
+      iframe.onload = showHelp;
+      // Fallback if onload doesn't trigger due to cross-origin sandbox
+      setTimeout(() => {
+        if(loader && !loader.classList.contains("hidden")) showHelp();
+      }, 4500);
+    }
   }
 
   const codeMatch = (it.name || "").match(/^([A-Za-z]{2,5}\d{1,4})([_ -]|$)/);
@@ -4156,8 +4215,26 @@ function openPreviewModal(it){
   openOverlay($("#previewOverlay"));
 }
 
+function embedHostOf(url){
+  try { return new URL(url, location.href).host; } catch(_) { return ""; }
+}
+function getNoEmbedHosts(){
+  try { return JSON.parse(localStorage.getItem("ts010_noEmbedHosts") || "[]"); } catch(_) { return []; }
+}
+function addNoEmbedHost(host){
+  if(!host) return;
+  const list = getNoEmbedHosts();
+  if(!list.includes(host)){ list.push(host); localStorage.setItem("ts010_noEmbedHosts", JSON.stringify(list)); }
+}
+function removeNoEmbedHost(host){
+  const list = getNoEmbedHosts().filter(h => h !== host);
+  localStorage.setItem("ts010_noEmbedHosts", JSON.stringify(list));
+}
+
 function setPreviewMode(mode){
   curPreviewMode = mode;
+  const help = $("#previewEmbedHelp");
+  if(help) help.classList.add("hidden");
   const iframe = $("#previewIframe");
   const imgBox = $("#previewImgBox");
   const loader = $("#previewIframeLoader");
@@ -4710,8 +4787,26 @@ function closeOverlay(el){
 }
 
 /* Interactive Preview Controls */
-onClick("#btnModeLiveIframe", () => setPreviewMode("live"));
+onClick("#btnModeLiveIframe", () => {
+  const iframe = $("#previewIframe");
+  const loader = $("#previewIframeLoader");
+  setPreviewMode("live");
+  // ถ้าเคยถูกจำว่า "ฝังไม่ได้" และกรอบยังว่าง → ลองโหลดใหม่ และเลิกจำ
+  if(iframe && curPreviewItem && curPreviewItem.url && (!iframe.src || iframe.src === "about:blank")){
+    removeNoEmbedHost(embedHostOf(curPreviewItem.url));
+    if(loader) loader.classList.remove("hidden");
+    iframe.onload = () => { if(loader) loader.classList.add("hidden"); };
+    iframe.src = curPreviewItem.url;
+    setTimeout(() => { if(loader) loader.classList.add("hidden"); }, 4500);
+  }
+});
 onClick("#btnModeScreenshot", () => setPreviewMode("screenshot"));
+onClick("#pehShotBtn", () => {
+  if(curPreviewItem) addNoEmbedHost(embedHostOf(curPreviewItem.url));
+  setPreviewMode("screenshot");
+  toast("จำไว้แล้ว — ครั้งหน้าจะแสดงภาพตัวอย่างให้อัตโนมัติ 🖼️");
+});
+onClick("#pehCloseBtn", () => $("#previewEmbedHelp")?.classList.add("hidden"));
 onClick("#previewToggleFullscreenBtn", togglePreviewFullscreen);
 onClick("#previewBarFsBtn", togglePreviewFullscreen);
 onClick("#previewCopyUrlBtn", copyPreviewUrl);
